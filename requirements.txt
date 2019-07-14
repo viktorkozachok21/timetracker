@@ -1,0 +1,8 @@
+Django==2.2.3
+django-filebrowser-no-grappelli==3.7.8
+django-tinymce4-lite==1.7.5
+jsmin==2.2.2
+Pillow==6.0.0
+pyenchant==2.0.0
+pytz==2019.1
+sqlparse==0.3.0

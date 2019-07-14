@@ -1,0 +1,49 @@
+{% extends 'index.html' %}
+
+
+
+{% block project_list %}
+<div class="project-list">
+  {% for project in projects_list %}
+  <div class="card m-3 border border-info">
+  {% if worker in project.workers.all or user.is_superuser %}
+  <div class="task m-1 light-green lighten-2 row">
+  <div class="m-1 project col-8"><a href="{{ project.get_absolute_url }}" title="{{ project.project_name }}">{{ project.project_name }}</a></div>
+  <div class="m-1 col-1 ml-auto text-center"><i class="fas fa-lock-open" title="available"></i></div>
+  <div class="m-1 col-2 created_on ml-auto">{{ project.created_on }}</div>
+  {% else %}
+  <div class="task m-1 orange lighten-2 row">
+  <div class="m-1 project col-8">{{ project.project_name }}</div>
+  <div class="m-1 col-1 ml-auto text-center"><i class="fas fa-lock" title="unavailable"></i></div>
+  <div class="m-1 col-2 created_on ml-auto">{{ project.created_on }}</div>
+  {% endif %}
+  </div>
+  <div class="m-1 row">Workers: {{ project.workers.all|join:", " }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<nav class="font-weight-bold d-flex m-3 justify-content-center" aria-label="Page navigation example">
+  {% if projects_list.has_other_pages %}
+  <ul class="pagination pagination-circle pg-blue justify-content-center">
+    {% if projects_list.has_previous %}
+    <li class="page-item"><a href="?page={{ projects_list.previous_page_number }}"><span class="page-link">&laquo;</span></a></li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+    {% endif %}
+    {% for p in projects_list.paginator.page_range %}
+    {% if projects_list.number == p %}
+    <li class="page-item active"><span class="page-link" aria-hidden="true">{{ p }}<span class="sr-only">(current)</span></span></li>
+    {% else %}
+    <li class="page-item"><a class="page-link" href="?page={{ p }}">{{ p }}</a></li>
+    {% endif %}
+    {% endfor %}
+    {% if projects_list.has_next %}
+    <li class="page-item"><a class="page-link" href="?page={{ projects_list.next_page_number }}">&raquo;</a></li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+    {% endif %}
+    {% endif %}
+  </ul>
+</nav>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% for comment in comments %}
+<div class="row align-items-center grey p-1 m-3">
+  <div class="col-8 p-1 text-justify"><p>{{ comment.comments|safe }}</p></div>
+  <div class="col comment_block created_on">{{ comment.author }}</div>
+  <div class="col comment_block created_on">{{ comment.created_on }}</div>
+</div>
+{% endfor %}
