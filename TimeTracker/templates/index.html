@@ -34,7 +34,7 @@
       <ul class="navbar-nav ml-auto">
         {% if user.is_authenticated %}
         <li class="nav-item m-1 text-center">
-          <a class="nav-link p-1 teal lighten-4" href="#" data-toggle="modal" data-target="#fullHeightModalTop">My account</a>
+          <a class="nav-link p-1 teal lighten-4" id="account" href="#" data-toggle="modal" data-target="#fullHeightModalTop">My account</a>
         </li>
         <li class="nav-item m-1 text-center">
           <a class="nav-link p-1 teal lighten-4" href="{% url 'user_logout' %}">Log Out</a>
@@ -72,7 +72,7 @@
         </div>
         <div class="modal-body mx-3">
           <div class="md-form mb-5">
-            <i class="fas fa-envelope prefix grey-text"></i>
+            <i class="fas fa-user-astronaut prefix grey-text"></i>
             <input type="text" id="username" name="username" class="form-control validate" required="required">
             <label data-error="wrong" data-success="right" for="username">Your username</label>
           </div>
@@ -112,6 +112,8 @@
         <div class="row justify-content-center align-items-center">
           <span class="m-1">E-mail: {{ user.email }}</span>
         </div>
+        <div class="row justify-content-center align-items-center" id="messages-box">
+        </div>
       <div class="modal-footer justify-content-center mt-3">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
@@ -135,6 +137,39 @@
 
   <script src="{% static 'js/go-to-top.js' %}"></script>
 
+  <script type="text/javascript">
+  $(document).on("click", "#account", function() {
+        $.ajax({
+            type: 'GET',
+            url: '{% url "get_messages" %}',
+            data: {
+              'worker': $('#user_name').attr("alt"),
+            },
+            success: function(response) {
+              $("#messages-box").html(response.messages_html);
+          }
+        });
+    });
+  </script>
+
+  <script type="text/javascript">
+    $(document).on("click", ".fa-trash-alt", function() {
+            $.ajax({
+              type: 'POST',
+              url: "{% url 'to_trash' %}",
+              data: {
+                'worker': $('#user_name').attr("alt"),
+                'message': $(this).attr("alt"),
+                'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+              },
+              success: function(response) {
+                $("#messages-box").html(response.messages_html);
+            }
+          });
+        return false;
+      });
+  </script>
+
   {% block add_comment %}
   {% endblock %}
 
@@ -148,6 +183,15 @@
   {% endblock %}
 
   {% block end_task %}
+  {% endblock %}
+
+  {% block completed_task %}
+  {% endblock %}
+
+  {% block open_task %}
+  {% endblock %}
+
+  {% block get_time_logs %}
   {% endblock %}
 </body>
 

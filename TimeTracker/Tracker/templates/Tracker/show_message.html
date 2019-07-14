@@ -1,0 +1,13 @@
+{% extends 'index.html' %}
+
+
+
+{% block project_list %}
+<div class="text-justify cyan lighten-4 p-3">
+  {{ message.message|safe }}
+  <hr class="my-3">
+  <div class="row created_on">
+    <h5>{{ message.created_on }}</h5>
+  </div>
+</div>
+{% endblock %}

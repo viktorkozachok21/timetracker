@@ -6,15 +6,18 @@
   {% if worker in project.workers.all or user.is_superuser %}
   <h1>{{ project.project_name }}</h1>
   <hr class="my-3">
-  <div class="container z-depth-5 text-justify p-3 m-auto">{{ project.summary|safe }}</div>
+  <div class="container z-depth-5 text-justify cyan lighten-5 p-3 m-auto">{{ project.summary|safe }}</div>
   <div class="p-1 mt-3 grey">
     {% for task in task_list %}
     {% if not task.is_completed %}
     <div class="p-1 m-3 white">
       <div class="row align-items-center success-color-dark p-3 m-3">
-        <div class="col-6 p-3 warning-color">
+        <div class="col-6 p-3 created_on warning-color">
+          {% if user.is_superuser %}
+          <i class="far fa-window-close mr-5" title="close the task" alt="{{ task.id }}"></i>
+          {% endif %}
           <a title="{{ task.title }}" data-toggle="collapse" data-target="#summary{{ task.id }}">
-            <span>{{ task.title }}</span>
+            <span>{{ task.title }}{{ task.author }}</span>
           </a>
         </div>
       <div class="col-4">
@@ -39,7 +42,7 @@
         </div>
       </div>
       <div class="col-2 ml-auto created_on" title="estimated time">
-        <i class="far fa-clock">{{ task.estimated_time }}</i>
+        <i class="far fa-clock" alt="{{ task.id }}"> {{ task.estimated_time }}</i>
       </div>
       <div class="text-center col-12 m-1">
         <div id="summary{{ task.id }}" class="collapse">
@@ -69,9 +72,13 @@
     {% else %}
     <div class="p-1 m-3 white">
       <div class="row align-items-center  teal lighten-4 p-3 m-3">
-        <div class="col-12 p-3 unique-color">
+        <div class="col-12 p-3 created_on unique-color">
           <a title="completed" data-toggle="collapse" data-target="#summary{{ task.id }}">
-            <i class="far fa-calendar-check"></i> <span>{{ task.title }}</span>
+            {% if user.is_superuser %}
+            <i class="far fa-calendar-plus mr-5" alt="{{ task.id }}"></i><span>{{ task.title }}</span>
+            {% else %}
+            <i class="far fa-calendar-check mr-5"></i><span>{{ task.title }}</span>
+            {% endif %}
           </a>
         </div>
       <div class="text-center col-12 m-1">
@@ -118,9 +125,28 @@
     </div>
   </div>
 </div>
+
+
+<div class="modal fade right" id="timeLogForm" tabindex="-1" role="dialog" aria-labelledby="mytimeLogForm" aria-hidden="true">
+  <div class="modal-dialog modal-full-height modal-right" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title w-100" id="mytimeLogForm">Time logs</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row justify-content-center align-items-center" id="time-logs">
+        </div>
+      <div class="modal-footer justify-content-center mt-3">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
-
-
 
 {% block add_comment %}
 <script type="text/javascript">
@@ -189,11 +215,13 @@ $(document).on("click", ".more", function() {
             url: "{% url 'save_task' project.id %}",
             data: {
               'summary': $(id).html(),
+              'worker': $('#user_name').attr("alt"),
               'task': $(this).attr("alt"),
               'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
             },
             success: function(response) {
               $(id).html(`${response.task.summary}`);
+              $("#messages-box").html(response.task.messages_html);
           }
         });
       return false;
@@ -209,13 +237,13 @@ $(document).on("click", ".more", function() {
             type: 'POST',
             url: "{% url 'end_task' project.id %}",
             data: {
+              'worker': $('#user_name').attr("alt"),
               'task': end.attr("alt"),
               'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
             },
             success: function(response) {
               var status = "#task_status" + end.attr("alt");
               var worker = "#task_worker" + end.attr("alt");
-              console.log(status);
               $(status).html(`<i class="far fa-check-square" title="start" alt="${response.task.task}"></i>`).fadeIn(500);
               $(worker).html('Worker: the task is free');
           }
@@ -240,12 +268,68 @@ $(document).on("click", ".more", function() {
             success: function(response) {
               var status = "#task_status" + start.attr("alt");
               var worker = "#task_worker" + start.attr("alt");
-              console.log(status);
               $(status).html(`<i class="far fa-pause-circle" title="end" alt="${response.task.task}"></i>`).fadeIn(500);
               $(worker).html(`Worker: ${response.task.worker}`);
           }
         });
       return false;
     });
+</script>
+{% endblock %}
+
+{% block completed_task %}
+<script type="text/javascript">
+  $(document).on("click", ".fa-window-close", function() {
+        var start = $(this);
+          $.ajax({
+            type: 'POST',
+            url: "{% url 'completed_task' project.id %}",
+            data: {
+              'task': start.attr("alt"),
+              'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+            },
+            success: function(response) {
+              window.location.href = response.url;
+          }
+        });
+      });
+</script>
+{% endblock %}
+
+{% block open_task %}
+<script type="text/javascript">
+  $(document).on("click", ".fa-calendar-plus", function() {
+        var start = $(this);
+          $.ajax({
+            type: 'POST',
+            url: "{% url 'open_task' project.id %}",
+            data: {
+              'task': start.attr("alt"),
+              'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+            },
+            success: function(response) {
+              window.location.href = response.url;
+          }
+        });
+      });
+</script>
+{% endblock %}
+
+{% block get_time_logs %}
+<script type="text/javascript">
+$(document).on("click", ".fa-clock", function() {
+      var self = $(this);
+      $.ajax({
+          type: 'GET',
+          url: '{% url "get_time_logs" project.id %}',
+          data: {
+            'task': self.attr("alt")
+          },
+          success: function(response) {
+            $("#time-logs").html(response.timelogs_html);
+            $('#timeLogForm').modal('show');
+        }
+      });
+  });
 </script>
 {% endblock %}

@@ -1,0 +1,7 @@
+{% for message in messages %}
+<div class="row align-items-center green accent-1 p-1 m-3">
+  <div class="col-8 comment_block created_on"><a href="{% url 'show_message' message.id %}" class="show-message" alt="{{ message.id }}">{{ message.title }}</a></div>
+  <div class="col comment_block created_on red-text">{{ message.status }}</div>
+  <div class="col comment_block created_on" title="to trash"><i class="far fa-trash-alt" alt="{{ message.id }}"></i></div>
+</div>
+{% endfor %}
