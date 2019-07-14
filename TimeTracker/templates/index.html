@@ -15,7 +15,7 @@
 </head>
 
 <body>
-
+<button id="back-to-top-btn"><i class="fas fa-angle-double-up"></i></button>
 <header class="container-fluid">
   <nav class="navbar navbar-light amber fixed-top scrolling-navbar lighten-4 mb-4">
     <ul class="navbar-nav mr-auto nav-flex-icons m-1">
@@ -104,13 +104,13 @@
         <img src="{{ worker.avatar.url }}" class="rounded-circle z-depth-0 m-3" alt="avatar image" height="150">
         </div>
         <div class="row justify-content-center align-items-center">
-          <span class="m-3" id="user_name" alt="{{ worker.id }}">{{ worker.first_name }} {{ worker.last_name }}</span>
+          <span class="m-1" id="user_name" alt="{{ worker.id }}">{{ worker.last_name }} {{ worker.first_name }}</span>
         </div>
         <div class="row justify-content-center align-items-center">
-          <span class="m-3">{{ worker.get_post_display }}</span>
+          <span class="m-1">{{ worker.get_post_display }}</span>
         </div>
         <div class="row justify-content-center align-items-center">
-          <span class="m-3">E-mail: {{ user.email }}</span>
+          <span class="m-1">E-mail: {{ user.email }}</span>
         </div>
       <div class="modal-footer justify-content-center mt-3">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -120,11 +120,11 @@
   </div>
 </div>
 
-
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.5/js/mdb.min.js"></script>
+
   <script type="text/javascript">
     $(document).ready(function() {
       $('.first-button').on('click', function() {
@@ -132,15 +132,22 @@
       });
     });
   </script>
+
+  <script src="{% static 'js/go-to-top.js' %}"></script>
+
   {% block add_comment %}
   {% endblock %}
+
   {% block show_comments %}
   {% endblock %}
+
   {% block save_task %}
   {% endblock %}
-  {% block end_task %}
-  {% endblock %}
+
   {% block start_task %}
+  {% endblock %}
+
+  {% block end_task %}
   {% endblock %}
 </body>
 

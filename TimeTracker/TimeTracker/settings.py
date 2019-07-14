@@ -82,7 +82,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'test',
-        'HOST': 'mongodb+srv://admin:adin-123@cluster0-cyvxg.mongodb.net/test?retryWrites=true&w=majority',
+        'HOST': 'mongodb+srv://admin:admin-123@cluster0-cyvxg.mongodb.net/test?retryWrites=true&w=majority',
         'USER': 'admin',
         'PASSWORD': 'admin-123',
     }
@@ -106,7 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/

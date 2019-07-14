@@ -53,9 +53,6 @@ class Task(models.Model):
     date_of_end = models.DateField(null=True, blank=True)
     estimated_time = models.CharField(max_length=10, null=True, blank=True)
 
-    class Meta:
-        ordering = ["-date_of_start"]
-
     def __str__(self):
         return self.project.project_name + " ~ " + self.title
 

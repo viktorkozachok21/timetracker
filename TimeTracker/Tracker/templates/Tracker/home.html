@@ -3,25 +3,28 @@
 
 
 {% block project_list %}
-<div class="project-list">
   {% for project in projects_list %}
   <div class="card m-3 border border-info">
   {% if worker in project.workers.all or user.is_superuser %}
   <div class="task m-1 light-green lighten-2 row">
-  <div class="m-1 project col-8"><a href="{{ project.get_absolute_url }}" title="{{ project.project_name }}">{{ project.project_name }}</a></div>
-  <div class="m-1 col-1 ml-auto text-center"><i class="fas fa-lock-open" title="available"></i></div>
+  <div class="m-1 project col-8">
+    <a href="{{ project.get_absolute_url }}" title="{{ project.project_name }}">{{ project.project_name }}</a>
+  </div>
+  <div class="m-1 col-1 ml-auto text-center">
+    <i class="fas fa-lock-open" title="available"></i>
+  </div>
   <div class="m-1 col-2 created_on ml-auto">{{ project.created_on }}</div>
+  </div>
   {% else %}
   <div class="task m-1 orange lighten-2 row">
   <div class="m-1 project col-8">{{ project.project_name }}</div>
   <div class="m-1 col-1 ml-auto text-center"><i class="fas fa-lock" title="unavailable"></i></div>
   <div class="m-1 col-2 created_on ml-auto">{{ project.created_on }}</div>
-  {% endif %}
   </div>
+  {% endif %}
   <div class="m-1 row">Workers: {{ project.workers.all|join:", " }}</div>
   </div>
   {% endfor %}
-</div>
 
 <nav class="font-weight-bold d-flex m-3 justify-content-center" aria-label="Page navigation example">
   {% if projects_list.has_other_pages %}
