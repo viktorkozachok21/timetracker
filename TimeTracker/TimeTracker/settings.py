@@ -145,7 +145,7 @@ TINYMCE_DEFAULT_CONFIG = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Kiev'
 
 USE_I18N = True
 
@@ -184,7 +184,7 @@ STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static_cdn')
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'media_cdn')
 
 STATICFILES_DIRS = [
-    os.path.join(os.path.dirname(BASE_DIR), 'resource')
+    os.path.join(BASE_DIR, 'resource')
 ]
 
 SITE_ID = 1

@@ -8,7 +8,7 @@
   {% if worker in project.workers.all or user.is_superuser %}
   <div class="task m-1 light-green lighten-2 row">
   <div class="m-1 project col-8">
-    <a href="{% url 'project_detail' project.id %}" title="{{ project.project_name }}">{{ project.project_name }}</a>
+    <a class="project-detail" alt="{{ project.id }}" title="{{ project.project_name }}">{{ project.project_name }}</a>
   </div>
   <div class="m-1 col-1 ml-auto text-center">
     <i class="fas fa-lock-open" title="available"></i>

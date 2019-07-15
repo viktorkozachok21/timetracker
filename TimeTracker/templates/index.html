@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% load static %}
+{% load staticfiles %}
 <html lang="en">
 
 <head>
@@ -7,192 +7,389 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
+  <!-- bootstrap css -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.5/css/mdb.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <!-- end bootstrap css -->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
   <title>TimeTracker</title>
 </head>
 
 <body>
-<button id="back-to-top-btn"><i class="fas fa-angle-double-up"></i></button>
-<header class="container-fluid">
-  <nav class="navbar navbar-light amber fixed-top scrolling-navbar lighten-4 mb-4">
-    <ul class="navbar-nav mr-auto nav-flex-icons m-1">
-      <li class="nav-item avatar">
-        <a class="nav-link p-0" href="{% url 'home' %}">
-          {% if user.is_authenticated %}
-          <img src="{{ worker.avatar.url }}" class="rounded-circle z-depth-0" alt="avatar image" height="35">
-          {% endif %}
-        </a>
-      </li>
-    </ul>
-    <button class="navbar-toggler first-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent20" aria-controls="navbarSupportedContent20" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon1"><span></span><span></span><span></span></div>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent20">
-      <ul class="navbar-nav ml-auto">
-        {% if user.is_authenticated %}
-        <li class="nav-item m-1 text-center">
-          <a class="nav-link p-1 teal lighten-4" id="account" href="#" data-toggle="modal" data-target="#fullHeightModalTop">My account</a>
+  <!-- the back to top button -->
+  <button id="back-to-top-btn"><i class="fas fa-angle-double-up"></i></button>
+
+  <!-- header with navbar menu -->
+  <header class="container-fluid">
+    <nav class="navbar navbar-light amber fixed-top scrolling-navbar lighten-4 mb-4">
+      <ul class="navbar-nav mr-auto nav-flex-icons m-1">
+        <li class="nav-item avatar">
+          <a class="nav-link p-0" title="back to home">
+            {% if user.is_authenticated %}
+            <img src="{{ worker.avatar.url }}" class="rounded-circle z-depth-0" id="worker-avatar" alt="avatar image" height="35">
+            {% endif %}
+          </a>
         </li>
-        <li class="nav-item m-1 text-center">
-          <a class="nav-link p-1 teal lighten-4" href="{% url 'user_logout' %}">Log Out</a>
-        </li>
-        {% else %}
-        <li class="nav-item m-1 text-center">
-          <a class="nav-link p-1 teal lighten-4" href="#" data-toggle="modal" data-target="#modalLoginForm">Sign in</a>
-        </li>
-        {% endif %}
       </ul>
-    </div>
-  </nav>
+      <button class="navbar-toggler first-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent20" aria-controls="navbarSupportedContent20" aria-expanded="false" aria-label="Toggle navigation">
+        <div class="animated-icon1"><span></span><span></span><span></span></div>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent20">
+        <ul class="navbar-nav ml-auto">
+          {% if user.is_authenticated %}
+          <li class="nav-item m-1 text-center">
+            <a class="nav-link p-1 teal lighten-4" id="account" href="#" data-toggle="modal" data-target="#userViewForm">My account</a>
+          </li>
+          <li class="nav-item m-1 text-center">
+            <a class="nav-link p-1 teal lighten-4" href="{% url 'user_logout' %}">Log Out</a>
+          </li>
+          {% else %}
+          <li class="nav-item m-1 text-center">
+            <a class="nav-link p-1 teal lighten-4" href="#" data-toggle="modal" data-target="#modalLoginForm">Sign in</a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
   </header>
+  <!-- end header -->
 
+  <!-- the main block -->
+  <main class="container-fluid text-center" id="main-block">
+    <hr class="my-5">
+    <hr class="my-3">
+    {% block project_list %}
+    {% endblock %}
+    <hr class="my-3">
+  </main>
+  <!-- end main -->
 
+  <!-- modal form to login -->
+  <div class="modal fade" id="modalLoginForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form id="login-form" action="{% url 'user_login' %}" method="POST">
+          {% csrf_token %}
+          <div class="modal-header text-center">
+            <h4 class="modal-title w-100 font-weight-bold">Sign in</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body mx-3">
+            <div class="md-form mb-5">
+              <i class="fas fa-user-astronaut prefix grey-text"></i>
+              <input type="text" id="username" name="username" class="form-control validate" required="required">
+              <label data-error="wrong" data-success="right" for="username">Your username</label>
+            </div>
+            <div class="md-form mb-4">
+              <i class="fas fa-lock prefix grey-text"></i>
+              <input type="password" id="password" name="password" class="form-control validate" required="required">
+              <label data-error="wrong" data-success="right" for="password">Your password</label>
+            </div>
+          </div>
+          <div class="modal-footer d-flex justify-content-center">
+            <button type="submit" class="btn btn-default">Login</button>
+          </div>
+      </div>
+      </form>
+    </div>
+  </div>
+  <!-- end modal login -->
 
-<section class="container-fluid text-center">
-  <hr class="my-5">
-  <hr class="my-3">
-  {% block project_list %}
-  {% endblock %}
-  <hr class="my-3">
-</section>
-
-<div class="modal fade" id="modalLoginForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <form id="login-form" action="{% url 'user_login' %}" method="POST">
-        {% csrf_token %}
-        <div class="modal-header text-center">
-          <h4 class="modal-title w-100 font-weight-bold">Sign in</h4>
+  <!-- modal form to show information about active worker -->
+  <div class="modal fade right" id="userViewForm" tabindex="-1" role="dialog" aria-labelledby="myuserViewForm" aria-hidden="true">
+    <div class="modal-dialog modal-full-height modal-right" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title w-100" id="myuserViewForm">Profile</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body mx-3">
-          <div class="md-form mb-5">
-            <i class="fas fa-user-astronaut prefix grey-text"></i>
-            <input type="text" id="username" name="username" class="form-control validate" required="required">
-            <label data-error="wrong" data-success="right" for="username">Your username</label>
+        <div class="modal-body">
+          <div class="row justify-content-center align-items-center">
+            <img src="{{ worker.avatar.url }}" class="rounded-circle z-depth-0 m-3" alt="avatar image" height="150">
           </div>
-          <div class="md-form mb-4">
-            <i class="fas fa-lock prefix grey-text"></i>
-            <input type="password" id="password" name="password" class="form-control validate" required="required">
-            <label data-error="wrong" data-success="right" for="password">Your password</label>
+          <div class="row justify-content-center align-items-center">
+            <span class="m-1" id="user_name" alt="{{ worker.id }}">{{ worker.last_name }} {{ worker.first_name }}</span>
+          </div>
+          <div class="row justify-content-center align-items-center">
+            <span class="m-1">{{ worker.get_post_display }}</span>
+          </div>
+          <div class="row justify-content-center align-items-center">
+            <span class="m-1">E-mail: {{ user.email }}</span>
+          </div>
+          <div class="row justify-content-center align-items-center" id="messages-box">
+          </div>
+          <div class="modal-footer justify-content-center mt-3">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>
-        <div class="modal-footer d-flex justify-content-center">
-          <button type="submit" class="btn btn-default">Login</button>
-        </div>
-    </div>
-    </form>
-  </div>
-</div>
-
-<div class="modal fade right" id="fullHeightModalTop" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-full-height modal-right" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title w-100" id="myModalLabel">Profile</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="row justify-content-center align-items-center">
-        <img src="{{ worker.avatar.url }}" class="rounded-circle z-depth-0 m-3" alt="avatar image" height="150">
-        </div>
-        <div class="row justify-content-center align-items-center">
-          <span class="m-1" id="user_name" alt="{{ worker.id }}">{{ worker.last_name }} {{ worker.first_name }}</span>
-        </div>
-        <div class="row justify-content-center align-items-center">
-          <span class="m-1">{{ worker.get_post_display }}</span>
-        </div>
-        <div class="row justify-content-center align-items-center">
-          <span class="m-1">E-mail: {{ user.email }}</span>
-        </div>
-        <div class="row justify-content-center align-items-center" id="messages-box">
-        </div>
-      <div class="modal-footer justify-content-center mt-3">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
-    </div>
   </div>
-</div>
+  <!-- end worker form -->
 
+  <!-- bootstrap js -->
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.5/js/mdb.min.js"></script>
+  <!-- end bootstrap js -->
 
+  <!-- front js -->
+  <script type="text/javascript" src="{% static 'js/go-to-top.js' %}"></script>
   <script type="text/javascript">
-    $(document).ready(function() {
-      $('.first-button').on('click', function() {
-        $('.animated-icon1').toggleClass('open');
+
+  //show project detail
+  $(document).on("click", ".project-detail", function() {
+      var self = $(this);
+      $.ajax({
+          type: 'GET',
+          url: '{% url "project_detail" %}',
+          data: {
+            'project': self.attr("alt"),
+          },
+          success: function(response) {
+            $("#main-block").html(response.project_html);
+        }
       });
-    });
-  </script>
+  });
 
-  <script src="{% static 'js/go-to-top.js' %}"></script>
+  //back to home
+  $(document).on("click", "#worker-avatar", function() {
+      $.ajax({
+          type: 'GET',
+          url: '{% url "back_to_home" %}',
+          data: {},
+          success: function(response) {
+            $("#main-block").html(response.home_html);
+        }
+      });
+  });
 
-  <script type="text/javascript">
+  //hamburger button animation in menu
+  $(document).on("click", ".first-button", function() {
+    $('.animated-icon1').toggleClass('open');
+  });
+
+  //get_message for worker
   $(document).on("click", "#account", function() {
+    $.ajax({
+        type: 'GET',
+        url: '{% url "get_messages" %}',
+        data: {
+          'worker': $('#user_name').attr("alt"),
+        },
+        success: function(response) {
+          $("#messages-box").html(response.messages_html);
+      }
+    });
+  });
+
+  //show message
+  $(document).on("click", ".show-message", function() {
+    $.ajax({
+        type: 'GET',
+        url: '{% url "show_message" %}',
+        data: {
+          'worker': $('#user_name').attr("alt"),
+          'message': $(this).attr("alt"),
+        },
+        success: function(response) {
+          $("#main-block").html(response.message_html);
+          $("#userViewForm").modal('hide');
+      }
+    });
+  });
+
+  //mesage to_trash
+  $(document).on("click", ".fa-trash-alt", function() {
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'to_trash' %}",
+          data: {
+            'worker': $('#user_name').attr("alt"),
+            'message': $(this).attr("alt"),
+            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+          },
+          success: function(response) {
+            $("#messages-box").html(response.messages_html);
+        }
+      });
+    return false;
+  });
+
+  //show new comment form
+  $(document).on("click", ".fa-plus-square", function() {
+        $('#modalCommentForm').modal('show');
+        $('#hide').attr("title", this.id);
+      });
+
+  //add new comment
+  $(document).on("submit", "#comment-form", function(event) {
+      event.preventDefault();
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'add_comment' %}",
+          data: {
+            'comment': $('#comments').val(),
+            'author': $('#user_name').html(),
+            'task': $('#hide').attr("title"),
+            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+          },
+          success: function(response) {
+            var id = "#more" + $('#hide').attr("title");
+            $(id).html(response.comments_html);
+        }
+      });
+    resetForm();
+    return false;
+  });
+
+  //reset comment form
+  function resetForm() {
+    $('#comments').val('');
+    $('#modalCommentForm').modal('hide');
+  };
+
+  //show all comments for task
+  $(document).on("click", ".more", function() {
+        var self = $(this);
         $.ajax({
             type: 'GET',
-            url: '{% url "get_messages" %}',
+            url: '{% url "show_comments" %}',
             data: {
-              'worker': $('#user_name').attr("alt"),
+              'task': self.attr("alt")
             },
             success: function(response) {
-              $("#messages-box").html(response.messages_html);
+              var id = "#more" + self.attr("alt");
+              $(id).html(response.comments_html);
           }
         });
     });
-  </script>
 
-  <script type="text/javascript">
-    $(document).on("click", ".fa-trash-alt", function() {
-            $.ajax({
-              type: 'POST',
-              url: "{% url 'to_trash' %}",
-              data: {
-                'worker': $('#user_name').attr("alt"),
-                'message': $(this).attr("alt"),
-                'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-              },
-              success: function(response) {
-                $("#messages-box").html(response.messages_html);
-            }
-          });
-        return false;
+  //save changes of task summary
+  $(document).on("click", ".fa-save", function() {
+      var id = "#content" + $(this).attr("alt");
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'save_task' %}",
+          data: {
+            'summary': $(id).html(),
+            'worker': $('#user_name').attr("alt"),
+            'task': $(this).attr("alt"),
+            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+          },
+          success: function(response) {
+            $(id).html(`${response.task.summary}`);
+            $("#messages-box").html(response.task.messages_html);
+        }
       });
+    return false;
+  });
+
+  //end working on task
+  $(document).on("click", ".fa-pause-circle", function() {
+      var end = $(this);
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'end_task' %}",
+          data: {
+            'worker': $('#user_name').attr("alt"),
+            'task': end.attr("alt"),
+            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+          },
+          success: function(response) {
+            var status = "#task_status" + end.attr("alt");
+            var worker = "#task_worker" + end.attr("alt");
+            $(status).html(`<i class="far fa-check-square" title="start" alt="${response.task.task}"></i>`).fadeIn(500);
+            $(worker).html('Worker: the task is free');
+        }
+      });
+    return false;
+  });
+
+  //start working on task
+  $(document).on("click", ".fa-check-square", function() {
+      var start = $(this);
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'start_task' %}",
+          data: {
+            'worker': $('#user_name').attr("alt"),
+            'task': start.attr("alt"),
+            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+          },
+          success: function(response) {
+            var status = "#task_status" + start.attr("alt");
+            var worker = "#task_worker" + start.attr("alt");
+            $(status).html(`<i class="far fa-pause-circle" title="end" alt="${response.task.task}"></i>`).fadeIn(500);
+            $(worker).html(`Worker: ${response.task.worker}`);
+        }
+      });
+    return false;
+  });
+
+  //close task
+  $(document).on("click", ".fa-window-close", function() {
+    var start = $(this);
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'completed_task' %}",
+        data: {
+          'task': start.attr("alt"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var list = start.parent().parent().parent();
+          list.fadeOut(function(){
+            $("#task-content").append(response.task_block).fadeIn();
+            list.remove();
+          });
+      }
+    });
+  });
+
+  //open closed task
+  $(document).on("click", ".fa-calendar-plus", function() {
+    var start = $(this);
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'open_task' %}",
+        data: {
+          'task': start.attr("alt"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var list = start.parent().parent().parent();
+          list.fadeOut(function(){
+            $("#task-content").prepend(response.task_block).fadeIn();
+            list.remove();
+          });
+      }
+    });
+  });
+
+  //get timelogs for task
+  $(document).on("click", ".fa-user-clock", function() {
+      var self = $(this);
+      $.ajax({
+          type: 'GET',
+          url: '{% url "get_time_logs" %}',
+          data: {
+            'task': self.attr("alt")
+          },
+          success: function(response) {
+            $("#time-logs").html(response.timelogs_html);
+            $('#timeLogForm').modal('show');
+        }
+      });
+  });
   </script>
+  <!-- end front -->
 
-  {% block add_comment %}
-  {% endblock %}
-
-  {% block show_comments %}
-  {% endblock %}
-
-  {% block save_task %}
-  {% endblock %}
-
-  {% block start_task %}
-  {% endblock %}
-
-  {% block end_task %}
-  {% endblock %}
-
-  {% block completed_task %}
-  {% endblock %}
-
-  {% block open_task %}
-  {% endblock %}
-
-  {% block get_time_logs %}
-  {% endblock %}
 </body>
-
 </html>

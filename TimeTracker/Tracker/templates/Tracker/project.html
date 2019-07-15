@@ -1,18 +1,18 @@
-{% extends 'index.html' %}
+<hr class="my-5">
+<hr class="my-3">
 
-
-
-{% block project_list %}
   {% if worker in project.workers.all or user.is_superuser %}
   <h1>{{ project.project_name }}</h1>
   <hr class="my-3">
   <div class="container z-depth-5 text-justify cyan lighten-5 p-3 m-auto">{{ project.summary|safe }}</div>
-  <div class="p-1 mt-3 grey">
+  <!-- task block -->
+  <div class="p-1 mt-3 grey" id="task-content">
     {% for task in task_list %}
     {% if not task.is_completed %}
+    <!-- if task is not completed -->
     <div class="p-1 m-3 white">
       <div class="row align-items-center success-color-dark p-3 m-3">
-        <div class="col-6 p-3 created_on warning-color">
+        <div class="col-8 p-3 created_on warning-color">
           {% if user.is_superuser %}
           <i class="far fa-window-close mr-5" title="close the task" alt="{{ task.id }}"></i>
           {% endif %}
@@ -20,29 +20,30 @@
             <span>{{ task.title }}</span>
           </a>
         </div>
-      <div class="col-4">
+      <div class="col-2 created_on">
         <div class="row">
-          <div class="col"><i class="fas fa-sync more" alt="{{ task.id }}" title="synchronize"></i></div>
+          <div class="m-1 p-1"><i class="fas fa-sync more" alt="{{ task.id }}" title="synchronize"></i></div>
           {% if not task.is_active %}
-          <div class="col task_status" id="task_status{{ task.id }}">
+          <div class="m-1 p-1 task_status" id="task_status{{ task.id }}">
             <i class="far fa-check-square" title="start" alt="{{ task.id }}"></i>
           </div>
           {% elif worker == task.worker %}
-          <div class="col task_status" id="task_status{{ task.id }}">
+          <div class="m-1 p-1 task_status" id="task_status{{ task.id }}">
             <i class="far fa-pause-circle" title="end" alt="{{ task.id }}"></i>
           </div>
           {% else %}
-          <div class="col task_status">
+          <div class="m-1 p-1 task_status">
             <i class="fas fa-lock" title="active"></i>
           </div>
           {% endif %}
-          <div class="col">
-            <i class="far fa-plus-square" id="{{ task.id }}" title="add comment"></i>
+          <div class="m-1 p-1">
+            <i class="far fa-plus-square" id="{{ task.id }}" onclock="addComment()" title="add comment"></i>
           </div>
         </div>
       </div>
-      <div class="col-2 ml-auto created_on" title="estimated time">
-        <i class="far fa-clock" alt="{{ task.id }}"> {{ task.estimated_time }}</i>
+      <div class="col-2 ml-auto created_on">
+        <i class="fas m-1 fa-user-clock" title="spend time" alt="{{ task.id }}"> {{ task.spend_time }}</i>
+        <i class="fas m-1 fa-clock" title="estimated time"> {{ task.estimated_time }}</i>
       </div>
       <div class="text-center col-12 m-1">
         <div id="summary{{ task.id }}" class="collapse">
@@ -68,18 +69,19 @@
       <div class="silver border border-warning p-1 m-2 text-center" id="more{{ task.id }}">
           <h5>To load the comments, just click on the sync button</h5>
       </div>
-      </div>
+    </div>
+    <!-- end is not completed -->
     {% else %}
+    <!-- if task is completed -->
     <div class="p-1 m-3 white">
       <div class="row align-items-center  teal lighten-4 p-3 m-3">
         <div class="col-12 p-3 created_on unique-color">
-          <a title="completed" data-toggle="collapse" data-target="#summary{{ task.id }}">
-            {% if user.is_superuser %}
-            <i class="far fa-calendar-plus mr-5" alt="{{ task.id }}"></i><span>{{ task.title }}</span>
-            {% else %}
-            <i class="far fa-calendar-check mr-5"></i><span>{{ task.title }}</span>
-            {% endif %}
-          </a>
+          {% if user.is_superuser %}
+          <i class="far fa-calendar-plus mr-5" title="open the task" alt="{{ task.id }}"></i>
+          {% else %}
+          <i class="far fa-calendar-check mr-5"></i>
+          {% endif %}
+          <a title="completed" data-toggle="collapse" data-target="#summary{{ task.id }}"><span>{{ task.title }}</span></a>
         </div>
       <div class="text-center col-12 m-1">
         <div id="summary{{ task.id }}" class="collapse">
@@ -95,11 +97,15 @@
       </div>
     </div>
     </div>
+    <!-- end is completed -->
     {% endif %}
     {% endfor %}
   </div>
+  <!-- end task block -->
   {% endif %}
 
+
+<!-- modal form to add a new comment for task -->
 <div class="modal fade" id="modalCommentForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -125,8 +131,9 @@
     </div>
   </div>
 </div>
+<!-- endform -->
 
-
+<!-- modal form to show timelogs of task -->
 <div class="modal fade right" id="timeLogForm" tabindex="-1" role="dialog" aria-labelledby="mytimeLogForm" aria-hidden="true">
   <div class="modal-dialog modal-full-height modal-right" role="document">
     <div class="modal-content">
@@ -146,190 +153,6 @@
     </div>
   </div>
 </div>
-{% endblock %}
+<!-- endform -->
 
-{% block add_comment %}
-<script type="text/javascript">
-  $(document).ready(function(){
-      $(".fa-plus-square").click(function(){
-        $('#modalCommentForm').modal('show');
-        $('#hide').attr("title", this.id);
-      });
-  });
-</script>
-<script type="text/javascript">
-  $(document).ready(function() {
-    $('#comment-form').submit(function(event) {
-    event.preventDefault();
-    $.ajax({
-      type: 'POST',
-      url: "{% url 'add_comment' project.id %}",
-      data: {
-        'comment': $('#comments').val(),
-        'author': $('#user_name').html(),
-        'task': $('#hide').attr("title"),
-        'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-      },
-      success: function(response) {
-        var id = "#more" + $('#hide').attr("title");
-        $(id).html(response.comments_html);
-    }
-    });
-    resetForm();
-    return false;
-  });
-  });
-
-  function resetForm() {
-    $('#comments').val('');
-    $('#modalCommentForm').modal('hide');
-  };
-</script>
-{% endblock %}
-
-{% block show_comments %}
-<script type="text/javascript">
-$(document).on("click", ".more", function() {
-      var self = $(this);
-      $.ajax({
-          type: 'GET',
-          url: '{% url "show_comments" project.id %}',
-          data: {
-            'task': self.attr("alt")
-          },
-          success: function(response) {
-            var id = "#more" + self.attr("alt");
-            $(id).html(response.comments_html);
-        }
-      });
-  });
-</script>
-{% endblock %}
-
-{% block save_task %}
-<script type="text/javascript">
-  $(document).on("click", ".fa-save", function() {
-        var id = "#content" + $(this).attr("alt");
-          $.ajax({
-            type: 'POST',
-            url: "{% url 'save_task' project.id %}",
-            data: {
-              'summary': $(id).html(),
-              'worker': $('#user_name').attr("alt"),
-              'task': $(this).attr("alt"),
-              'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-            },
-            success: function(response) {
-              $(id).html(`${response.task.summary}`);
-              $("#messages-box").html(response.task.messages_html);
-          }
-        });
-      return false;
-    });
-</script>
-{% endblock %}
-
-{% block end_task %}
-<script type="text/javascript">
-  $(document).on("click", ".fa-pause-circle", function() {
-        var end = $(this);
-          $.ajax({
-            type: 'POST',
-            url: "{% url 'end_task' project.id %}",
-            data: {
-              'worker': $('#user_name').attr("alt"),
-              'task': end.attr("alt"),
-              'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-            },
-            success: function(response) {
-              var status = "#task_status" + end.attr("alt");
-              var worker = "#task_worker" + end.attr("alt");
-              $(status).html(`<i class="far fa-check-square" title="start" alt="${response.task.task}"></i>`).fadeIn(500);
-              $(worker).html('Worker: the task is free');
-          }
-        });
-      return false;
-    });
-</script>
-{% endblock %}
-
-{% block start_task %}
-<script type="text/javascript">
-  $(document).on("click", ".fa-check-square", function() {
-        var start = $(this);
-          $.ajax({
-            type: 'POST',
-            url: "{% url 'start_task' project.id %}",
-            data: {
-              'worker': $('#user_name').attr("alt"),
-              'task': start.attr("alt"),
-              'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-            },
-            success: function(response) {
-              var status = "#task_status" + start.attr("alt");
-              var worker = "#task_worker" + start.attr("alt");
-              $(status).html(`<i class="far fa-pause-circle" title="end" alt="${response.task.task}"></i>`).fadeIn(500);
-              $(worker).html(`Worker: ${response.task.worker}`);
-          }
-        });
-      return false;
-    });
-</script>
-{% endblock %}
-
-{% block completed_task %}
-<script type="text/javascript">
-  $(document).on("click", ".fa-window-close", function() {
-        var start = $(this);
-          $.ajax({
-            type: 'POST',
-            url: "{% url 'completed_task' project.id %}",
-            data: {
-              'task': start.attr("alt"),
-              'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-            },
-            success: function(response) {
-              window.location.href = response.url;
-          }
-        });
-      });
-</script>
-{% endblock %}
-
-{% block open_task %}
-<script type="text/javascript">
-  $(document).on("click", ".fa-calendar-plus", function() {
-        var start = $(this);
-          $.ajax({
-            type: 'POST',
-            url: "{% url 'open_task' project.id %}",
-            data: {
-              'task': start.attr("alt"),
-              'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-            },
-            success: function(response) {
-              window.location.href = response.url;
-          }
-        });
-      });
-</script>
-{% endblock %}
-
-{% block get_time_logs %}
-<script type="text/javascript">
-$(document).on("click", ".fa-clock", function() {
-      var self = $(this);
-      $.ajax({
-          type: 'GET',
-          url: '{% url "get_time_logs" project.id %}',
-          data: {
-            'task': self.attr("alt")
-          },
-          success: function(response) {
-            $("#time-logs").html(response.timelogs_html);
-            $('#timeLogForm').modal('show');
-        }
-      });
-  });
-</script>
-{% endblock %}
+<hr class="my-3">

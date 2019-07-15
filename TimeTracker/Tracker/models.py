@@ -50,6 +50,7 @@ class Task(models.Model):
     date_of_start = models.DateTimeField(auto_now_add=True)
     date_of_end = models.DateTimeField(null=True, blank=True)
     estimated_time = models.CharField(max_length=10, default="24:00:00")
+    spend_time = models.CharField(max_length=10, default="00:00:00")
 
     class Meta:
         ordering = ["-date_of_start"]
@@ -62,7 +63,11 @@ class Task(models.Model):
     def open(self):
         self.date_of_start = datetime.now()
         self.is_completed = False
-        self.estimated_time = "10:00:00"
+        self.estimated_time = "20:00:00"
+        self.save()
+
+    def spent(self, new_time):
+        self.spend_time = new_time
         self.save()
 
     def __str__(self):
@@ -116,6 +121,7 @@ class TimeLog(models.Model):
     task = models.ForeignKey('Task', on_delete=models.SET_NULL, null=True, blank=True)
     start_comment = models.TextField()
     end_comment = models.TextField()
+    is_completed = models.BooleanField()
 
     class Meta:
         ordering = ["-time_of_start"]
