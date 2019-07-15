@@ -3,6 +3,8 @@ from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from .models import *
 
+from django.db.models import Sum
+
 import json
 from datetime import datetime
 from django.template import loader
@@ -63,7 +65,7 @@ def project_detail(request):
         worker = get_object_or_404(Worker, user=request.user)
         project = get_object_or_404(Project, id=project_key)
 
-        task_list = Task.objects.all().filter(project=project).order_by("is_completed")
+        task_list = Task.objects.all().filter(project=project)
 
         project_html = loader.render_to_string(
                 'Tracker/project.html',
@@ -196,33 +198,49 @@ def end_task(request):
         task = get_object_or_404(Task, id=task_key)
         worker = get_object_or_404(Worker, id=worker_key)
 
+        timelog = TimeLog.objects.filter(task=task, worker=worker)[0]
+
+        comment = worker.last_name + " " + worker.first_name + " finished working!"
+        timelog.end_comment = comment
+        timelog.get_end()
+
         timelog_list = TimeLog.objects.filter(task=task, is_completed=True)
 
-        hour, minute, second = "", "", ""
+        hour, minute, second = 0, 0, 0
 
         for log in timelog_list:
             hour += log.spend_time.hour
             minute += log.spend_time.minute
             second += log.spend_time.second
 
-        duration_time = str(hour) + ":" + str(minute) + ":" + str(second)
+        if hour < 10:
+            hours = "0" + str(hour)
+        else:
+            hours = str(hour)
 
-        task.spend_time = duration_time
+        if minute < 10:
+            minutes = "0" + str(minute)
+        else:
+            minutes = str(minute)
+
+        if second < 10:
+            seconds = "0" + str(second)
+        else:
+            seconds = str(second)
+
+        start_time = hours + ":" + minutes + ":" + seconds
+
+        task.spend_time = start_time
         task.worker = None
         task.is_active = False
         task.save()
 
-        timelog = TimeLog.objects.filter(task=task, worker=worker).order_by('-id')[0]
-
-        comment = worker.last_name + " " + worker.first_name + " finished working!"
-        timelog.end_comment = comment
-        timelog.get_end()
-
-        changed_task = {
+        context = {
             'task': task.id,
+            'spend_time': task.spend_time
         }
 
-        return JsonResponse({"task":changed_task}, status=200)
+        return JsonResponse({"context":context}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def completed_task(request):
@@ -299,7 +317,7 @@ def to_trash(request):
 
         messages_html = loader.render_to_string(
             'Tracker/content.html',
-            {'messages': messages}
+            {'message_list': messages}
         )
 
         return JsonResponse({"messages_html": messages_html}, status=200)
@@ -312,6 +330,7 @@ def show_message(request):
         worker = get_object_or_404(Worker, id=worker_key)
         message = get_object_or_404(Message, id=message_key, receiver=worker)
 
+        message.read()
 
         message_html = loader.render_to_string(
             'Tracker/content.html',

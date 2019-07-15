@@ -3,7 +3,7 @@ from tinymce import HTMLField
 from django.urls import reverse
 from django_currentuser.db.models import CurrentUserField
 from django.contrib.auth.models import User
-from datetime import datetime
+from datetime import datetime, timedelta
 import uuid
 
 
@@ -53,10 +53,13 @@ class Task(models.Model):
     spend_time = models.CharField(max_length=10, default="00:00:00")
 
     class Meta:
-        ordering = ["-date_of_start"]
+        ordering = ["-date_of_start", "is_completed"]
 
     def complete(self):
+        self.date_of_start = datetime.now() - timedelta(days=7)
         self.date_of_end = datetime.now()
+        self.worker = None
+        self.is_active = False
         self.is_completed = True
         self.save()
 
@@ -133,6 +136,7 @@ class TimeLog(models.Model):
         second = self.time_of_end.second - self.time_of_start.second
         duration_time = str(hour) + ":" + str(minute) + ":" + str(second)
         self.spend_time = duration_time
+        self.is_completed = True
         self.save()
 
     def __str__(self):
@@ -152,3 +156,7 @@ class Message(models.Model):
 
     def __str__(self):
         return self.title
+
+    def read(self):
+        self.status = ""
+        self.save()

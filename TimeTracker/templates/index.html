@@ -205,7 +205,7 @@
     });
   });
 
-  //mesage to_trash
+  //message to_trash
   $(document).on("click", ".fa-trash-alt", function() {
         $.ajax({
           type: 'POST',
@@ -305,8 +305,10 @@
           success: function(response) {
             var status = "#task_status" + end.attr("alt");
             var worker = "#task_worker" + end.attr("alt");
-            $(status).html(`<i class="far fa-check-square" title="start" alt="${response.task.task}"></i>`).fadeIn(500);
+            var time = "#spendtime" + end.attr("alt");
+            $(status).html(`<i class="far fa-check-square" title="start" alt="${response.context.task}"></i>`).fadeIn(500);
             $(worker).html('Worker: the task is free');
+            $(time).html(` ${response.context.spend_time}`);
         }
       });
     return false;

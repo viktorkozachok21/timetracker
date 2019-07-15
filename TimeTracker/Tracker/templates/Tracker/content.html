@@ -79,12 +79,12 @@
       </div>
       {% endif %}
       <div class="m-1 p-1">
-        <i class="far fa-plus-square" id="{{ task.id }}" onclock="addComment()" title="add comment"></i>
+        <i class="far fa-plus-square" id="{{ task.id }}" title="add comment"></i>
       </div>
     </div>
   </div>
   <div class="col-2 ml-auto created_on">
-    <i class="fas m-1 fa-user-clock" title="spend time" alt="{{ task.id }}"> {{ task.spend_time }}</i>
+    <i class="fas m-1 fa-user-clock" title="spend time" alt="{{ task.id }}" id="spendtime{{ task.id }}"> {{ task.spend_time }}</i>
     <i class="fas m-1 fa-clock" title="estimated time"> {{ task.estimated_time }}</i>
   </div>
   <div class="text-center col-12 m-1">
@@ -109,7 +109,7 @@
   </div>
 </div>
   <div class="silver border border-warning p-1 m-2 text-center" id="more{{ task.id }}">
-      <h5>To load the comments, just click on the sync button</h5>
+      <h5>To load comments, just click on the sync button</h5>
   </div>
 </div>
 {% endif %}
@@ -119,7 +119,7 @@
   <div class="row align-items-center teal lighten-4 p-3 m-3">
     <div class="col-12 p-3 created_on unique-color">
       {% if user.is_superuser %}
-      <i class="far fa-calendar-plus mr-5" title="open the task" alt="{{ task.id }}"></i>
+      <i class="far fa-calendar-plus mr-5" title="open the task again" alt="{{ task.id }}"></i>
       {% else %}
       <i class="far fa-calendar-check mr-5"></i>
       {% endif %}
