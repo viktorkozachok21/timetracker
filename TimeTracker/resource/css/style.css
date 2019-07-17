@@ -45,7 +45,7 @@ body {
   background-color: rgba(65, 163, 41, 0.5);
 }
 
-#id_post, #id_date_of_birth {
+#id_post, #id_date_of_birth, #id_priority_of_task, #id_type_of_task {
   cursor: pointer;
 }
 
@@ -188,7 +188,7 @@ input {
   min-width: 100%;
 }
 
-.fa-plus-circle {
+.fa-plus-circle, .fa-user-edit {
   font-size: 2em !important;
 }
 

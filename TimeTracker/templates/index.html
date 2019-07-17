@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.5/css/mdb.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <!-- end bootstrap css -->
   <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
 
@@ -130,6 +130,7 @@
   </div>
   <!-- end modal new project -->
 
+
   <!-- modal form add new task -->
   <div class="modal fade card" id="newTaskForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog form-dialog">
@@ -146,7 +147,7 @@
           <div class="row teal lighten-2 m-1">
             <div class="col-12">
               <div class="md-form">
-                <i class="fas fa-user-tie mr-2" title="username"></i>
+                <i class="fas fa-user-tag mr-2" title="task title"></i>
                 {{ task_form.title }}
               </div>
             </div>
@@ -154,27 +155,32 @@
           <div class="row teal lighten-2 m-1">
             <div class="col-md-12">
               <div class="md-form">
-                <i class="fas fa-key mr-2" title="password"></i>
                 {{ task_form.description|safe }}
               </div>
             </div>
           </div>
           <div class="row teal lighten-2 m-1">
             <div class="col-md-4">
-              <div class="md-form">
-                <i class="fas fa-user-tag mr-2" title="first name"></i>
+              <div class="md-form input-group created_on">
+                  <div class="input-group-addon m-1">
+                    <span class="input-group-text"></i>Task priority</span>
+                  </div>
                 {{ task_form.priority_of_task }}
               </div>
             </div>
             <div class="col-md-4">
-              <div class="md-form">
-                <i class="fas fa-user-tag mr-2" title="last name"></i>
+              <div class="md-form input-group created_on">
+                  <div class="input-group-addon m-1">
+                    <span class="input-group-text"></i>Task type</span>
+                  </div>
                 {{ task_form.type_of_task }}
               </div>
             </div>
             <div class="col-md-4">
-              <div class="md-form">
-                <i class="fas fa-user-tag mr-2" title="last name"></i>
+              <div class="md-form input-group created_on">
+                  <div class="input-group-addon m-1">
+                    <span class="input-group-text"></i>Estimated time</span>
+                  </div>
                 {{ task_form.estimated_time }}
               </div>
             </div>
@@ -245,11 +251,13 @@
               </div>
             </div>
           </div>
-          <div class="md-form teal lighten-2 input-group m-3 mr-3">
+          <div class="row teal lighten-2 m-3 mr-3">
+            <div class="col-md-12 md-form input-group">
             <div class="input-group-addon">
               <span class="input-group-text"><i class="fas fa-user-circle mr-2" title="post"></i>Post: </span>
             </div>
             {{ worker_form.post }}
+          </div>
           </div>
       </div>
       <div class="modal-footer created_on">
@@ -335,18 +343,19 @@
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.5/js/mdb.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <!-- end bootstrap js -->
 
   <script type="text/javascript">
     $(function() {
         $('.picker').datepicker({
-          format: "dd.mm.yyyy",
+          dateFormat: 'dd.mm.yy',
+          minDate: '01.01.1930',
+          maxDate: '0',
           container:'#new-worker',
           autoclose: true,
           changeMonth: true,
-          changeYear: true,
-          yearRange: "1950:2019"
+          changeYear: true
         });
       });
   </script>
@@ -372,7 +381,6 @@
           },
           success: function(response) {
             $("#main-block").html(response.project_html);
-            smoothScrollBackToTop();
         }
       });
   });
@@ -385,7 +393,6 @@
           data: {},
           success: function(response) {
             $("#main-block").html(response.home_html);
-            smoothScrollBackToTop();
         }
       });
   });
@@ -412,7 +419,6 @@
           success: function(response) {
             $("#new-worker-form")[0].reset();
             $("#newWorkerForm").modal('hide');
-            $("#id_date_of_birth").removeClass("datepicker").addClass("datepicker");
         }
       });
     return false;
@@ -421,7 +427,6 @@
   //add new project
   $(document).on("submit", "#new-project-form", function(event) {
     event.preventDefault();
-    tinyMCE.activeEditor.getContent();
         $.ajax({
           type: 'POST',
           url: "{% url 'add_project' %}",
@@ -429,6 +434,33 @@
           success: function(response) {
             $("#new-project-form")[0].reset();
             $("#newProjectForm").modal('hide');
+            $(".worker-avatar").click();
+        }
+      });
+    return false;
+  });
+
+  //show workers change form
+  $(document).on("click", ".fa-user-edit", function() {
+        var self = $(this);
+        $("#new-project-workers").attr("alt", $(this).attr("alt"));
+        $("#newProjectWorkersForm").modal("show");
+    });
+
+  //changes workers for project
+  $(document).on("submit", "#new-project-workers-form", function(event) {
+      event.preventDefault();
+      var formData = $(this).serializeArray();
+      formData.push({name: 'project', value: $('#new-project-workers').attr('alt')});
+      formData.push({name: 'csrfmiddlewaretoken', value: $("input[name=csrfmiddlewaretoken]").val()});
+      console.log(formData);
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'change_workers' %}",
+          data: formData,
+          success: function(response) {
+            $("#new-project-workers-form")[0].reset();
+            $("#newProjectWorkersForm").modal('hide');
             $(".worker-avatar").click();
         }
       });
@@ -479,7 +511,6 @@
         success: function(response) {
           $("#main-block").html(response.message_html);
           $("#userViewForm").modal('hide');
-          smoothScrollBackToTop();
       }
     });
   });
@@ -506,6 +537,7 @@
         $('#modalCommentForm').modal('show');
         $('#hide').attr("title", this.id);
       });
+
 
   //add new comment
   $(document).on("submit", "#comment-form", function(event) {
@@ -665,7 +697,7 @@
           'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
         },
         success: function(response) {
-          var list = start.parent().parent().parent();
+          var list = start.parent().parent().parent().parent().parent();
           list.fadeOut(function(){
             list.remove();
           });
@@ -703,7 +735,7 @@
           'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
         },
         success: function(response) {
-          var list = start.parent().parent().parent();
+          var list = start.parent().parent().parent().parent().parent();
           list.fadeOut(function(){
             $("#task-content").prepend(response.task_block).fadeIn();
             list.remove();

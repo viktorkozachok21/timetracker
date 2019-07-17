@@ -55,13 +55,13 @@ def worker_register(request):
         if user_form.is_valid() and worker_form.is_valid():
             first_name = request.POST['first_name']
             last_name = request.POST['last_name']
-            user = user_form.save(commit=False)
+            user = user_form.save()
             user.set_password(user.password)
             user.first_name = first_name
             user.last_name = last_name
             user.save()
 
-            worker = worker_form.save(commit=False)
+            worker = worker_form.save()
             worker.user = user
             worker.save()
 
@@ -77,7 +77,7 @@ def add_project(request):
     if request.method == "POST" and request.is_ajax:
         project_form = ProjectForm(request.POST)
         if project_form.is_valid():
-            project = project_form.save(commit=False)
+            project = project_form.save()
             project.save()
 
             worker_list = request.POST.getlist('workers')
@@ -92,17 +92,41 @@ def add_project(request):
         return JsonResponse({"success":False}, status=400)
     return JsonResponse({"success":False}, status=400)
 
+def change_workers(request):
+    if request.method == "POST" and request.is_ajax:
+        project_workers_form = ProjectWorkersForm(request.POST)
+        if project_workers_form.is_valid():
+            project_key = request.POST['project']
+            project = get_object_or_404(Project, id=project_key)
+
+            worker_list = request.POST.getlist('workers')
+            project.workers.remove(*project.workers.all())
+
+            for people in worker_list:
+                project.workers.add(people)
+            project.save()
+
+            project_workers_form = ProjectWorkersForm()
+
+            return JsonResponse({"success":True}, status=200)
+
+        return JsonResponse({"success":False}, status=400)
+    return JsonResponse({"success":False}, status=400)
+
 def add_task(request):
     if request.method == "POST" and request.is_ajax:
         task_form = TaskForm(request.POST)
         if task_form.is_valid():
-            task = task_form.save(commit=False)
+            task = task_form.save()
             project_key = request.POST['project']
             project = get_object_or_404(Project, id=project_key)
 
             task.project = project
+            task.spend_time = "00:00:00"
+            task.is_active = False
+            task.is_completed = False
             task.save()
-            print("yeah")
+
             worker = get_object_or_404(Worker, user=request.user)
 
             task_block = loader.render_to_string(
@@ -141,11 +165,13 @@ def project_detail(request):
         worker = get_object_or_404(Worker, user=request.user)
         project = get_object_or_404(Project, id=project_key)
 
+        project_workers_form = ProjectWorkersForm()
+
         task_list = Task.objects.all().filter(project=project)
 
         project_html = loader.render_to_string(
                 'Tracker/project.html',
-                {'project': project, 'worker': worker, 'task_list': task_list, 'user': request.user}
+                {'project': project, 'worker': worker, 'project_workers_form': project_workers_form, 'task_list': task_list, 'user': request.user}
             )
 
         return JsonResponse({"project_html": project_html}, status=200)

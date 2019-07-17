@@ -51,18 +51,18 @@
 {% endfor %}
 {% endif %}
 
-{% if task.is_completed == False %}
+{% if task and task.is_completed == False %}
 <div class="p-1 m-3 white">
   <div class="row align-items-center success-color-dark p-3 m-3">
-    <div class="col-8 p-3 created_on warning-color">
-      {% if user.is_superuser %}
-      <i class="far fa-window-close mr-5" title="close the task" alt="{{ task.id }}"></i>
-      {% endif %}
+    <div class="col-6 p-3 created_on warning-color">
       <a title="{{ task.title }}" data-toggle="collapse" data-target="#summary{{ task.id }}">
         <span>{{ task.title }}</span>
       </a>
     </div>
-  <div class="col-2 created_on">
+  <div class="col-4 created_on">
+    {% if user.is_superuser %}
+    <i class="far fa-window-close mr-5 p-2" title="close the task" alt="{{ task.id }}"></i>
+    {% endif %}
     <div class="row">
       <div class="p-2 col-xs-12 col-sm-4"><i class="fas fa-sync more" alt="{{ task.id }}" title="synchronize"></i></div>
       {% if not task.is_active %}
@@ -116,35 +116,36 @@
 </div>
 {% endif %}
 
-{% if project.is_completed == True %}
+{% if project and project.is_completed == True %}
 <div class="card m-3 border border-warning">
   <div class="task m-1 teal lighten-4 row">
-  <div class="m-1 project col-8">
-    {% if user.is_superuser %}
-    <i class="fas fa-external-link-alt mr-5" title="open the project again" alt="{{ project.id }}"></i>
-    {% endif %}
+  <div class="m-1 project col-7">
     <span title="{{ project.project_name }}">{{ project.project_name }}</span>
-    {% if user.is_superuser %}
-    <i class="fas fa-minus-square ml-5" title="to trash" alt="{{ project.id }}"></i>
-    {% endif %}
   </div>
-  <div class="m-1 col-1 ml-auto text-center"><i class="fas fa-lock" title="unavailable"></i></div>
+  <div class="m-1 col-2 ml-auto text-center">
+    {% if user.is_superuser %}
+    <i class="fas fa-external-link-alt m-1" title="open the project again" alt="{{ project.id }}"></i>
+    <i class="fas fa-minus-square m-1" title="to trash" alt="{{ project.id }}"></i>
+    {% endif %}
+    <i class="fas fa-lock m-1" title="unavailable"></i>
+  </div>
   <div class="m-1 col-2 created_on ml-auto" title="end date">{{ project.date_of_end }}</div>
   </div>
 </div>
 {% endif %}
 
-{% if project.is_completed == False %}
+{% if project and project.is_completed == False %}
 <div class="card m-3 border border-info">
     <div class="task m-1 light-green lighten-2 row">
-    <div class="m-1 project col-8">
-      {% if user.is_superuser %}
-      <i class="fas fa-times mr-5" title="close the task" alt="{{ project.id }}"></i>
-      {% endif %}
-      <a class="project-detail" alt="{{ project.id }}" title="{{ project.project_name }}">{{ project.project_name }}</a>
-    </div>
-    <div class="m-1 col-1 ml-auto text-center">
-      <i class="fas fa-lock-open" title="available"></i>
+      <div class="m-1 project col-7">
+        <a class="project-detail" alt="{{ project.id }}" title="{{ project.project_name }}">{{ project.project_name }}</a>
+      </div>
+      <div class="m-1 col-2 ml-auto text-center">
+        {% if user.is_superuser %}
+        <i class="fas fa-times mr-3" title="close the project" alt="{{ project.id }}"></i>
+        <i class="fas fa-user-edit mr-3" data-toggle="modal" data-target="#newProjectWorkersForm" title="edit project workers" alt="{{ project.id }}"></i>
+        {% endif %}
+        <i class="fas fa-lock-open m-1" title="available"></i>
     </div>
     <div class="m-1 col-2 created_on ml-auto" title="created on">{{ project.created_on }}</div>
     </div>
@@ -152,19 +153,23 @@
 </div>
 {% endif %}
 
-{% if task.is_completed == True %}
+{% if task and task.is_completed == True %}
 <div class="p-1 m-3 white">
-  <div class="row align-items-center  teal lighten-4 p-3 m-3">
-    <div class="col-12 p-3 created_on unique-color">
-      {% if user.is_superuser %}
-      <i class="far fa-calendar-plus mr-5" title="open the task again" alt="{{ task.id }}"></i>
-      {% else %}
-      <i class="far fa-calendar-check mr-5"></i>
-      {% endif %}
+  <div class="row align-items-center teal lighten-4 p-3 m-3">
+    <div class="col-12 p-3 unique-color">
+      <div class="row">
+        <div class="col-11 created_on">
       <a title="completed" data-toggle="collapse" data-target="#summary{{ task.id }}"><span>{{ task.title }}</span></a>
+      </div>
+      <div class="col-1 mr-auto created_on">
       {% if user.is_superuser %}
-      <i class="fas fa-trash ml-5" title="to trash" alt="{{ task.id }}"></i>
+      <i class="far fa-calendar-plus mr-3" title="open the task again" alt="{{ task.id }}"></i>
+      <i class="fas fa-trash" title="to trash" alt="{{ task.id }}"></i>
+      {% else %}
+      <i class="far fa-calendar-check m-1"></i>
       {% endif %}
+        </div>
+      </div>
     </div>
   <div class="text-center col-12 m-1">
     <div id="summary{{ task.id }}" class="collapse">

@@ -1,10 +1,13 @@
   {% if worker in project.workers.all or user.is_superuser %}
   <div class="row">
-    <div class="col-11">
+    <div class="col-10">
       <h1>{{ project.project_name }}</h1>
     </div>
-    <div class="col-1">
-      <i class="fas fa-plus-circle mr-auto" data-toggle="modal" data-target="#newTaskForm" onclick="closeMenu()" alt="{{ project.id }}" title="add new task"></i>
+    <div class="col-2">
+      {% if user.is_superuser %}
+      <i class="fas fa-plus-circle mr-3" data-toggle="modal" data-target="#newTaskForm" onclick="closeMenu()" alt="{{ project.id }}" title="add new task"></i>
+      <i class="fas fa-user-edit" data-toggle="modal" data-target="#newProjectWorkersForm" title="edit project workers" alt="{{ project.id }}"></i>
+      {% endif %}
     </div>
   </div>
   <hr class="my-3">
@@ -16,15 +19,15 @@
     <!-- if task is not completed -->
     <div class="p-1 m-3 white">
       <div class="row align-items-center success-color-dark p-3 m-3">
-        <div class="col-8 p-3 created_on warning-color">
-          {% if user.is_superuser %}
-          <i class="far fa-window-close mr-5" title="close the task" alt="{{ task.id }}"></i>
-          {% endif %}
+        <div class="col-6 p-3 created_on warning-color">
           <a title="{{ task.title }}" data-toggle="collapse" data-target="#summary{{ task.id }}">
             <span>{{ task.title }}</span>
           </a>
         </div>
-      <div class="col-2 created_on">
+      <div class="col-4 created_on">
+        {% if user.is_superuser %}
+        <i class="far fa-window-close mr-5 p-2" title="close the task" alt="{{ task.id }}"></i>
+        {% endif %}
         <div class="row">
           <div class="p-2 col-xs-12 col-sm-4"><i class="fas fa-sync more" alt="{{ task.id }}" title="synchronize"></i></div>
           {% if not task.is_active %}
@@ -81,16 +84,20 @@
     <!-- if task is completed -->
     <div class="p-1 m-3 white">
       <div class="row align-items-center teal lighten-4 p-3 m-3">
-        <div class="col-12 p-3 created_on unique-color">
-          {% if user.is_superuser %}
-          <i class="far fa-calendar-plus mr-5" title="open the task again" alt="{{ task.id }}"></i>
-          {% else %}
-          <i class="far fa-calendar-check mr-5"></i>
-          {% endif %}
+        <div class="col-12 p-3 unique-color">
+          <div class="row">
+            <div class="col-11 created_on">
           <a title="completed" data-toggle="collapse" data-target="#summary{{ task.id }}"><span>{{ task.title }}</span></a>
+          </div>
+          <div class="col-1 mr-auto created_on">
           {% if user.is_superuser %}
-          <i class="fas fa-trash ml-5" title="to trash" alt="{{ task.id }}"></i>
+          <i class="far fa-calendar-plus mr-3" title="open the task again" alt="{{ task.id }}"></i>
+          <i class="fas fa-trash" title="to trash" alt="{{ task.id }}"></i>
+          {% else %}
+          <i class="far fa-calendar-check m-1"></i>
           {% endif %}
+            </div>
+          </div>
         </div>
       <div class="text-center col-12 m-1">
         <div id="summary{{ task.id }}" class="collapse">
@@ -141,6 +148,36 @@
   </div>
 </div>
 <!-- endform -->
+
+<!-- modal form add new project workers -->
+<div class="modal fade card" id="newProjectWorkersForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal-dialog form-dialog" role="document">
+<div class="modal-content form-content container-fluid text-center p-1">
+  <form action="" id="new-project-workers-form" method="POST" novalidate>
+    {% csrf_token %}
+    <div class="modal-header mb-1 created_on">
+      <h4 class="modal-title font-weight-bold">Change Project Workers</h4>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body jumbotron mx-1" id="new-project-workers" alt="">
+      <div class="md-form teal lighten-2 input-group created_on mb-3">
+        <div class="input-group-addon m-1">
+          <span class="input-group-text"><i class="fas fa-users mr-2"></i>Workers<i class="fas fa-users ml-2"></i></span>
+        </div>
+        {{ project_workers_form.workers }}
+      </div>
+    </div>
+    <div class="modal-footer created_on">
+      <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
+      <button type="submit" class="btn btn-success btn-lg">Save project</button>
+    </div>
+  </form>
+</div>
+</div>
+</div>
+<!-- end modal new project workers -->
 
 <!-- modal form to show timelogs of task -->
 <div class="modal fade right" id="timeLogForm" tabindex="-1" role="dialog" aria-labelledby="mytimeLogForm" aria-hidden="true">

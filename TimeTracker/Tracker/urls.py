@@ -25,4 +25,5 @@ urlpatterns = [
     path('open_task/', views.open_task, name="open_task"),
     path('open_project/', views.open_project, name="open_project"),
     path('get_time_logs/', views.get_time_logs, name="get_time_logs"),
+    path('change_workers/', views.change_workers, name="change_workers"),
 ]

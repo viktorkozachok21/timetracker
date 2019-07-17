@@ -18,7 +18,7 @@ class WorkerForm(forms.ModelForm):
 
     first_name = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'placeholder': 'First name'}))
     last_name = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'placeholder': 'Last name'}))
-    date_of_birth = forms.DateField(widget=forms.DateInput(format=('%d.%m.%Y'), attrs={'class' : 'picker date', 'placeholder': 'Choice your birth date'}))
+    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'class' : 'picker date', 'placeholder': 'Choice your birth date', 'readonly': ''}))
 
     class Meta:
         model = Worker
@@ -49,3 +49,9 @@ class TaskForm(forms.ModelForm):
             'priority_of_task': forms.Select(choices=Task.PRIORITIZE,attrs={'class': 'form-control'}),
             'type_of_task': forms.Select(choices=Task.TYPES,attrs={'class': 'form-control'})
         }
+
+class ProjectWorkersForm(forms.ModelForm):
+
+    class Meta:
+        model = Project
+        fields = ['workers',]
