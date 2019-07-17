@@ -93,7 +93,7 @@
     <div id="summary{{ task.id }}" class="collapse">
       <div class="container-fluid grey lighten-2 p-1">
         <div class="row white m-1">
-          <div class="col-12 summary-content text-justify" contenteditable="true" id="content{{ task.id }}">{{ task.summary|safe }}</div>
+          <div class="col-12 summary-content text-justify" contenteditable="true" id="content{{ task.id }}">{{ task.description|safe }}</div>
           <div class="col m-1 p-1"><i class="fas fa-save" title="save" alt="{{ task.id }}"></i></div>
         </div>
         <div class="row orange accent-1">
@@ -170,7 +170,7 @@
     <div id="summary{{ task.id }}" class="collapse">
       <div class="container-fluid grey lighten-2 p-1">
         <div class="row white m-1">
-          <div class="col-12 text-justify">{{ task.summary|safe }}</div>
+          <div class="col-12 text-justify">{{ task.description|safe }}</div>
         </div>
         <div class="row orange accent-1">
           <div class="col-12">End date: {{ task.date_of_end }}</div>

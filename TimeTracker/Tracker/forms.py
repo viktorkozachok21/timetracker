@@ -29,9 +29,23 @@ class WorkerForm(forms.ModelForm):
 
 class ProjectForm(forms.ModelForm):
 
-    project_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Project name', 'validate': ''}))
+    project_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Project name'}))
     summary = forms.CharField(widget=forms.Textarea(attrs={'class': 'mceEditor'}))
 
     class Meta:
         model = Project
         fields = ['project_name', 'summary', 'workers']
+
+class TaskForm(forms.ModelForm):
+
+    title = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Task title'}))
+    description = forms.CharField(widget=forms.Textarea(attrs={'class': 'mceEditor'}))
+    estimated_time = forms.CharField(max_length=9, widget=forms.TextInput(attrs={'placeholder': 'Estimated time', 'value' : '24:00:00'}))
+
+    class Meta:
+        model = Task
+        fields = ['title', 'description', 'priority_of_task', 'type_of_task', 'estimated_time']
+        widgets = {
+            'priority_of_task': forms.Select(choices=Task.PRIORITIZE,attrs={'class': 'form-control'}),
+            'type_of_task': forms.Select(choices=Task.TYPES,attrs={'class': 'form-control'})
+        }

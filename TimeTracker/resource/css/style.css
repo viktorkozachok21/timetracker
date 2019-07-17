@@ -84,7 +84,7 @@ a {
 }
 
 .picker {
-  z-index: 100;
+  z-index: 1500 !important;
 }
 
 .task a:hover {

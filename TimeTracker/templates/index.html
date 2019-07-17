@@ -14,6 +14,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.css" rel="stylesheet">
   <!-- end bootstrap css -->
   <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+
   <script type="text/javascript" src="{% static 'tinymce/js/tinymce/tinymce.min.js' %}"></script>
   <script>
       tinyMCE.init({
@@ -129,9 +130,69 @@
   </div>
   <!-- end modal new project -->
 
+  <!-- modal form add new task -->
+  <div class="modal fade card" id="newTaskForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog form-dialog">
+      <div class="modal-content form-content container-fluid text-center p-1">
+        <form action="" id="new-task-form" method="POST" novalidate>
+          {% csrf_token %}
+        <div class="modal-header mb-3 created_on">
+          <h4 class="modal-title font-weight-bold">New Task</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body jumbotron mx-1" id="new-task">
+          <div class="row teal lighten-2 m-1">
+            <div class="col-12">
+              <div class="md-form">
+                <i class="fas fa-user-tie mr-2" title="username"></i>
+                {{ task_form.title }}
+              </div>
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-1">
+            <div class="col-md-12">
+              <div class="md-form">
+                <i class="fas fa-key mr-2" title="password"></i>
+                {{ task_form.description|safe }}
+              </div>
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-1">
+            <div class="col-md-4">
+              <div class="md-form">
+                <i class="fas fa-user-tag mr-2" title="first name"></i>
+                {{ task_form.priority_of_task }}
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="md-form">
+                <i class="fas fa-user-tag mr-2" title="last name"></i>
+                {{ task_form.type_of_task }}
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="md-form">
+                <i class="fas fa-user-tag mr-2" title="last name"></i>
+                {{ task_form.estimated_time }}
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer created_on">
+        <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success btn-lg">Add task</button>
+      </div>
+    </form>
+  </div>
+  </div>
+  </div>
+  <!-- end modal new task -->
+
   <!-- modal form add new worker -->
   <div class="modal fade card" id="newWorkerForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog form-dialog" role="document">
+    <div class="modal-dialog form-dialog">
       <div class="modal-content form-content container-fluid text-center p-1">
         <form action="" id="new-worker-form" method="POST" novalidate>
           {% csrf_token %}
@@ -184,7 +245,7 @@
               </div>
             </div>
           </div>
-          <div class="md-form teal lighten-2 input-group m-3">
+          <div class="md-form teal lighten-2 input-group m-3 mr-3">
             <div class="input-group-addon">
               <span class="input-group-text"><i class="fas fa-user-circle mr-2" title="post"></i>Post: </span>
             </div>
@@ -274,17 +335,14 @@
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.5/js/mdb.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.js"></script>
   <!-- end bootstrap js -->
 
-  <!-- front js -->
-  <script type="text/javascript" src="{% static 'js/go-to-top.js' %}"></script>
-
-  <script>
+  <script type="text/javascript">
     $(function() {
         $('.picker').datepicker({
           format: "dd.mm.yyyy",
-          language: 'pt-BR',
+          container:'#new-worker',
           autoclose: true,
           changeMonth: true,
           changeYear: true,
@@ -293,7 +351,14 @@
       });
   </script>
 
+  <!-- front js -->
+  <script type="text/javascript" src="{% static 'js/go-to-top.js' %}"></script>
+
   <script type="text/javascript">
+
+    $('#newWorkerForm').on('shown.bs.modal', function() {
+      $('.picker').css('z-index','1600');
+  });
 
   //show project detail
   $(document).on("click", ".project-detail", function() {
@@ -365,6 +430,24 @@
             $("#new-project-form")[0].reset();
             $("#newProjectForm").modal('hide');
             $(".worker-avatar").click();
+        }
+      });
+    return false;
+  });
+
+  //add new task
+  $(document).on("submit", "#new-task-form", function(event) {
+    event.preventDefault();
+      var formData = $(this).serializeArray();
+      formData.push({name: 'project', value: $('.fa-plus-circle').attr('alt')});
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'add_task' %}",
+          data: formData,
+          success: function(response) {
+            $("#new-task-form")[0].reset();
+            $("#newTaskForm").modal('hide');
+            $("#task-content").prepend(response.task_block).fadeIn();
         }
       });
     return false;

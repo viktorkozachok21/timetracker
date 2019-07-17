@@ -22,10 +22,12 @@ def home(request):
     user_form = UserForm()
     worker_form = WorkerForm()
     project_form = ProjectForm()
+    task_form = TaskForm()
 
     context['user_form'] = user_form
     context['worker_form'] = worker_form
     context['project_form'] = project_form
+    context['task_form'] = task_form
 
     if request.user.is_authenticated:
         worker = get_object_or_404(Worker, user=request.user)
@@ -88,6 +90,27 @@ def add_project(request):
             return JsonResponse({"success":True}, status=200)
 
         return JsonResponse({"success":False}, status=400)
+    return JsonResponse({"success":False}, status=400)
+
+def add_task(request):
+    if request.method == "POST" and request.is_ajax:
+        task_form = TaskForm(request.POST)
+        if task_form.is_valid():
+            task = task_form.save(commit=False)
+            project_key = request.POST['project']
+            project = get_object_or_404(Project, id=project_key)
+
+            task.project = project
+            task.save()
+            print("yeah")
+            worker = get_object_or_404(Worker, user=request.user)
+
+            task_block = loader.render_to_string(
+                'Tracker/content.html',
+                {'task': task, 'user': request.user, 'worker': worker}
+            )
+
+            return JsonResponse({"task_block": task_block}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def back_to_home(request):

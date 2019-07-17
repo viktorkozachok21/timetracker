@@ -41,7 +41,7 @@ class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = CurrentUserField(editable=False)
     worker = models.ForeignKey('Worker', on_delete=models.SET_NULL, null=True, blank=True)
-    summary = HTMLField('Summary')
+    description = HTMLField('Description')
     project = models.ForeignKey('Project', on_delete=models.SET_NULL, null=True)
     is_active = models.BooleanField()
     is_completed = models.BooleanField()
@@ -59,7 +59,7 @@ class Task(models.Model):
         ('F', 'Feature'),
     )
 
-    type_of_task = models.CharField(max_length=1, choices=TYPES, blank=True, default='B')
+    type_of_task = models.CharField(max_length=1, choices=TYPES, blank=True, default='F')
     date_of_start = models.DateTimeField(auto_now_add=True)
     date_of_end = models.DateTimeField(null=True, blank=True)
     estimated_time = models.CharField(max_length=10, default="24:00:00")
