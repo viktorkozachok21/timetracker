@@ -13,10 +13,23 @@ class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     summary = HTMLField('Summary')
     created_on = models.DateTimeField(auto_now_add=True)
-    workers = models.ManyToManyField('Worker', help_text="Select a worker for this project")
+    workers = models.ManyToManyField('Worker', help_text="Select a worker for this project", related_name='project_worker')
+    is_completed = models.BooleanField()
+    date_of_end = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        ordering = ["-created_on"]
+        ordering = ["-created_on", "is_completed"]
+
+    def complete(self):
+        self.created_on = datetime.now() - timedelta(days=7)
+        self.date_of_end = datetime.now()
+        self.is_completed = True
+        self.save()
+
+    def open(self):
+        self.created_on = datetime.now()
+        self.is_completed = False
+        self.save()
 
     def __str__(self):
         return self.project_name
@@ -107,13 +120,10 @@ class Worker(models.Model):
     )
 
     post = models.CharField(max_length=1, choices=POSTS, blank=True, default='E')
-    avatar = models.ImageField()
-
-    def get_absolute_url(self):
-        return reverse('worker-detail', args=[str(self.id)])
+    avatar = models.ImageField(default="img/default.webp", blank=True, null=True, upload_to="avatars")
 
     def __str__(self):
-        return self.last_name + ' ' + self.first_name
+        return self.first_name + ' ' + self.last_name
 
 class TimeLog(models.Model):
 

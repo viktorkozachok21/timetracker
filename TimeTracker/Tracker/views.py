@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from .models import *
+from .forms import *
 
 from django.db.models import Sum
 
@@ -17,6 +18,14 @@ from django.contrib.auth import authenticate, login, logout
 # Create your views here.
 def home(request):
     context = {}
+
+    user_form = UserForm()
+    worker_form = WorkerForm()
+    project_form = ProjectForm()
+
+    context['user_form'] = user_form
+    context['worker_form'] = worker_form
+    context['project_form'] = project_form
 
     if request.user.is_authenticated:
         worker = get_object_or_404(Worker, user=request.user)
@@ -36,6 +45,50 @@ def home(request):
     context['page'] = page
 
     return render(request, 'Tracker/home.html', context)
+
+def worker_register(request):
+    if request.method == "POST" and request.is_ajax:
+        user_form = UserForm(request.POST)
+        worker_form = WorkerForm(request.POST)
+        if user_form.is_valid() and worker_form.is_valid():
+            first_name = request.POST['first_name']
+            last_name = request.POST['last_name']
+            user = user_form.save(commit=False)
+            user.set_password(user.password)
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+
+            worker = worker_form.save(commit=False)
+            worker.user = user
+            worker.save()
+
+            user_form = UserForm()
+            worker_form = WorkerForm()
+
+            return JsonResponse({"success":True}, status=200)
+
+        return JsonResponse({"success":False}, status=400)
+    return JsonResponse({"success":False}, status=400)
+
+def add_project(request):
+    if request.method == "POST" and request.is_ajax:
+        project_form = ProjectForm(request.POST)
+        if project_form.is_valid():
+            project = project_form.save(commit=False)
+            project.save()
+
+            worker_list = request.POST.getlist('workers')
+            for people in worker_list:
+                project.workers.add(people)
+            project.save()
+
+            project_form = ProjectForm()
+
+            return JsonResponse({"success":True}, status=200)
+
+        return JsonResponse({"success":False}, status=400)
+    return JsonResponse({"success":False}, status=400)
 
 def back_to_home(request):
     if request.method == "GET" and request.is_ajax:
@@ -258,6 +311,41 @@ def completed_task(request):
         return JsonResponse({"task_block": task_block}, status=200)
     return JsonResponse({"success":False}, status=400)
 
+def completed_project(request):
+    if request.method == "POST" and request.is_ajax:
+        project_key = request.POST['project']
+        project = get_object_or_404(Project, id=project_key)
+
+        project.complete()
+
+        project_block = loader.render_to_string(
+            'Tracker/content.html',
+            {'project': project, 'user': request.user}
+        )
+
+        return JsonResponse({"project_block": project_block}, status=200)
+    return JsonResponse({"success":False}, status=400)
+
+def remove_task(request):
+    if request.method == "POST" and request.is_ajax:
+        task_key = request.POST['task']
+        task = get_object_or_404(Task, id=task_key)
+
+        task.delete()
+
+        return JsonResponse({"success":False}, status=200)
+    return JsonResponse({"success":False}, status=400)
+
+def remove_project(request):
+    if request.method == "POST" and request.is_ajax:
+        project_key = request.POST['project']
+        project = get_object_or_404(Project, id=project_key)
+
+        project.delete()
+
+        return JsonResponse({"success":False}, status=200)
+    return JsonResponse({"success":False}, status=400)
+
 def open_task(request):
     if request.method == "POST" and request.is_ajax:
         task_key = request.POST['task']
@@ -272,6 +360,22 @@ def open_task(request):
         )
 
         return JsonResponse({"task_block": task_block}, status=200)
+    return JsonResponse({"success":False}, status=400)
+
+def open_project(request):
+    if request.method == "POST" and request.is_ajax:
+        project_key = request.POST['project']
+        project = get_object_or_404(Project, id=project_key)
+        worker = get_object_or_404(Worker, user=request.user)
+
+        project.open()
+
+        project_block = loader.render_to_string(
+            'Tracker/content.html',
+            {'project': project, 'user': request.user}
+        )
+
+        return JsonResponse({"project_block": project_block}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def get_time_logs(request):

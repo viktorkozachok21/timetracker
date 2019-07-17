@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 ]
 
 MIDDLEWARE = [
@@ -143,16 +144,14 @@ TINYMCE_DEFAULT_CONFIG = {
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en_US'
 
 TIME_ZONE = 'Europe/Kiev'
 
-TIME_INPUT_FORMATS = [
-    '%H:%M:%S',
-]
+DATE_DB_FORMAT = ['%d.%m.%Y']
 
-DATETIME_INPUT_FORMATS = [
-    '%d-%m-%Y %H:%M:%S',
+DATE_INPUT_FORMATS = [
+    '%d.%m.%Y'
 ]
 
 USE_I18N = True
@@ -176,7 +175,7 @@ DIRECTORY = ''
 
 FILEBROWSER_EXTENSIONS = {
     'Folder': [''],
-    'Image': ['.jpg', '.jpeg', '.gif', '.png', '.tif', '.pdf', '.tiff'],
+    'Image': ['.jpg', '.jpeg', '.gif', '.png', '.tif', '.pdf', '.tiff', '.webp'],
     'Document': ['.doc', '.docx', '.rtf', '.txt', '.xls', '.xslx', '.csv', '.ppt', '.pptx'],
     'Video': ['.mov', '.wmv', '.mpeg', '.mpg', '.avi', '.rm'],
     'Audio': ['.mp3', '.mp4', '.wav', '.aiff', '.midi', '.m4p'],

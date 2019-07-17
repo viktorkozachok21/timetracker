@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,700&display=swap');
 
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -12,14 +12,45 @@ body, html {
   font-family: 'Poppins', sans-serif;
 }
 
-body{
-  background-image: linear-gradient(120deg,#487eb0,#fbc531);
+body {
+  background-image: linear-gradient(120deg, #487eb0, #fbc531);
   background-repeat: no-repeat;
 }
 
 .fas, .far, .fab {
   cursor: pointer;
   font-size: 1.5em;
+}
+
+#id_workers {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  height: 30vh;
+  padding: 10px;
+  line-height: 1.3em;
+  font-size: 1.2em;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+#id_workers option {
+  margin: auto;
+}
+
+#id_workers option:hover {
+  color: rgb(166, 44, 22);
+  font-weight: 1000;
+  background-color: rgba(65, 163, 41, 0.5);
+}
+
+#id_post, #id_date_of_birth {
+  cursor: pointer;
+}
+
+.time-block {
+  font-size: 0.6em !important;
 }
 
 .comment_block {
@@ -48,11 +79,19 @@ a {
   color: rgba(41, 54, 51, 0.73);
 }
 
+.nav-link:hover {
+  background-color: rgba(4, 70, 51, 0.78);
+}
+
+.picker {
+  z-index: 100;
+}
+
 .task a:hover {
   color: rgb(170, 45, 18);
 }
 
-.animated-icon1{
+.animated-icon1 {
   width: 30px;
   height: 20px;
   position: relative;
@@ -62,7 +101,7 @@ a {
   cursor: pointer;
 }
 
-.animated-icon1 span{
+.animated-icon1 span {
   display: block;
   position: absolute;
   height: 3px;
@@ -130,13 +169,52 @@ a {
   z-index: 1000;
 }
 
+.form-dialog {
+  min-width: 90vw;
+  min-height: 95vh;
+  padding: 0;
+}
 
-@media (max-width: 768px) {
+.form-content {
+  height: 100%;
+  border-radius: 0;
+}
+
+.jumbotron {
+  background-color: rgba(156, 219, 174, 0.83);
+}
+
+input {
+  min-width: 100%;
+}
+
+.fa-plus-circle {
+  font-size: 2em !important;
+}
+
+.container img {
+  width: 50%;
+  height: 50%;
+}
+
+
+
+@media (max-width: 992px) {
   * {
     font-size: 1rem !important;
   }
 
   .created_on {
     font-size: 0.7rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  * {
+    font-size: 0.9rem !important;
+  }
+
+  .created_on {
+    font-size: 0.6rem !important;
   }
 }

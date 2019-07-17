@@ -1,8 +1,12 @@
-<hr class="my-5">
-<hr class="my-3">
-
   {% if worker in project.workers.all or user.is_superuser %}
-  <h1>{{ project.project_name }}</h1>
+  <div class="row">
+    <div class="col-11">
+      <h1>{{ project.project_name }}</h1>
+    </div>
+    <div class="col-1">
+      <i class="fas fa-plus-circle mr-auto" alt="{{ project.id }}" title="add new task"></i>
+    </div>
+  </div>
   <hr class="my-3">
   <div class="container z-depth-5 text-justify cyan lighten-5 p-3 m-auto">{{ project.summary|safe }}</div>
   <!-- task block -->
@@ -22,28 +26,30 @@
         </div>
       <div class="col-2 created_on">
         <div class="row">
-          <div class="m-1 p-1"><i class="fas fa-sync more" alt="{{ task.id }}" title="synchronize"></i></div>
+          <div class="p-2 col-xs-12 col-sm-4"><i class="fas fa-sync more" alt="{{ task.id }}" title="synchronize"></i></div>
           {% if not task.is_active %}
-          <div class="m-1 p-1 task_status" id="task_status{{ task.id }}">
+          <div class="p-2 col-xs-12 col-sm-4 task_status" id="task_status{{ task.id }}">
             <i class="far fa-check-square" title="start" alt="{{ task.id }}"></i>
           </div>
           {% elif worker == task.worker %}
-          <div class="m-1 p-1 task_status" id="task_status{{ task.id }}">
+          <div class="p-2 col-xs-12 col-sm-4 task_status" id="task_status{{ task.id }}">
             <i class="far fa-pause-circle" title="end" alt="{{ task.id }}"></i>
           </div>
           {% else %}
-          <div class="m-1 p-1 task_status">
+          <div class="p-2 col-xs-12 col-sm-4 task_status">
             <i class="fas fa-lock" title="active"></i>
           </div>
           {% endif %}
-          <div class="m-1 p-1">
+          <div class="p-2 col-xs-12 col-sm-4">
             <i class="far fa-plus-square" id="{{ task.id }}" title="add comment"></i>
           </div>
         </div>
       </div>
-      <div class="col-2 ml-auto created_on">
-        <i class="fas m-1 fa-user-clock" title="spend time" alt="{{ task.id }}" id="spendtime{{ task.id }}"> {{ task.spend_time }}</i>
-        <i class="fas m-1 fa-clock" title="estimated time"> {{ task.estimated_time }}</i>
+      <div class="col-2 created_on">
+        <div class="row">
+        <i class="fas col-xs-12 col-sm-6 p-1 fa-user-clock" title="spend time" alt="{{ task.id }}" id="spendtime{{ task.id }}"><span class="time-block p-1 created_on"> {{ task.spend_time }}</span></i>
+        <i class="fas col-xs-12 col-sm-6 p-1 fa-clock" title="estimated time"><span class="time-block p-1 created_on"> {{ task.estimated_time }}</span></i>
+        </div>
       </div>
       <div class="text-center col-12 m-1">
         <div id="summary{{ task.id }}" class="collapse">
@@ -74,7 +80,7 @@
     {% else %}
     <!-- if task is completed -->
     <div class="p-1 m-3 white">
-      <div class="row align-items-center  teal lighten-4 p-3 m-3">
+      <div class="row align-items-center teal lighten-4 p-3 m-3">
         <div class="col-12 p-3 created_on unique-color">
           {% if user.is_superuser %}
           <i class="far fa-calendar-plus mr-5" title="open the task again" alt="{{ task.id }}"></i>
@@ -82,6 +88,9 @@
           <i class="far fa-calendar-check mr-5"></i>
           {% endif %}
           <a title="completed" data-toggle="collapse" data-target="#summary{{ task.id }}"><span>{{ task.title }}</span></a>
+          {% if user.is_superuser %}
+          <i class="fas fa-trash ml-5" title="to trash" alt="{{ task.id }}"></i>
+          {% endif %}
         </div>
       <div class="text-center col-12 m-1">
         <div id="summary{{ task.id }}" class="collapse">
@@ -154,5 +163,3 @@
   </div>
 </div>
 <!-- endform -->
-
-<hr class="my-3">
