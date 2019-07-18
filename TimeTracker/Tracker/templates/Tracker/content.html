@@ -1,6 +1,4 @@
 {% if new_message %}
-<hr class="my-5">
-<hr class="my-3">
 <div class="text-justify cyan lighten-4 p-3">
   {{ new_message.message|safe }}
   <hr class="my-3">
@@ -8,7 +6,6 @@
     <h5>{{ new_message.created_on }}</h5>
   </div>
 </div>
-<hr class="my-3">
 {% endif %}
 
 {% if comments %}
@@ -93,7 +90,7 @@
     <div id="summary{{ task.id }}" class="collapse">
       <div class="container-fluid grey lighten-2 p-1">
         <div class="row white m-1">
-          <div class="col-12 summary-content text-justify" contenteditable="true" id="content{{ task.id }}">{{ task.description|safe }}</div>
+          <div class="col-12 summary-content text-justify p-3" contenteditable="true" id="content{{ task.id }}">{{ task.description|safe }}</div>
           <div class="col m-1 p-1"><i class="fas fa-save" title="save" alt="{{ task.id }}"></i></div>
         </div>
         <div class="row orange accent-1">
@@ -136,20 +133,19 @@
 
 {% if project and project.is_completed == False %}
 <div class="card m-3 border border-info">
-    <div class="task m-1 light-green lighten-2 row">
-      <div class="m-1 project col-7">
-        <a class="project-detail" alt="{{ project.id }}" title="{{ project.project_name }}">{{ project.project_name }}</a>
-      </div>
-      <div class="m-1 col-2 ml-auto text-center">
-        {% if user.is_superuser %}
-        <i class="fas fa-times mr-3" title="close the project" alt="{{ project.id }}"></i>
-        <i class="fas fa-user-edit mr-3" data-toggle="modal" data-target="#newProjectWorkersForm" title="edit project workers" alt="{{ project.id }}"></i>
-        {% endif %}
-        <i class="fas fa-lock-open m-1" title="available"></i>
-    </div>
-    <div class="m-1 col-2 created_on ml-auto" title="created on">{{ project.created_on }}</div>
-    </div>
-<div class="m-1 row">Workers: {{ project.workers.all|join:", " }}</div>
+  <div class="task m-1 light-green lighten-2 row">
+  <div class="m-1 project col-7">
+    <a class="project-detail" alt="{{ project.id }}" title="{{ project.project_name }}">{{ project.project_name }}</a>
+  </div>
+  <div class="m-1 col-2 ml-auto text-center">
+    {% if user.is_superuser %}
+    <i class="fas fa-times mr-3" title="close the project" alt="{{ project.id }}"></i>
+    {% endif %}
+    <i class="fas fa-lock-open m-1" title="available"></i>
+  </div>
+  <div class="m-1 col-2 created_on ml-auto" title="created on">{{ project.created_on }}</div>
+  </div>
+  <div class="m-1 row">Workers: {{ project.workers.all|join:", " }}</div>
 </div>
 {% endif %}
 

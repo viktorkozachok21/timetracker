@@ -589,13 +589,13 @@
           type: 'POST',
           url: "{% url 'save_task' %}",
           data: {
-            'summary': $(id).html(),
+            'description': $(id).html(),
             'worker': $('#user_name').attr("alt"),
             'task': $(this).attr("alt"),
             'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
           },
           success: function(response) {
-            $(id).html(`${response.task.summary}`);
+            $(id).html(`${response.task.description}`);
             $("#messages-box").html(response.task.messages_html);
         }
       });

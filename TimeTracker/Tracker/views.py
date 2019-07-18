@@ -236,23 +236,23 @@ def save_task(request):
     if request.method == "POST" and request.is_ajax:
         task_key = request.POST['task']
         worker_key = request.POST['worker']
-        new_summary = request.POST['summary']
+        new_description = request.POST['description']
         task = get_object_or_404(Task, id=task_key)
 
         author_key = task.author
         worker = get_object_or_404(Worker, id=worker_key)
         author = get_object_or_404(Worker, user=author_key)
-        old_summary = task.summary
+        old_description = task.description
 
-        title = "Changed task summary: " + task.project.project_name + " ~ " + task.title
+        title = "Changed task description: " + task.project.project_name + " ~ " + task.title
 
 
-        message_context = "<h2>Worker: " + worker.last_name + " " + worker.first_name + " changed task: " + task.title + " ( " + task.project.project_name + " )</h2>" + "<h3>Old summary:</h3>" + old_summary + "<h3>New summary:</h3>" + new_summary
+        message_context = "<h3>Worker: " + worker.last_name + " " + worker.first_name + " changed task: " + task.title + " (" + task.project.project_name + ")</h3>" + "<h5>Old description:</h5>" + old_description + "<h5>New description:</h5>" + new_description
 
         message_to_worker = Message.objects.create(receiver=worker, title=title, message=message_context)
         message_to_author = Message.objects.create(receiver=author, title=title, message=message_context)
 
-        task.summary = new_summary
+        task.description = new_description
         task.save()
 
         messages = Message.objects.filter(receiver=worker)
@@ -263,7 +263,7 @@ def save_task(request):
         )
 
         changed_task = {
-            'summary': task.summary,
+            'description': task.description,
             'messages_html': messages_html
         }
 
