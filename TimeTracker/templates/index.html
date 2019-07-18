@@ -17,12 +17,12 @@
 
   <script type="text/javascript" src="{% static 'tinymce/js/tinymce/tinymce.min.js' %}"></script>
   <script>
-      tinyMCE.init({
-        mode : "specific_textareas",
-        editor_selector : "mceEditor",
-        height: 300,
-        theme: "modern"
-      });
+    tinyMCE.init({
+      mode: "specific_textareas",
+      editor_selector: "mceEditor",
+      height: 300,
+      theme: "modern"
+    });
   </script>
   <title>TimeTracker</title>
 </head>
@@ -34,11 +34,12 @@
   <!-- header with navbar menu -->
   <header class="container-fluid">
     <nav class="navbar navbar-light amber fixed-top scrolling-navbar lighten-4 mb-4">
+      {% if user.is_authenticated %}
       <ul class="navbar-nav mr-auto nav-flex-icons m-1">
         <li class="nav-item avatar">
           <a class="nav-link p-0" title="back to home">
             {% if user.is_authenticated %}
-            <img src="{{ worker.avatar.url }}" class="rounded-circle z-depth-0 worker-avatar" alt="avatar image" height="35">
+            <img src="{{ worker.avatar.url }}" id="avatar-small" class="rounded-circle z-depth-0 worker-avatar" alt="avatar image" height="35">
             {% endif %}
           </a>
         </li>
@@ -46,6 +47,7 @@
       <button class="navbar-toggler first-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent20" aria-controls="navbarSupportedContent20" aria-expanded="false" aria-label="Toggle navigation">
         <div class="animated-icon1"><span></span><span></span><span></span></div>
       </button>
+      {% endif %}
       <div class="collapse navbar-collapse" id="navbarSupportedContent20">
         <ul class="navbar-nav ml-auto">
           {% if user.is_authenticated %}
@@ -54,7 +56,7 @@
           </li>
           {% if user.is_superuser %}
           <li class="nav-item m-1 text-center">
-            <a class="nav-link p-1 teal lighten-4" data-toggle="modal" data-target="#newWorkerForm" onclick="closeMenu()">New worker</a>
+            <a class="nav-link p-1 teal lighten-4" id="add-new-worker" onclick="closeMenu()">New worker</a>
           </li>
           <li class="nav-item m-1 text-center">
             <a class="nav-link p-1 teal lighten-4" data-toggle="modal" data-target="#newProjectForm" onclick="closeMenu()">New project</a>
@@ -64,11 +66,10 @@
             <a class="nav-link p-1 teal lighten-4" id="account" onclick="closeMenu()" data-toggle="modal" data-target="#userViewForm">My account</a>
           </li>
           <li class="nav-item m-1 text-center">
-            <a class="nav-link p-1 teal lighten-4" href="{% url 'user_logout' %}">Log Out</a>
+            <a class="nav-link p-1 teal lighten-4 show-timelogs" onclick="closeMenu()">Time logs</a>
           </li>
-          {% else %}
           <li class="nav-item m-1 text-center">
-            <a class="nav-link p-1 teal lighten-4" href="#" data-toggle="modal" data-target="#modalLoginForm">Sign in</a>
+            <a class="nav-link p-1 teal lighten-4" href="{% url 'user_logout' %}">Log Out</a>
           </li>
           {% endif %}
         </ul>
@@ -77,10 +78,9 @@
   </header>
   <!-- end header -->
 
-
+  <!-- the main block -->
   <hr class="my-5">
   <hr class="my-3">
-  <!-- the main block -->
   <main class="container-fluid text-center" id="main-block">
     {% block project_list %}
     {% endblock %}
@@ -88,220 +88,10 @@
   <hr class="my-3">
   <!-- end main -->
 
-
-  <!-- modal form add new project -->
-  <div class="modal fade card" id="newProjectForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog form-dialog" role="document">
-  <div class="modal-content form-content container-fluid text-center p-1">
-    <form action="" id="new-project-form" method="POST" novalidate>
-      {% csrf_token %}
-      <div class="modal-header mb-1 created_on">
-        <h4 class="modal-title font-weight-bold">New Project</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body jumbotron mx-1" id="new-project">
-        <div class="row teal lighten-2 m-1">
-          <div class="col-12">
-            <div class="md-form">
-              <i class="fas fa-user-tag mr-2" title="project name"></i>
-              {{ project_form.project_name }}
-            </div>
-          </div>
-        </div>
-        <div class="md-form teal lighten-2">
-          {{ project_form.summary|safe }}
-        </div>
-        <div class="md-form teal lighten-2 input-group created_on mb-3">
-          <div class="input-group-addon m-1">
-            <span class="input-group-text"><i class="fas fa-users mr-2"></i>Workers<i class="fas fa-users ml-2"></i></span>
-          </div>
-          {{ project_form.workers }}
-        </div>
-      </div>
-      <div class="modal-footer created_on">
-        <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-success btn-lg">Add project</button>
-      </div>
-    </form>
-  </div>
-  </div>
-  </div>
-  <!-- end modal new project -->
-
-
-  <!-- modal form add new task -->
-  <div class="modal fade card" id="newTaskForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog form-dialog">
-      <div class="modal-content form-content container-fluid text-center p-1">
-        <form action="" id="new-task-form" method="POST" novalidate>
-          {% csrf_token %}
-        <div class="modal-header mb-3 created_on">
-          <h4 class="modal-title font-weight-bold">New Task</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body jumbotron mx-1" id="new-task">
-          <div class="row teal lighten-2 m-1">
-            <div class="col-12">
-              <div class="md-form">
-                <i class="fas fa-user-tag mr-2" title="task title"></i>
-                {{ task_form.title }}
-              </div>
-            </div>
-          </div>
-          <div class="row teal lighten-2 m-1">
-            <div class="col-md-12">
-              <div class="md-form">
-                {{ task_form.description|safe }}
-              </div>
-            </div>
-          </div>
-          <div class="row teal lighten-2 m-1">
-            <div class="col-md-4">
-              <div class="md-form input-group created_on">
-                  <div class="input-group-addon m-1">
-                    <span class="input-group-text"></i>Task priority</span>
-                  </div>
-                {{ task_form.priority_of_task }}
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="md-form input-group created_on">
-                  <div class="input-group-addon m-1">
-                    <span class="input-group-text"></i>Task type</span>
-                  </div>
-                {{ task_form.type_of_task }}
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="md-form input-group created_on">
-                  <div class="input-group-addon m-1">
-                    <span class="input-group-text"></i>Estimated time</span>
-                  </div>
-                {{ task_form.estimated_time }}
-              </div>
-            </div>
-          </div>
-      </div>
-      <div class="modal-footer created_on">
-        <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-success btn-lg">Add task</button>
-      </div>
-    </form>
-  </div>
-  </div>
-  </div>
-  <!-- end modal new task -->
-
-  <!-- modal form add new worker -->
-  <div class="modal fade card" id="newWorkerForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog form-dialog">
-      <div class="modal-content form-content container-fluid text-center p-1">
-        <form action="" id="new-worker-form" method="POST" novalidate>
-          {% csrf_token %}
-        <div class="modal-header mb-3 created_on">
-          <h4 class="modal-title font-weight-bold">New Worker</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body jumbotron mx-1" id="new-worker">
-          <div class="row teal lighten-2 m-1">
-            <div class="col-md-6">
-              <div class="md-form">
-                <i class="fas fa-user-tie mr-2" title="username"></i>
-                {{ user_form.username }}
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="md-form">
-                <i class="fas fa-envelope mr-2" title="email"></i>
-                {{ user_form.email }}
-              </div>
-            </div>
-          </div>
-          <div class="row teal lighten-2 m-1">
-            <div class="col-md-6">
-              <div class="md-form">
-                <i class="fas fa-key mr-2" title="password"></i>
-                {{ user_form.password }}
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="md-form">
-                <i class="fas fa-calendar-alt mr-2" title="birth date"></i>Birth date:
-                {{ worker_form.date_of_birth }}
-              </div>
-            </div>
-          </div>
-          <div class="row teal lighten-2 m-1">
-            <div class="col-md-6">
-              <div class="md-form">
-                <i class="fas fa-user-tag mr-2" title="first name"></i>
-                {{ worker_form.first_name }}
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="md-form">
-                <i class="fas fa-user-tag mr-2" title="last name"></i>
-                {{ worker_form.last_name }}
-              </div>
-            </div>
-          </div>
-          <div class="row teal lighten-2 m-3 mr-3">
-            <div class="col-md-12 md-form input-group">
-            <div class="input-group-addon">
-              <span class="input-group-text"><i class="fas fa-user-circle mr-2" title="post"></i>Post: </span>
-            </div>
-            {{ worker_form.post }}
-          </div>
-          </div>
-      </div>
-      <div class="modal-footer created_on">
-        <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-success btn-lg">Add worker</button>
-      </div>
-    </form>
-  </div>
-  </div>
-  </div>
-  <!-- end modal new worker -->
-
-  <!-- modal form to login -->
-  <div class="modal fade" id="modalLoginForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <form id="login-form" action="{% url 'user_login' %}" method="POST">
-          {% csrf_token %}
-          <div class="modal-header text-center">
-            <h4 class="modal-title w-100 font-weight-bold">Sign in</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body mx-3">
-            <div class="md-form mb-5">
-              <i class="fas fa-user-astronaut prefix grey-text"></i>
-              <input type="text" id="login-username" name="username" class="form-control" required="required">
-              <label data-error="wrong" data-success="right" for="login-username">Your username</label>
-            </div>
-            <div class="md-form mb-4">
-              <i class="fas fa-lock prefix grey-text"></i>
-              <input type="password" id="login-password" name="password" class="form-control" required="required">
-              <label data-error="wrong" data-success="right" for="login-password">Your password</label>
-            </div>
-          </div>
-          <div class="modal-footer d-flex justify-content-center">
-            <button type="submit" class="btn btn-default">Login</button>
-          </div>
-      </div>
-      </form>
-    </div>
-  </div>
-  <!-- end modal login -->
+  <!-- modal section -->
+  <section class="forms-container">
+  </section>
+  <!-- end modal section -->
 
   <!-- modal form to show information about active worker -->
   <div class="modal fade right" id="userViewForm" tabindex="-1" role="dialog" aria-labelledby="myuserViewForm" aria-hidden="true">
@@ -314,21 +104,42 @@
           </button>
         </div>
         <div class="modal-body">
-          <div class="row justify-content-center align-items-center">
-            <img src="{{ worker.avatar.url }}" class="rounded-circle z-depth-0 m-3" alt="avatar image" height="150">
+          <div class="row created_on">
+            <img src="{{ worker.avatar.url }}" id="avatar-full" class="rounded-circle z-depth-0 m-3" alt="avatar image" height="150">
           </div>
-          <div class="row justify-content-center align-items-center">
+          <div class="row created_on">
             <span class="m-1" id="user_name" alt="{{ worker.id }}">{{ worker.last_name }} {{ worker.first_name }}</span>
           </div>
-          <div class="row justify-content-center align-items-center">
+          <div class="row created_on">
+            <span class="m-1">Birth date: {{ worker.date_of_birth }}</span>
+          </div>
+          <div class="row created_on">
             <span class="m-1">{{ worker.get_post_display }}</span>
           </div>
-          <div class="row justify-content-center align-items-center">
+          <div class="row created_on">
             <span class="m-1">E-mail: {{ user.email }}</span>
           </div>
-          <div class="row justify-content-center align-items-center" id="messages-box">
+          <div class="row created_on warning-color">
+            <a title="change avatar" data-toggle="collapse" data-target="#change-avatar">
+              <span>Change avatar</span>
+            </a>
           </div>
-          <div class="modal-footer justify-content-center mt-3">
+          <div class="created_on row m-1 p-1">
+            <div id="change-avatar" class="collapse">
+              <form id="change-avatar-form" method="POST" action="" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="md-form">
+                  {{ file_form.avatar }}
+                </div>
+                <div class="modal-footer created_on">
+                  <button type="submit" class="btn btn-default">Save</button>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="row created_on" id="messages-box">
+          </div>
+          <div class="modal-footer created_on mt-3">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>
@@ -336,7 +147,6 @@
     </div>
   </div>
   <!-- end worker form -->
-
 
   <!-- bootstrap js -->
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -348,327 +158,188 @@
 
   <script type="text/javascript">
     $(function() {
-        $('.picker').datepicker({
-          dateFormat: 'dd.mm.yy',
-          minDate: '01.01.1930',
-          maxDate: '0',
-          container:'#new-worker',
-          autoclose: true,
-          changeMonth: true,
-          changeYear: true
-        });
+      $('.picker-from').datepicker({
+        dateFormat: 'dd.mm.yy',
+        minDate: '0',
+        container: '#new-task',
+        autoclose: true,
+        changeMonth: true,
+        changeYear: true
       });
+    });
+
+    $(function() {
+      $('.picker-to').datepicker({
+        dateFormat: 'dd.mm.yy',
+        minDate: '0',
+        container: '#new-task',
+        autoclose: true,
+        changeMonth: true,
+        changeYear: true
+      });
+    });
   </script>
 
   <!-- front js -->
   <script type="text/javascript" src="{% static 'js/go-to-top.js' %}"></script>
 
   <script type="text/javascript">
+    //hamburger button animation in menu
+    $(document).on("click", ".first-button", function() {
+      $('.animated-icon1').toggleClass('open');
+    });
 
-    $('#newWorkerForm').on('shown.bs.modal', function() {
-      $('.picker').css('z-index','1600');
+    //close menu
+    function closeMenu() {
+      if ($('.animated-icon1').hasClass("open")) {
+        $('.first-button').click();
+      }
+    };
+
+    //back to home
+    $(document).on("click", ".worker-avatar", function() {
+      $.ajax({
+        type: 'GET',
+        url: '{% url "back_to_home" %}',
+        data: {},
+        success: function(response) {
+          $("#main-block").html(response.home_html);
+          smoothScrollBackToTop();
+        }
+      });
+    });
+  </script>
+
+  <!-- worker ajax -->
+  <script type="text/javascript">
+  //show new project form
+  $(document).on("click", "#add-new-worker", function() {
+    $.ajax({
+      type: 'GET',
+      url: '{% url "add_worker" %}',
+      data: {},
+      success: function(response) {
+        $(".forms-container").html(response.form_html);
+        $("#newWorkerForm").modal('show');
+        $(function() {
+          $('.picker').datepicker({
+            dateFormat: 'dd.mm.yy',
+            minDate: '01.01.1930',
+            maxDate: '0',
+            container: '#new-worker',
+            autoclose: true,
+            changeMonth: true,
+            changeYear: true
+          });
+        });
+      }
+    });
   });
 
-  //show project detail
-  $(document).on("click", ".project-detail", function() {
+    //add new worker
+    $(document).on("submit", "#new-worker-form", function(event) {
+      event.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'add_worker' %}",
+        data: $(this).serializeArray(),
+        success: function(response) {
+          $("#new-worker-form")[0].reset();
+          $("#newWorkerForm").modal('hide');
+        }
+      });
+      return false;
+    });
+
+    //change avatar for worker
+    $(document).on("submit", "#change-avatar-form", function(event) {
+      event.preventDefault();
+      var form = $(this);
+      var formdata = false;
+      if (window.FormData) {
+        formdata = new FormData(form[0]);
+      }
+      formdata.append('worker', $('#user_name').attr("alt"));
+      var formAction = form.attr('action');
+
+      $.ajax({
+        url: "{% url 'change_avatar' %}",
+        data: formdata ? formdata : form.serialize(),
+        cache: false,
+        contentType: false,
+        processData: false,
+        type: 'POST',
+        success: function(response, textStatus, jqXHR) {
+          $("#change-avatar-form")[0].reset();
+          $("#avatar-small").attr('src', response.avatar);
+          $("#avatar-full").attr('src', response.avatar);
+        }
+      });
+      return false;
+    });
+  </script>
+  <!-- end worker ajax -->
+
+  <!-- project ajax -->
+  <script type="text/javascript">
+    //add new project
+    $(document).on("submit", "#new-project-form", function(event) {
+      event.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'add_project' %}",
+        data: $(this).serializeArray(),
+        success: function(response) {
+          $("#new-project-form")[0].reset();
+          $("#newProjectForm").modal('hide');
+          $(".worker-avatar").click();
+        }
+      });
+      return false;
+    });
+
+    //show project detail
+    $(document).on("click", ".project-detail", function() {
       var self = $(this);
       closeMenu();
       $.ajax({
-          type: 'GET',
-          url: '{% url "project_detail" %}',
-          data: {
-            'project': self.attr("alt"),
-          },
-          success: function(response) {
-            $("#main-block").html(response.project_html);
-        }
-      });
-  });
-
-  //back to home
-  $(document).on("click", ".worker-avatar", function() {
-      $.ajax({
-          type: 'GET',
-          url: '{% url "back_to_home" %}',
-          data: {},
-          success: function(response) {
-            $("#main-block").html(response.home_html);
-        }
-      });
-  });
-
-  //hamburger button animation in menu
-  $(document).on("click", ".first-button", function() {
-    $('.animated-icon1').toggleClass('open');
-  });
-
-  //close menu
-  function closeMenu() {
-    if( $('.animated-icon1').hasClass("open") ) {
-      $('.first-button').click();
-    }
-  };
-
-  //add new worker
-  $(document).on("submit", "#new-worker-form", function(event) {
-    event.preventDefault();
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'worker_register' %}",
-          data: $(this).serializeArray(),
-          success: function(response) {
-            $("#new-worker-form")[0].reset();
-            $("#newWorkerForm").modal('hide');
-        }
-      });
-    return false;
-  });
-
-  //add new project
-  $(document).on("submit", "#new-project-form", function(event) {
-    event.preventDefault();
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'add_project' %}",
-          data: $(this).serializeArray(),
-          success: function(response) {
-            $("#new-project-form")[0].reset();
-            $("#newProjectForm").modal('hide');
-            $(".worker-avatar").click();
-        }
-      });
-    return false;
-  });
-
-  //show workers change form
-  $(document).on("click", ".fa-user-edit", function() {
-        var self = $(this);
-        $("#new-project-workers").attr("alt", $(this).attr("alt"));
-        $("#newProjectWorkersForm").modal("show");
-    });
-
-  //changes workers for project
-  $(document).on("submit", "#new-project-workers-form", function(event) {
-      event.preventDefault();
-      var formData = $(this).serializeArray();
-      formData.push({name: 'project', value: $('#new-project-workers').attr('alt')});
-      formData.push({name: 'csrfmiddlewaretoken', value: $("input[name=csrfmiddlewaretoken]").val()});
-      console.log(formData);
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'change_workers' %}",
-          data: formData,
-          success: function(response) {
-            $("#new-project-workers-form")[0].reset();
-            $("#newProjectWorkersForm").modal('hide');
-            $(".worker-avatar").click();
-        }
-      });
-    return false;
-  });
-
-  //add new task
-  $(document).on("submit", "#new-task-form", function(event) {
-    event.preventDefault();
-      var formData = $(this).serializeArray();
-      formData.push({name: 'project', value: $('.fa-plus-circle').attr('alt')});
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'add_task' %}",
-          data: formData,
-          success: function(response) {
-            $("#new-task-form")[0].reset();
-            $("#newTaskForm").modal('hide');
-            $("#task-content").prepend(response.task_block).fadeIn();
-        }
-      });
-    return false;
-  });
-
-  //get_message for worker
-  $(document).on("click", "#account", function() {
-    $.ajax({
         type: 'GET',
-        url: '{% url "get_messages" %}',
+        url: '{% url "project_detail" %}',
         data: {
-          'worker': $('#user_name').attr("alt"),
+          'project': self.attr("alt"),
         },
         success: function(response) {
-          $("#messages-box").html(response.messages_html);
-      }
-    });
-  });
-
-  //show message
-  $(document).on("click", ".show-message", function() {
-    $.ajax({
-        type: 'GET',
-        url: '{% url "show_message" %}',
-        data: {
-          'worker': $('#user_name').attr("alt"),
-          'message': $(this).attr("alt"),
-        },
-        success: function(response) {
-          $("#main-block").html(response.message_html);
-          $("#userViewForm").modal('hide');
-      }
-    });
-  });
-
-  //message to_trash
-  $(document).on("click", ".fa-trash-alt", function() {
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'to_trash' %}",
-          data: {
-            'worker': $('#user_name').attr("alt"),
-            'message': $(this).attr("alt"),
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            $("#messages-box").html(response.messages_html);
+          $("#main-block").html(response.project_html);
+          smoothScrollBackToTop();
         }
       });
-    return false;
-  });
-
-  //show new comment form
-  $(document).on("click", ".fa-plus-square", function() {
-        $('#modalCommentForm').modal('show');
-        $('#hide').attr("title", this.id);
-      });
-
-
-  //add new comment
-  $(document).on("submit", "#comment-form", function(event) {
-      event.preventDefault();
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'add_comment' %}",
-          data: {
-            'comment': $('#comments').val(),
-            'author': $('#user_name').html(),
-            'task': $('#hide').attr("title"),
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            var id = "#more" + $('#hide').attr("title");
-            $(id).html(response.comments_html);
-        }
-      });
-    resetForm();
-    return false;
-  });
-
-  //reset comment form
-  function resetForm() {
-    $('#comments').val('');
-    $('#modalCommentForm').modal('hide');
-  };
-
-  //show all comments for task
-  $(document).on("click", ".more", function() {
-        var self = $(this);
-        $.ajax({
-            type: 'GET',
-            url: '{% url "show_comments" %}',
-            data: {
-              'task': self.attr("alt")
-            },
-            success: function(response) {
-              var id = "#more" + self.attr("alt");
-              $(id).html(response.comments_html);
-          }
-        });
     });
 
-  //save changes of task summary
-  $(document).on("click", ".fa-save", function() {
-      var id = "#content" + $(this).attr("alt");
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'save_task' %}",
-          data: {
-            'description': $(id).html(),
-            'worker': $('#user_name').attr("alt"),
-            'task': $(this).attr("alt"),
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            $(id).html(`${response.task.description}`);
-            $("#messages-box").html(response.task.messages_html);
-        }
-      });
-    return false;
-  });
-
-  //end working on task
-  $(document).on("click", ".fa-pause-circle", function() {
-      var end = $(this);
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'end_task' %}",
-          data: {
-            'worker': $('#user_name').attr("alt"),
-            'task': end.attr("alt"),
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            var status = "#task_status" + end.attr("alt");
-            var worker = "#task_worker" + end.attr("alt");
-            var time = "#spendtime" + end.attr("alt");
-            $(status).html(`<i class="far fa-check-square" title="start" alt="${response.context.task}"></i>`).fadeIn(500);
-            $(worker).html('Worker: the task is free');
-            $(time).html(` ${response.context.spend_time}`);
-        }
-      });
-    return false;
-  });
-
-  //start working on task
-  $(document).on("click", ".fa-check-square", function() {
-      var start = $(this);
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'start_task' %}",
-          data: {
-            'worker': $('#user_name').attr("alt"),
-            'task': start.attr("alt"),
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            var status = "#task_status" + start.attr("alt");
-            var worker = "#task_worker" + start.attr("alt");
-            $(status).html(`<i class="far fa-pause-circle" title="end" alt="${response.task.task}"></i>`).fadeIn(500);
-            $(worker).html(`Worker: ${response.task.worker}`);
-        }
-      });
-    return false;
-  });
-
-  //close task
-  $(document).on("click", ".fa-window-close", function() {
-    var start = $(this);
+    //show change project form
+    $(document).on("click", ".fa-edit", function() {
       $.ajax({
-        type: 'POST',
-        url: "{% url 'completed_task' %}",
+        type: 'GET',
+        url: '{% url "change_project" %}',
         data: {
-          'task': start.attr("alt"),
-          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+          'project': $(this).attr("alt")
         },
         success: function(response) {
-          var list = start.parent().parent().parent();
-          list.fadeOut(function(){
-            $("#task-content").append(response.task_block).fadeIn();
-            list.remove();
+          $(".forms-container").html(response.form_html);
+          $("#changeProjectForm").modal('show');
+          tinyMCE.remove();
+          tinyMCE.init({
+            mode: "specific_textareas",
+            editor_selector: "mceEditor",
+            height: 300,
+            theme: "modern"
           });
-      }
+        }
+      });
     });
-  });
 
-  //close project
-  $(document).on("click", ".fa-times", function() {
-    var start = $(this);
+    //close project
+    $(document).on("click", ".fa-times", function() {
+      var start = $(this);
       $.ajax({
         type: 'POST',
         url: "{% url 'completed_project' %}",
@@ -678,75 +349,17 @@
         },
         success: function(response) {
           var list = start.parent().parent().parent();
-          list.fadeOut(function(){
+          list.fadeOut(function() {
             $("#main-block").append(response.project_block).fadeIn();
             list.remove();
           });
-      }
+        }
+      });
     });
-  });
 
-  //remove task
-  $(document).on("click", ".fa-trash", function() {
-    var start = $(this);
-      $.ajax({
-        type: 'POST',
-        url: "{% url 'remove_task' %}",
-        data: {
-          'task': start.attr("alt"),
-          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-        },
-        success: function(response) {
-          var list = start.parent().parent().parent().parent().parent();
-          list.fadeOut(function(){
-            list.remove();
-          });
-      }
-    });
-  });
-
-  //remove project
-  $(document).on("click", ".fa-minus-square", function() {
-    var start = $(this);
-      $.ajax({
-        type: 'POST',
-        url: "{% url 'remove_project' %}",
-        data: {
-          'project': start.attr("alt"),
-          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-        },
-        success: function(response) {
-          var list = start.parent().parent().parent();
-          list.fadeOut(function(){
-            list.remove();
-          });
-      }
-    });
-  });
-
-  //open closed task
-  $(document).on("click", ".fa-calendar-plus", function() {
-    var start = $(this);
-      $.ajax({
-        type: 'POST',
-        url: "{% url 'open_task' %}",
-        data: {
-          'task': start.attr("alt"),
-          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-        },
-        success: function(response) {
-          var list = start.parent().parent().parent().parent().parent();
-          list.fadeOut(function(){
-            $("#task-content").prepend(response.task_block).fadeIn();
-            list.remove();
-          });
-      }
-    });
-  });
-
-  //open closed project
-  $(document).on("click", ".fa-external-link-alt", function() {
-    var start = $(this);
+    //open closed project
+    $(document).on("click", ".fa-external-link-alt", function() {
+      var start = $(this);
       $.ajax({
         type: 'POST',
         url: "{% url 'open_project' %}",
@@ -756,31 +369,369 @@
         },
         success: function(response) {
           var list = start.parent().parent().parent();
-          list.fadeOut(function(){
+          list.fadeOut(function() {
             $("#main-block").prepend(response.project_block).fadeIn();
             list.remove();
           });
-      }
-    });
-  });
-
-  //get timelogs for task
-  $(document).on("click", ".fa-user-clock", function() {
-      var self = $(this);
-      $.ajax({
-          type: 'GET',
-          url: '{% url "get_time_logs" %}',
-          data: {
-            'task': self.attr("alt")
-          },
-          success: function(response) {
-            $("#time-logs").html(response.timelogs_html);
-            $('#timeLogForm').modal('show');
         }
       });
-  });
+    });
+
+    //remove project
+    $(document).on("click", ".fa-minus-square", function() {
+      var start = $(this);
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'remove_project' %}",
+        data: {
+          'project': start.attr("alt"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var list = start.parent().parent().parent();
+          list.fadeOut(function() {
+            list.remove();
+          });
+        }
+      });
+    });
   </script>
+  <!-- end project ajax -->
+
+  <!-- task ajax -->
+  <script type="text/javascript">
+    //add new task
+    $(document).on("submit", "#new-task-form", function(event) {
+      event.preventDefault();
+      var date_from = $("#id_available_from").datepicker('getDate');
+      var date_to = $('#id_available_to').datepicker('getDate');;
+
+      if (date_from > date_to) {
+        alert("Unavailable date for: 'Available from'!");
+      } else {
+        var formData = $(this).serializeArray();
+        formData.push({
+          name: 'project',
+          value: $('.fa-plus-circle').attr('alt')
+        });
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'add_task' %}",
+          data: formData,
+          success: function(response) {
+            $("#new-task-form")[0].reset();
+            $("#newTaskForm").modal('hide');
+            $("#task-content").prepend(response.task_block).fadeIn();
+          }
+        });
+        return false;
+      }
+    });
+
+    //open closed task
+    $(document).on("click", ".fa-calendar-plus", function() {
+      var start = $(this);
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'open_task' %}",
+        data: {
+          'task': start.attr("alt"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var list = start.parent().parent().parent().parent().parent();
+          list.fadeOut(function() {
+            $("#task-content").prepend(response.task_block).fadeIn();
+            list.remove();
+          });
+        }
+      });
+    });
+
+    //save changes of task summary
+    $(document).on("click", ".fa-save", function() {
+      var id = "#content" + $(this).attr("alt");
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'save_task' %}",
+        data: {
+          'description': $(id).html(),
+          'worker': $('#user_name').attr("alt"),
+          'task': $(this).attr("alt"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          $(id).html(`${response.task.description}`);
+          $("#messages-box").html(response.task.messages_html);
+        }
+      });
+      return false;
+    });
+
+    //start working on task
+    $(document).on("click", ".fa-check-square", function() {
+      var start = $(this);
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'start_task' %}",
+        data: {
+          'worker': $('#user_name').attr("alt"),
+          'task': start.attr("alt"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var status = "#task_status" + start.attr("alt");
+          var worker = "#task_worker" + start.attr("alt");
+          $(status).html(`<i class="far fa-pause-circle" title="end" alt="${response.task.task}"></i>`).fadeIn(500);
+          $(worker).html(`Worker: ${response.task.worker}`);
+        }
+      });
+      return false;
+    });
+
+    //end working on task
+    $(document).on("click", ".fa-pause-circle", function() {
+      var end = $(this);
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'end_task' %}",
+        data: {
+          'worker': $('#user_name').attr("alt"),
+          'task': end.attr("alt"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var status = "#task_status" + end.attr("alt");
+          var worker = "#task_worker" + end.attr("alt");
+          $(status).html(`<i class="far fa-check-square" title="start" alt="${response.context.task}"></i>`).fadeIn(500);
+          $(worker).html('Worker: the task is free');
+        }
+      });
+      return false;
+    });
+
+    //close task
+    $(document).on("click", ".fa-window-close", function() {
+      var start = $(this);
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'completed_task' %}",
+        data: {
+          'task': start.attr("alt"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var list = start.parent().parent().parent();
+          list.fadeOut(function() {
+            $("#task-content").append(response.task_block).fadeIn();
+            list.remove();
+          });
+        }
+      });
+    });
+
+    //remove task
+    $(document).on("click", ".fa-trash", function() {
+      var start = $(this);
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'remove_task' %}",
+        data: {
+          'task': start.attr("alt"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var list = start.parent().parent().parent().parent().parent();
+          list.fadeOut(function() {
+            list.remove();
+          });
+        }
+      });
+    });
+  </script>
+  <!-- end task ajax -->
+
+  <!-- comment ajax -->
+  <script type="text/javascript">
+    //show new comment form
+    $(document).on("click", ".fa-plus-square", function() {
+      $('#modalCommentForm').modal('show');
+      $('#hide').attr("title", this.id);
+    });
+
+    //add new comment
+    $(document).on("submit", "#comment-form", function(event) {
+      event.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'add_comment' %}",
+        data: {
+          'comment': $('#comments').val(),
+          'author': $('#user_name').html(),
+          'worker': $('#user_name').attr("alt"),
+          'task': $('#hide').attr("title"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var id = "#more" + $('#hide').attr("title");
+          $(id).html(response.comments_html);
+          $("#comment-form")[0].reset();
+        }
+      });
+      resetForm();
+      return false;
+    });
+
+    //show all comments for task
+    $(document).on("click", ".more", function() {
+      var self = $(this);
+      $.ajax({
+        type: 'GET',
+        url: '{% url "show_comments" %}',
+        data: {
+          'task': self.attr("alt")
+        },
+        success: function(response) {
+          var id = "#more" + self.attr("alt");
+          $(id).html(response.comments_html);
+        }
+      });
+    });
+  </script>
+  <!-- end comment ajax -->
+
+  <!-- time log ajax -->
+  <script type="text/javascript">
+    //get timelogs for task
+    $(document).on("click", ".fa-user-clock", function() {
+      var self = $(this);
+      $.ajax({
+        type: 'GET',
+        url: '{% url "get_time_logs" %}',
+        data: {
+          'task': self.attr("alt")
+        },
+        success: function(response) {
+          $("#time-logs").html(response.timelogs_html);
+          $('#timeLogForm').modal('show');
+        }
+      });
+    });
+    //show all time logs
+    $(document).on("click", ".show-timelogs", function() {
+      $.ajax({
+        type: 'GET',
+        url: '{% url "show_time_logs" %}',
+        data: {},
+        success: function(response) {
+          $("#main-block").html(`<div className="row mb-2">
+            <div className="col-12 m-1 created_on">
+            <span class="m-1 p-1 default-color"><a class="show-timelogs">All time logs</a></span>/
+            <span class="m-1 p-1 default-color"><a class="my_timelogs">Your time logs</a></span>
+            </div>
+            </div>
+            ${response.timelogs_html}`);
+            smoothScrollBackToTop();
+        }
+      });
+    });
+
+    //show worker time logs
+    $(document).on("click", ".my_timelogs", function() {
+      $.ajax({
+        type: 'GET',
+        url: '{% url "show_time_logs" %}',
+        data: {
+          'worker': $('#user_name').attr("alt")
+        },
+        success: function(response) {
+          $("#main-block").html(`<div className="row mb-2">
+            <div className="col-12 m-1 created_on">
+            <span class="m-1 p-1 default-color"><a class="show-timelogs">All time logs</a></span>/
+            <span class="m-1 p-1 default-color"><a class="my_timelogs">Your time logs</a></span>
+            </div>
+            </div>
+            ${response.timelogs_html}`);
+            smoothScrollBackToTop()
+        }
+      });
+    });
+
+    //log to trash
+    $(document).on("click", ".fa-user-times", function() {
+      var self = $(this);
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'remove_time_log' %}",
+        data: {
+          'worker': $('#user_name').attr("alt"),
+          'timelog': self.attr("alt"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var log = self.parent().parent().parent();
+          log.fadeOut(function() {
+            log.remove();
+          });
+        }
+      });
+      return false;
+    });
+  </script>
+  <!-- end time log ajax -->
+
+  <!-- message ajax -->
+  <script type="text/javascript">
+    //get_message for worker
+    $(document).on("click", "#account", function() {
+      $.ajax({
+        type: 'GET',
+        url: '{% url "get_messages" %}',
+        data: {
+          'worker': $('#user_name').attr("alt"),
+        },
+        success: function(response) {
+          $("#messages-box").html(response.messages_html);
+        }
+      });
+    });
+
+    //show message
+    $(document).on("click", ".show-message", function() {
+      $.ajax({
+        type: 'GET',
+        url: '{% url "show_message" %}',
+        data: {
+          'worker': $('#user_name').attr("alt"),
+          'message': $(this).attr("alt"),
+        },
+        success: function(response) {
+          $("#main-block").html(response.message_html);
+          $("#userViewForm").modal('hide');
+        }
+      });
+    });
+
+    //message to trash
+    $(document).on("click", ".fa-trash-alt", function() {
+      $.ajax({
+        type: 'POST',
+        url: '{% url "remove_message" %}',
+        data: {
+          'worker': $('#user_name').attr("alt"),
+          'message': $(this).attr("alt"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          $("#messages-box").html(response.messages_html);
+        }
+      });
+      return false;
+    });
+  </script>
+  <!-- end message ajax -->
   <!-- end front -->
 
 </body>
+
 </html>

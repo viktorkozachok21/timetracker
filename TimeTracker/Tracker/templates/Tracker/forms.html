@@ -1,0 +1,389 @@
+<!-- user / worker form block -->
+{% if new_user_form %}
+<div class="modal fade card" id="newWorkerForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog form-dialog">
+    <div class="modal-content form-content container-fluid text-center p-1">
+      <form action="" id="new-worker-form" method="POST" novalidate>
+        {% csrf_token %}
+        <div class="modal-header mb-3 created_on">
+          <h4 class="modal-title font-weight-bold">New Worker</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body jumbotron mx-1">
+          <div class="row teal lighten-2 m-1">
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-user-tie mr-2" title="username"></i>
+                {{ new_user_form.username }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-envelope mr-2" title="email"></i>
+                {{ new_user_form.email }}
+              </div>
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-1">
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-key mr-2" title="password"></i>
+                {{ new_user_form.password }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-calendar-alt mr-2" title="birth date"></i>Birth date:
+                {{ new_worker_form.date_of_birth }}
+              </div>
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-1">
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-user-tag mr-2" title="first name"></i>
+                {{ new_worker_form.first_name }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-user-tag mr-2" title="last name"></i>
+                {{ new_worker_form.last_name }}
+              </div>
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-3 mr-3">
+            <div class="col-md-12 md-form input-group">
+              <div class="input-group-addon">
+                <span class="input-group-text"><i class="fas fa-user-circle mr-2" title="post"></i>Post: </span>
+              </div>
+              {{ new_worker_form.post }}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer created_on">
+          <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success btn-lg">Add worker</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if change_user_form %}
+<div class="modal fade card" id="changeWorkerForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog form-dialog">
+    <div class="modal-content form-content container-fluid text-center p-1">
+      <form action="" id="change-worker-form" method="POST" novalidate>
+        {% csrf_token %}
+        <div class="modal-header mb-3 created_on">
+          <h4 class="modal-title font-weight-bold">New Worker</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body jumbotron mx-1">
+          <div class="row teal lighten-2 m-1">
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-user-tie mr-2" title="username"></i>
+                {{ user_form.username }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-envelope mr-2" title="email"></i>
+                {{ user_form.email }}
+              </div>
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-1">
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-key mr-2" title="password"></i>
+                {{ user_form.password }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-calendar-alt mr-2" title="birth date"></i>Birth date:
+                {{ worker_form.date_of_birth }}
+              </div>
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-1">
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-user-tag mr-2" title="first name"></i>
+                {{ worker_form.first_name }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-user-tag mr-2" title="last name"></i>
+                {{ worker_form.last_name }}
+              </div>
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-3 mr-3">
+            <div class="col-md-12 md-form input-group">
+              <div class="input-group-addon">
+                <span class="input-group-text"><i class="fas fa-user-circle mr-2" title="post"></i>Post: </span>
+              </div>
+              {{ worker_form.post }}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer created_on">
+          <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success btn-lg">Add worker</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+<!-- end user / worker form block -->
+
+<!-- project form block -->
+{% if new_project_form %}
+<div class="modal fade card" id="newProjectForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog form-dialog" role="document">
+    <div class="modal-content form-content container-fluid text-center p-1">
+      <form action="" id="new-project-form" method="POST" novalidate>
+        {% csrf_token %}
+        <div class="modal-header mb-1 created_on">
+          <h4 class="modal-title font-weight-bold">New Project</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body jumbotron mx-1">
+          <div class="row teal lighten-2 m-1">
+            <div class="col-12">
+              <div class="md-form">
+                <i class="fas fa-user-tag mr-2" title="project name"></i>
+                {{ project_form.project_name }}
+              </div>
+            </div>
+          </div>
+          <div class="md-form teal lighten-2">
+            {{ project_form.summary|safe }}
+          </div>
+          <div class="md-form teal lighten-2 input-group created_on mb-3">
+            <div class="input-group-addon m-1">
+              <span class="input-group-text"><i class="fas fa-users mr-2"></i>Workers<i class="fas fa-users ml-2"></i></span>
+            </div>
+            {{ project_form.workers }}
+          </div>
+        </div>
+        <div class="modal-footer created_on">
+          <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success btn-lg">Add project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if change_project_form %}
+<div class="modal fade card" id="changeProjectForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog form-dialog" role="document">
+    <div class="modal-content form-content container-fluid text-center p-1">
+      <form action="" id="change-project-form" method="POST" novalidate>
+        {% csrf_token %}
+        <div class="modal-header mb-1 created_on">
+          <h4 class="modal-title font-weight-bold">New Project</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body jumbotron mx-1">
+          <div class="row teal lighten-2 m-1">
+            <div class="col-12">
+              <div class="md-form">
+                <i class="fas fa-user-tag mr-2" title="project name"></i>
+                {{ change_project_form.project_name }}
+              </div>
+            </div>
+          </div>
+          <div class="md-form teal lighten-2">
+            {{ change_project_form.summary|safe }}
+          </div>
+          <div class="md-form teal lighten-2 input-group created_on mb-3">
+            <div class="input-group-addon m-1">
+              <span class="input-group-text"><i class="fas fa-users mr-2"></i>Workers<i class="fas fa-users ml-2"></i></span>
+            </div>
+            {{ change_project_form.workers }}
+          </div>
+        </div>
+        <div class="modal-footer created_on">
+          <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success btn-lg">Add project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+<!-- end project form block -->
+
+<!-- task form block -->
+{% if new_task_form %}
+<div class="modal fade card" id="newTaskForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog form-dialog">
+    <div class="modal-content form-content container-fluid text-center p-1">
+      <form action="" id="new-task-form" method="POST" novalidate>
+        {% csrf_token %}
+        <div class="modal-header mb-3 created_on">
+          <h4 class="modal-title font-weight-bold">New Task</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body jumbotron mx-1">
+          <div class="row teal lighten-2 m-1">
+            <div class="col-12">
+              <div class="md-form">
+                <i class="fas fa-user-tag mr-2" title="task title"></i>
+                {{ task_form.title }}
+              </div>
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-1">
+            <div class="col-md-12">
+              <div class="md-form">
+                {{ task_form.description|safe }}
+              </div>
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-1">
+            <div class="col-md-4">
+              <div class="md-form input-group created_on">
+                <div class="input-group-addon m-1">
+                  <span class="input-group-text">Task priority</span>
+                </div>
+                {{ task_form.priority_of_task }}
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="md-form input-group created_on">
+                <div class="input-group-addon m-1">
+                  <span class="input-group-text">Task type</span>
+                </div>
+                {{ task_form.type_of_task }}
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="md-form input-group created_on">
+                <span class="input-group-text">Estimated time</span>{{ task_form.estimated_time }}
+              </div>
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-1">
+            <div class="col-12" style="display: none;" id="date-uncorrect"></div>
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-calendar-alt mr-2" title="birth date"></i>Fvailable from:
+                {{ task_form.available_from }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-calendar-alt mr-2" title="birth date"></i>Available to:
+                {{ task_form.available_to }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer created_on">
+          <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success btn-lg">Add task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if change_task_form %}
+<div class="modal fade card" id="changeTaskForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog form-dialog">
+    <div class="modal-content form-content container-fluid text-center p-1">
+      <form action="" id="change-task-form" method="POST" novalidate>
+        {% csrf_token %}
+        <div class="modal-header mb-3 created_on">
+          <h4 class="modal-title font-weight-bold">New Task</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body jumbotron mx-1">
+          <div class="row teal lighten-2 m-1">
+            <div class="col-12">
+              <div class="md-form">
+                <i class="fas fa-user-tag mr-2" title="task title"></i>
+                {{ task_form.title }}
+              </div>
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-1">
+            <div class="col-md-12">
+              <div class="md-form">
+                {{ task_form.description|safe }}
+              </div>
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-1">
+            <div class="col-md-4">
+              <div class="md-form input-group created_on">
+                <div class="input-group-addon m-1">
+                  <span class="input-group-text">Task priority</span>
+                </div>
+                {{ task_form.priority_of_task }}
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="md-form input-group created_on">
+                <div class="input-group-addon m-1">
+                  <span class="input-group-text">Task type</span>
+                </div>
+                {{ task_form.type_of_task }}
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="md-form input-group created_on">
+                <span class="input-group-text">Estimated time</span>{{ task_form.estimated_time }}
+              </div>
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-1">
+            <div class="col-12" style="display: none;" id="date-uncorrect"></div>
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-calendar-alt mr-2" title="birth date"></i>Fvailable from:
+                {{ task_form.available_from }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="md-form">
+                <i class="fas fa-calendar-alt mr-2" title="birth date"></i>Available to:
+                {{ task_form.available_to }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer created_on">
+          <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success btn-lg">Add task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+<!-- end task form block -->

@@ -62,15 +62,29 @@ class Task(models.Model):
     type_of_task = models.CharField(max_length=1, choices=TYPES, blank=True, default='F')
     date_of_start = models.DateTimeField(auto_now_add=True)
     date_of_end = models.DateTimeField(null=True, blank=True)
+    available_from = models.DateField(null=True, blank=True)
+    available_to = models.DateField(null=True, blank=True)
+    is_available = models.BooleanField()
     estimated_time = models.CharField(max_length=10, default="24:00:00")
-    spend_time = models.CharField(max_length=10, default="00:00:00")
 
     class Meta:
         ordering = ["-date_of_start", "is_completed"]
 
+    def accessibility(self):
+        today = datetime.now().date()
+        if self.available_from <= today and self.available_to >= today:
+            self.is_available = True
+            self.save()
+        else:
+            self.is_available = False
+            self.save()
+
     def complete(self):
         self.date_of_start = datetime.now() - timedelta(days=7)
         self.date_of_end = datetime.now()
+        self.available_from = datetime.now().date()
+        self.available_to = datetime.now().date() + timedelta(days=7)
+        self.accessibility()
         self.worker = None
         self.is_active = False
         self.is_completed = True
@@ -82,12 +96,14 @@ class Task(models.Model):
         self.estimated_time = "20:00:00"
         self.save()
 
-    def spent(self, new_time):
-        self.spend_time = new_time
+    def end(self):
+        self.date_of_end = datetime.now()
+        self.is_active = False
+        self.worker = None
         self.save()
 
     def __str__(self):
-        return self.project.project_name + " ~ " + self.title
+        return self.title
 
 
 class Comment(models.Model):
@@ -110,11 +126,11 @@ class Worker(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     POSTS = (
-        ('D', 'Designer'),
         ('A', 'Analyst'),
+        ('D', 'Designer'),
         ('M', 'Manager'),
         ('T', 'Tester'),
-        ('D', 'Developer'),
+        ('P', 'Programmer'),
         ('E', 'Engineer'),
         ('L', 'Lead'),
     )
@@ -128,29 +144,17 @@ class Worker(models.Model):
 class TimeLog(models.Model):
 
     time_of_start = models.DateTimeField(auto_now_add=True)
-    time_of_end = models.DateTimeField(null=True, blank=True)
-    spend_time = models.TimeField(null=True, blank=True)
+    action = models.CharField(max_length=256)
     worker = models.ForeignKey('Worker', on_delete=models.SET_NULL, null=True, blank=True)
     task = models.ForeignKey('Task', on_delete=models.SET_NULL, null=True, blank=True)
-    start_comment = models.TextField()
-    end_comment = models.TextField()
-    is_completed = models.BooleanField()
+    comment = models.TextField()
+    spend_time = models.CharField(max_length=10, null=True, blank=True)
 
     class Meta:
         ordering = ["-time_of_start"]
 
-    def get_end(self):
-        self.time_of_end = datetime.now()
-        hour = self.time_of_end.hour - self.time_of_start.hour
-        minute = self.time_of_end.minute - self.time_of_start.minute
-        second = self.time_of_end.second - self.time_of_start.second
-        duration_time = str(hour) + ":" + str(minute) + ":" + str(second)
-        self.spend_time = duration_time
-        self.is_completed = True
-        self.save()
-
     def __str__(self):
-        return self.task.project.project_name + " ~ " + self.task.title
+        return self.action
 
 class Message(models.Model):
 

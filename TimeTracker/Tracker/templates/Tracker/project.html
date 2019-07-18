@@ -1,3 +1,4 @@
+<!-- project detail page -->
   {% if worker in project.workers.all or user.is_superuser %}
   <div class="row">
     <div class="col-10">
@@ -19,65 +20,75 @@
     <!-- if task is not completed -->
     <div class="p-1 m-3 white">
       <div class="row align-items-center success-color-dark p-3 m-3">
-        <div class="col-6 p-3 created_on warning-color">
+        <div class="col-7 p-3 created_on warning-color">
           <a title="{{ task.title }}" data-toggle="collapse" data-target="#summary{{ task.id }}">
             <span>{{ task.title }}</span>
           </a>
         </div>
-      <div class="col-4 created_on">
-        {% if user.is_superuser %}
-        <i class="far fa-window-close mr-5 p-2" title="close the task" alt="{{ task.id }}"></i>
-        {% endif %}
-        <div class="row">
-          <div class="p-2 col-xs-12 col-sm-4"><i class="fas fa-sync more" alt="{{ task.id }}" title="synchronize"></i></div>
-          {% if not task.is_active %}
-          <div class="p-2 col-xs-12 col-sm-4 task_status" id="task_status{{ task.id }}">
-            <i class="far fa-check-square" title="start" alt="{{ task.id }}"></i>
-          </div>
-          {% elif worker == task.worker %}
-          <div class="p-2 col-xs-12 col-sm-4 task_status" id="task_status{{ task.id }}">
-            <i class="far fa-pause-circle" title="end" alt="{{ task.id }}"></i>
+        <div class="col-4 created_on">
+          {% if user.is_superuser %}
+          <i class="far fa-window-close mr-5 p-2" title="close the task" alt="{{ task.id }}"></i>
+          {% endif %}
+          {% if task.is_available == True %}
+          <div class="row">
+            <div class="p-2 col-xs-12 col-sm-4"><i class="fas fa-sync more" alt="{{ task.id }}" title="synchronize"></i></div>
+            {% if not task.is_active %}
+            <div class="p-2 col-xs-12 col-sm-4 task_status" id="task_status{{ task.id }}">
+              <i class="far fa-check-square" title="start" alt="{{ task.id }}"></i>
+            </div>
+            {% elif worker == task.worker %}
+            <div class="p-2 col-xs-12 col-sm-4 task_status" id="task_status{{ task.id }}">
+              <i class="far fa-pause-circle" title="end" alt="{{ task.id }}"></i>
+            </div>
+            {% else %}
+            <div class="p-2 col-xs-12 col-sm-4 task_status">
+              <i class="fas fa-lock" title="active"></i>
+            </div>
+            {% endif %}
+            <div class="p-2 col-xs-12 col-sm-4">
+              <i class="far fa-plus-square" id="{{ task.id }}" title="add comment"></i>
+            </div>
           </div>
           {% else %}
-          <div class="p-2 col-xs-12 col-sm-4 task_status">
-            <i class="fas fa-lock" title="active"></i>
+          <div class="col">
+            <h5>The task is unavailable</h5>
           </div>
           {% endif %}
-          <div class="p-2 col-xs-12 col-sm-4">
-            <i class="far fa-plus-square" id="{{ task.id }}" title="add comment"></i>
-          </div>
         </div>
-      </div>
-      <div class="col-2 created_on">
-        <div class="row">
-        <i class="fas col-xs-12 col-sm-6 p-1 fa-user-clock" title="spend time" alt="{{ task.id }}" id="spendtime{{ task.id }}"><span class="time-block p-1 created_on"> {{ task.spend_time }}</span></i>
-        <i class="fas col-xs-12 col-sm-6 p-1 fa-clock" title="estimated time"><span class="time-block p-1 created_on"> {{ task.estimated_time }}</span></i>
+        <div class="col-1 created_on">
+          <i class="fas p-1 fa-user-clock" alt="{{ task.id }}" title="estimated time"><span class="time-block p-1 created_on"> {{ task.estimated_time }}</span></i>
         </div>
-      </div>
-      <div class="text-center col-12 m-1">
-        <div id="summary{{ task.id }}" class="collapse">
-          <div class="container-fluid grey lighten-2 p-1">
-            <div class="row white m-1">
-              <div class="col-12 summary-content text-justify p-3" contenteditable="true" id="content{{ task.id }}">{{ task.description|safe }}</div>
-              <div class="col m-1 p-1"><i class="fas fa-save" title="save" alt="{{ task.id }}"></i></div>
-            </div>
-            <div class="row orange accent-1">
-              <div class="col-3 created_on">Created: {{ task.date_of_start }}</div>
-              <div class="col-3 created_on">Priority: {{ task.get_priority_of_task_display }}</div>
-              <div class="col-3 created_on">Type: {{ task.get_type_of_task_display }}</div>
-              {% if task.worker %}
-              <div class="col-3 task_worker created_on" id="task_worker{{ task.id }}">Worker: {{ task.worker }}</div>
-              {% else %}
-              <div class="col-3 task_worker created_on" id="task_worker{{ task.id }}">Worker: the task is free</div>
-              {% endif %}
+        <div class="text-center col-12 m-1">
+          <div id="summary{{ task.id }}" class="collapse">
+            <div class="container-fluid grey lighten-2 p-1">
+              <div class="row white m-1">
+                <div class="col-12 summary-content text-justify p-3" contenteditable="true" id="content{{ task.id }}">{{ task.description|safe }}</div>
+                <div class="col m-1 p-1"><i class="fas fa-save" title="save" alt="{{ task.id }}"></i></div>
+              </div>
+              <div class="row orange accent-1">
+                <div class="col-3 created_on">Created: {{ task.date_of_start }}</div>
+                <div class="col-3 created_on">Priority: {{ task.get_priority_of_task_display }}</div>
+                <div class="col-3 created_on">Type: {{ task.get_type_of_task_display }}</div>
+                {% if task.worker %}
+                <div class="col-3 task_worker created_on" id="task_worker{{ task.id }}">Worker: {{ task.worker }}</div>
+                {% else %}
+                <div class="col-3 task_worker created_on" id="task_worker{{ task.id }}">Worker: the task is free</div>
+                {% endif %}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      <div class="row created_on">
+        <div class="col-12 warning-color created_on m-1 p-1">
+          Available from: {{ task.available_from }} to: {{ task.available_to }}
+        </div>
+      </div>
+      {% if task.is_available == True %}
       <div class="silver border border-warning p-1 m-2 text-center" id="more{{ task.id }}">
-          <h5>To load comments, just click on the sync button</h5>
+        <h5>To load comments, just click on the sync button</h5>
       </div>
+      {% endif %}
     </div>
     <!-- end is not completed -->
     {% else %}
@@ -87,31 +98,31 @@
         <div class="col-12 p-3 unique-color">
           <div class="row">
             <div class="col-11 created_on">
-          <a title="completed" data-toggle="collapse" data-target="#summary{{ task.id }}"><span>{{ task.title }}</span></a>
-          </div>
-          <div class="col-1 mr-auto created_on">
-          {% if user.is_superuser %}
-          <i class="far fa-calendar-plus mr-3" title="open the task again" alt="{{ task.id }}"></i>
-          <i class="fas fa-trash" title="to trash" alt="{{ task.id }}"></i>
-          {% else %}
-          <i class="far fa-calendar-check m-1"></i>
-          {% endif %}
+              <a title="completed" data-toggle="collapse" data-target="#summary{{ task.id }}"><span>{{ task.title }}</span></a>
+            </div>
+            <div class="col-1 mr-auto created_on">
+              {% if user.is_superuser %}
+              <i class="far fa-calendar-plus mr-3" title="open the task again" alt="{{ task.id }}"></i>
+              <i class="fas fa-trash" title="to trash" alt="{{ task.id }}"></i>
+              {% else %}
+              <i class="far fa-calendar-check m-1"></i>
+              {% endif %}
             </div>
           </div>
         </div>
-      <div class="text-center col-12 m-1">
-        <div id="summary{{ task.id }}" class="collapse">
-          <div class="container-fluid grey lighten-2 p-1">
-            <div class="row white m-1">
-              <div class="col-12 text-justify">{{ task.description|safe }}</div>
-            </div>
-            <div class="row orange accent-1">
-              <div class="col-12">End date: {{ task.date_of_end }}</div>
+        <div class="text-center col-12 m-1">
+          <div id="summary{{ task.id }}" class="collapse">
+            <div class="container-fluid grey lighten-2 p-1">
+              <div class="row white m-1">
+                <div class="col-12 text-justify">{{ task.description|safe }}</div>
+              </div>
+              <div class="row orange accent-1">
+                <div class="col-12">End date: {{ task.date_of_end }}</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
     <!-- end is completed -->
     {% endif %}
@@ -119,84 +130,54 @@
   </div>
   <!-- end task block -->
   {% endif %}
+<!-- end project detail block -->
 
+  <!-- modal form to add a new comment for task -->
+  <div class="modal fade" id="modalCommentForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form id="comment-form" action="" method="POST">
+          {% csrf_token %}
+          <div class="modal-header text-center">
+            <h4 class="modal-title w-100 font-weight-bold">Add comment</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body mx-3">
+            <div class="md-form mb-5">
+              <textarea type="text" id="comments" name="comment" class="form-control md-textarea" required="required"></textarea>
+              <label data-error="wrong" data-success="right" for="comments">Your comments</label>
+              <div id="hide" title=""></div>
+            </div>
+          </div>
+          <div class="modal-footer d-flex justify-content-center">
+            <button type="submit" class="btn btn-default">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- endform -->
 
-<!-- modal form to add a new comment for task -->
-<div class="modal fade" id="modalCommentForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <form id="comment-form" action="" method="POST">
-        {% csrf_token %}
-        <div class="modal-header text-center">
-          <h4 class="modal-title w-100 font-weight-bold">Add comment</h4>
+  <!-- modal form to show timelogs of task -->
+  <div class="modal fade right" id="timeLogForm" tabindex="-1" role="dialog" aria-labelledby="mytimeLogForm" aria-hidden="true">
+    <div class="modal-dialog modal-full-height modal-right" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title w-100" id="mytimeLogForm">Time logs</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body mx-3">
-          <div class="md-form mb-5">
-            <textarea type="text" id="comments" name="comment" class="form-control md-textarea" required="required"></textarea>
-            <label data-error="wrong" data-success="right" for="comments">Your comments</label>
-            <div id="hide" title=""></div>
+        <div class="modal-body">
+          <div class="row justify-content-center align-items-center" id="time-logs">
+          </div>
+          <div class="modal-footer justify-content-center mt-3">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>
-        <div class="modal-footer d-flex justify-content-center">
-          <button type="submit" class="btn btn-default">Save</button>
-        </div>
-    </form>
+      </div>
     </div>
   </div>
-</div>
-<!-- endform -->
-
-<!-- modal form add new project workers -->
-<div class="modal fade card" id="newProjectWorkersForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-<div class="modal-dialog form-dialog" role="document">
-<div class="modal-content form-content container-fluid text-center p-1">
-  <form action="" id="new-project-workers-form" method="POST" novalidate>
-    {% csrf_token %}
-    <div class="modal-header mb-1 created_on">
-      <h4 class="modal-title font-weight-bold">Change Project Workers</h4>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body jumbotron mx-1" id="new-project-workers" alt="">
-      <div class="md-form teal lighten-2 input-group created_on mb-3">
-        <div class="input-group-addon m-1">
-          <span class="input-group-text"><i class="fas fa-users mr-2"></i>Workers<i class="fas fa-users ml-2"></i></span>
-        </div>
-        {{ project_workers_form.workers }}
-      </div>
-    </div>
-    <div class="modal-footer created_on">
-      <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
-      <button type="submit" class="btn btn-success btn-lg">Save project</button>
-    </div>
-  </form>
-</div>
-</div>
-</div>
-<!-- end modal new project workers -->
-
-<!-- modal form to show timelogs of task -->
-<div class="modal fade right" id="timeLogForm" tabindex="-1" role="dialog" aria-labelledby="mytimeLogForm" aria-hidden="true">
-  <div class="modal-dialog modal-full-height modal-right" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title w-100" id="mytimeLogForm">Time logs</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="row justify-content-center align-items-center" id="time-logs">
-        </div>
-      <div class="modal-footer justify-content-center mt-3">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-    </div>
-  </div>
-</div>
-<!-- endform -->
+  <!-- endform -->

@@ -22,7 +22,7 @@ class WorkerForm(forms.ModelForm):
 
     class Meta:
         model = Worker
-        fields = ['last_name', 'first_name', 'date_of_birth', 'post', 'avatar']
+        fields = ['last_name', 'first_name', 'date_of_birth', 'post']
         widgets = {
             'post': forms.Select(choices=Worker.POSTS,attrs={'class': 'form-control'})
         }
@@ -41,17 +41,17 @@ class TaskForm(forms.ModelForm):
     title = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Task title'}))
     description = forms.CharField(widget=forms.Textarea(attrs={'class': 'mceEditor'}))
     estimated_time = forms.CharField(max_length=9, widget=forms.TextInput(attrs={'placeholder': 'Estimated time', 'value' : '24:00:00'}))
+    available_from = forms.DateField(widget=forms.DateInput(attrs={'class' : 'picker-from date', 'placeholder': 'Choice start date', 'readonly': ''}))
+    available_to = forms.DateField(widget=forms.DateInput(attrs={'class' : 'picker-to date', 'placeholder': 'Choice end date', 'readonly': ''}))
 
     class Meta:
         model = Task
-        fields = ['title', 'description', 'priority_of_task', 'type_of_task', 'estimated_time']
+        fields = ['title', 'description', 'priority_of_task', 'type_of_task', 'estimated_time', 'available_from', 'available_to']
         widgets = {
             'priority_of_task': forms.Select(choices=Task.PRIORITIZE,attrs={'class': 'form-control'}),
             'type_of_task': forms.Select(choices=Task.TYPES,attrs={'class': 'form-control'})
         }
 
-class ProjectWorkersForm(forms.ModelForm):
+class FileUploadForm(forms.Form):
 
-    class Meta:
-        model = Project
-        fields = ['workers',]
+    avatar = forms.ImageField()
