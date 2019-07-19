@@ -14,7 +14,7 @@ class Project(models.Model):
     summary = HTMLField('Summary')
     created_on = models.DateTimeField(auto_now_add=True)
     workers = models.ManyToManyField('Worker', help_text="Select a worker for this project", related_name='project_worker')
-    is_completed = models.BooleanField()
+    is_completed = models.BooleanField(default=False)
     date_of_end = models.DateTimeField(null=True, blank=True)
 
     class Meta:
@@ -43,8 +43,8 @@ class Task(models.Model):
     worker = models.ForeignKey('Worker', on_delete=models.SET_NULL, null=True, blank=True)
     description = HTMLField('Description')
     project = models.ForeignKey('Project', on_delete=models.SET_NULL, null=True)
-    is_active = models.BooleanField()
-    is_completed = models.BooleanField()
+    is_active = models.BooleanField(default=False)
+    is_completed = models.BooleanField(default=False)
 
     PRIORITIZE = (
         ('N', 'Normal'),
@@ -64,7 +64,7 @@ class Task(models.Model):
     date_of_end = models.DateTimeField(null=True, blank=True)
     available_from = models.DateField(null=True, blank=True)
     available_to = models.DateField(null=True, blank=True)
-    is_available = models.BooleanField()
+    is_available = models.BooleanField(default=False)
     estimated_time = models.CharField(max_length=10, default="24:00:00")
 
     class Meta:

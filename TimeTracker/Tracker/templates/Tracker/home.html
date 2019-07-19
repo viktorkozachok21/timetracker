@@ -1,57 +1,64 @@
 {% extends 'index.html' %}
 
 
+
 <!-- project list block -->
-{% block project_list %}
+{% block main_block %}
 {% for project in projects_list %}
 {% if project.is_completed == False %}
-<div class="card m-3 border border-info">
+<div class="card m-3 border border-info" id="{{ project.id }}">
   {% if worker in project.workers.all or user.is_superuser %}
-  <div class="task m-1 light-green lighten-2 row">
-    <div class="m-1 project col-7">
-      <a class="project-detail" alt="{{ project.id }}" title="{{ project.project_name }}">{{ project.project_name }}</a>
+  <div class="p-1 m-1 light-green lighten-2 waves-effect waves-light block-center text-center row">
+    <div class="p-1 project-detail col-lg-8 col-xs-8" title="{{ project.project_name }}">
+      {{ project.project_name }}
     </div>
-    <div class="m-1 col-2 ml-auto text-center">
+    <div class="col-lg-2 col-xs-2 ml-auto block-center p-1 text-center">
       {% if user.is_superuser %}
-      <i class="fas fa-times mr-3" title="close the project" alt="{{ project.id }}"></i>
-      <i class="fas fa-edit" alt="{{ project.id }}"></i>
+      <i class="fas fa-edit m-1 mr-2 text-center" title="edit the project"></i>
+      <i class="far fa-times-circle m-1 mr-2 text-center" title="close the project"></i>
       {% endif %}
-      <i class="fas fa-lock-open m-1" title="available"></i>
+      <i class="fas fa-lock-open m-1 text-center" title="available"></i>
     </div>
-    <div class="m-1 col-2 created_on ml-auto" title="created on">{{ project.created_on }}</div>
+    <div class="col-lg-2 col-xs-2 block-center date ml-auto" title="created on">{{ project.created_on }}</div>
   </div>
   {% else %}
-  <div class="task m-1 orange lighten-2 row">
-    <div class="m-1 project col-8" title="{{ project.project_name }}">{{ project.project_name }}</div>
-    <div class="m-1 col-1 ml-auto text-center"><i class="fas fa-lock" title="unavailable"></i></div>
-    <div class="m-1 col-2 created_on ml-auto" title="created on">{{ project.created_on }}</div>
+  <div class="p-1 m-1 orange lighten-2 waves-effect waves-light block-center text-center row">
+    <div class="p-1 col-lg-8 col-xs-8 text-center" title="{{ project.project_name }}">{{ project.project_name }}</div>
+    <div class="p-1 col-lg-2 col-xs-2 ml-auto text-center"><i class="fas fa-lock" title="unavailable"></i></div>
+    <div class="p-1 col-lg-2 col-xs-2 block-center date ml-auto" title="created on">{{ project.created_on }}</div>
   </div>
   {% endif %}
-  <div class="m-1 row">Workers: {{ project.workers.all|join:", " }}</div>
+  <div class="row p-1">
+    <div class="col-lg-12 col-xs-12 text-left">
+    Workers: {{ project.workers.all|join:", " }}
+    </div>
+  </div>
 </div>
 {% else %}
-<div class="card m-3 border border-warning">
-  <div class="task m-1 teal lighten-4 row">
-    <div class="m-1 project col-7">
+<div class="card m-3 border border-warning" id="{{ project.id }}">
+  <div class="p-1 m-1 teal lighten-4 waves-effect waves-light block-center text-center row">
+    <div class="p-1 col-lg-8 col-xs-8">
       <span title="{{ project.project_name }}">{{ project.project_name }}</span>
     </div>
-    <div class="m-1 col-2 ml-auto text-center">
+    <div class="col-lg-2 col-xs-2 ml-auto block-center text-center">
       {% if user.is_superuser %}
-      <i class="fas fa-external-link-alt mr-3" title="open the project again" alt="{{ project.id }}"></i>
-      <i class="fas fa-minus-square mr-3" title="to trash" alt="{{ project.id }}"></i>
-      <i class="fas fa-lock-open mr-3" title="available"></i>
+      <i class="far fa-arrow-alt-circle-up m-1 mr-2 text-center" title="open the project again"></i>
+      <i class="fas fa-trash-alt m-1 mr-2 text-center" title="to trash"></i>
+      <i class="fas fa-lock-open m-1 text-center" title="available"></i>
       {% else %}
-      <i class="fas fa-lock m-1" title="unavailable"></i>
+      <i class="fas fa-lock m-1 text-center" title="unavailable"></i>
       {% endif %}
     </div>
-    <div class="m-1 col-2 created_on ml-auto" title="end date">{{ project.date_of_end }}</div>
+    <div class="col-lg-2 col-xs-2 block-center date ml-auto" title="end date">{{ project.date_of_end }}</div>
   </div>
 </div>
 {% endif %}
 {% endfor %}
+{% endblock %}
 <!-- end project list block -->
 
 <!-- paginator -->
+<!-- {% block paginator %}
 <nav class="font-weight-bold d-flex m-3 justify-content-center" aria-label="Page navigation example">
   {% if projects_list.has_other_pages %}
   <ul class="pagination pagination-circle pg-blue justify-content-center">
@@ -75,5 +82,5 @@
     {% endif %}
   </ul>
 </nav>
+{% endblock %} -->
 <!-- end paginator -->
-{% endblock %}

@@ -1,11 +1,11 @@
-<!-- user / worker form block -->
 {% if new_user_form %}
+<!-- user / worker form block -->
 <div class="modal fade card" id="newWorkerForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog form-dialog">
     <div class="modal-content form-content container-fluid text-center p-1">
-      <form action="" id="new-worker-form" method="POST" novalidate>
-        {% csrf_token %}
-        <div class="modal-header mb-3 created_on">
+      <form action="" id="new-worker-form" method="POST">
+        <div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token_value }}"/></div>
+        <div class="modal-header mb-3">
           <h4 class="modal-title font-weight-bold">New Worker</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -63,7 +63,14 @@
             </div>
           </div>
         </div>
-        <div class="modal-footer created_on">
+        <div class="block-center error p-1"></div>
+        <div class="p-1">
+          {{ new_user_form.errors }}
+          {{ new_user_form.non_field_errors }}
+          {{ new_worker_form.errors }}
+          {{ new_worker_form.non_field_errors }}
+        </div>
+        <div class="modal-footer block-center">
           <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
           <button type="submit" class="btn btn-success btn-lg">Add worker</button>
         </div>
@@ -79,7 +86,7 @@
     <div class="modal-content form-content container-fluid text-center p-1">
       <form action="" id="change-worker-form" method="POST" novalidate>
         {% csrf_token %}
-        <div class="modal-header mb-3 created_on">
+        <div class="modal-header mb-3">
           <h4 class="modal-title font-weight-bold">New Worker</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -137,7 +144,7 @@
             </div>
           </div>
         </div>
-        <div class="modal-footer created_on">
+        <div class="modal-footer block-center">
           <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
           <button type="submit" class="btn btn-success btn-lg">Add worker</button>
         </div>
@@ -145,17 +152,16 @@
     </div>
   </div>
 </div>
-{% endif %}
 <!-- end user / worker form block -->
+{% endif %}
 
-<!-- project form block -->
 {% if new_project_form %}
 <div class="modal fade card" id="newProjectForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog form-dialog" role="document">
-    <div class="modal-content form-content container-fluid text-center p-1">
+    <div class="modal-content form-content text-center p-1">
       <form action="" id="new-project-form" method="POST" novalidate>
-        {% csrf_token %}
-        <div class="modal-header mb-1 created_on">
+        <div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token_value }}"/></div>
+        <div class="modal-header mb-1">
           <h4 class="modal-title font-weight-bold">New Project</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -166,21 +172,24 @@
             <div class="col-12">
               <div class="md-form">
                 <i class="fas fa-user-tag mr-2" title="project name"></i>
-                {{ project_form.project_name }}
+                {{ new_project_form.project_name }}
               </div>
             </div>
           </div>
           <div class="md-form teal lighten-2">
-            {{ project_form.summary|safe }}
+            {{ new_project_form.summary }}
           </div>
-          <div class="md-form teal lighten-2 input-group created_on mb-3">
-            <div class="input-group-addon m-1">
-              <span class="input-group-text"><i class="fas fa-users mr-2"></i>Workers<i class="fas fa-users ml-2"></i></span>
+          <div class="md-form teal lighten-2 input-group block-center">
+            <div class="input-group-addon m-1 text-center">
+              <div class="input-group-text block-center">
+                <i class="fas fa-users mr-2"></i>Workers<i class="fas fa-users ml-2"></i>
+              </div>
             </div>
-            {{ project_form.workers }}
+            {{ new_project_form.workers }}
           </div>
         </div>
-        <div class="modal-footer created_on">
+        <div class="block-center error p-1"></div>
+        <div class="modal-footer block-center">
           <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
           <button type="submit" class="btn btn-success btn-lg">Add project</button>
         </div>
@@ -190,14 +199,14 @@
 </div>
 {% endif %}
 
-{% if change_project_form %}
-<div class="modal fade card" id="changeProjectForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+{% if edit_project_form %}
+<div class="modal fade card" id="editProjectForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog form-dialog" role="document">
-    <div class="modal-content form-content container-fluid text-center p-1">
-      <form action="" id="change-project-form" method="POST" novalidate>
-        {% csrf_token %}
-        <div class="modal-header mb-1 created_on">
-          <h4 class="modal-title font-weight-bold">New Project</h4>
+    <div class="modal-content form-content text-center p-1">
+      <form action="" id="edit-project-form" method="POST" novalidate>
+        <div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token_value }}"/></div>
+        <div class="modal-header mb-1">
+          <h4 class="modal-title font-weight-bold">Edit Project</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -207,33 +216,35 @@
             <div class="col-12">
               <div class="md-form">
                 <i class="fas fa-user-tag mr-2" title="project name"></i>
-                {{ change_project_form.project_name }}
+                {{ edit_project_form.project_name }}
               </div>
             </div>
           </div>
           <div class="md-form teal lighten-2">
-            {{ change_project_form.summary|safe }}
+            {{ edit_project_form.summary }}
           </div>
-          <div class="md-form teal lighten-2 input-group created_on mb-3">
-            <div class="input-group-addon m-1">
-              <span class="input-group-text"><i class="fas fa-users mr-2"></i>Workers<i class="fas fa-users ml-2"></i></span>
+          <div class="md-form teal lighten-2 input-group block-center">
+            <div class="input-group-addon m-1 text-center">
+              <div class="input-group-text block-center">
+                <i class="fas fa-users mr-2"></i>Workers<i class="fas fa-users ml-2"></i>
+              </div>
             </div>
-            {{ change_project_form.workers }}
+            {{ edit_project_form.workers }}
           </div>
         </div>
-        <div class="modal-footer created_on">
+        <div class="block-center error p-1" id="{{ selected_project }}"></div>
+        <div class="modal-footer block-center">
           <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-success btn-lg">Add project</button>
+          <button type="submit" class="btn btn-success btn-lg">Save project</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 {% endif %}
-<!-- end project form block -->
 
-<!-- task form block -->
 {% if new_task_form %}
+<!-- task form block -->
 <div class="modal fade card" id="newTaskForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog form-dialog">
     <div class="modal-content form-content container-fluid text-center p-1">
@@ -385,5 +396,5 @@
     </div>
   </div>
 </div>
-{% endif %}
 <!-- end task form block -->
+{% endif %}

@@ -93,17 +93,20 @@ def add_worker(request):
     if request.method == "GET" and request.is_ajax:
         user_form = UserForm()
         worker_form = WorkerForm()
+        csrf_token_value = request.COOKIES['csrftoken']
         form_html = loader.render_to_string(
             'Tracker/forms.html',
-            {'new_user_form': user_form, 'new_worker_form': worker_form}
+            {'new_user_form': user_form, 'new_worker_form': worker_form, "csrf_token_value": csrf_token_value}
         )
         return JsonResponse({"form_html": form_html}, status=200)
-    return JsonResponse({"success":False}, status=400)
 
     if request.method == "POST" and request.is_ajax:
         user_form = UserForm(request.POST)
         worker_form = WorkerForm(request.POST)
         if user_form.is_valid() and worker_form.is_valid():
+            new_user_email = request.POST['email']
+            if User.objects.filter(email__iexact=new_user_email).exists():
+                return JsonResponse({"success":False, "message":"User with this email already exists!"}, status=200)
             first_name = request.POST['first_name']
             last_name = request.POST['last_name']
             user = user_form.save()
@@ -114,10 +117,13 @@ def add_worker(request):
             worker = worker_form.save()
             worker.user = user
             worker.save()
-            user_form = UserForm()
-            worker_form = WorkerForm()
+            print(worker.first_name)
             return JsonResponse({"success":True}, status=200)
-        return JsonResponse({"success":False}, status=400)
+        username = request.POST['username']
+        if User.objects.filter(username__iexact=username).exists():
+            return JsonResponse({"success":False, "message":"User with this username already exists!"}, status=200)
+        else:
+            return JsonResponse({"success":False, "message":"You did not fill all the fields!"}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def change_worker(self):
@@ -152,18 +158,36 @@ def remove_worker(request):
 #project views block
 def add_project(request):
 
+    if request.method == "GET" and request.is_ajax:
+        project_form = ProjectForm()
+        csrf_token_value = request.COOKIES['csrftoken']
+        form_html = loader.render_to_string(
+            'Tracker/forms.html',
+            {'new_project_form': project_form, "csrf_token_value": csrf_token_value}
+        )
+        return JsonResponse({"form_html": form_html}, status=200)
+
     if request.method == "POST" and request.is_ajax:
         project_form = ProjectForm(request.POST)
         if project_form.is_valid():
+            new_project = request.POST['project_name']
+            if Project.objects.filter(project_name__iexact=new_project).exists():
+                return JsonResponse({"success":False, "message":"Project with this name already exists!"}, status=200)
             project = project_form.save()
-            project.save()
+            print(project.project_name)
             worker_list = request.POST.getlist('workers')
+            project.workers.remove(*project.workers.all())
             for people in worker_list:
                 project.workers.add(people)
             project.save()
-            project_form = ProjectForm()
-            return JsonResponse({"success":True}, status=200)
-        return JsonResponse({"success":False}, status=400)
+            project_html = loader.render_to_string(
+                'Tracker/content.html',
+                {'new_solo_project': project}
+            )
+            print("end")
+            return JsonResponse({"success":True, "project_html": project_html}, status=200)
+        else:
+            return JsonResponse({"success":False, "message":"You did not fill all the fields!"}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def project_detail(request):
@@ -185,18 +209,45 @@ def project_detail(request):
 
 def change_project(request):
 
+
     if request.method == "GET" and request.is_ajax:
         project_key = request.GET['project']
         project = get_object_or_404(Project, id=project_key)
+        selected_project = project.id
         project_form = ProjectForm(instance=project)
+        csrf_token_value = request.COOKIES['csrftoken']
         form_html = loader.render_to_string(
             'Tracker/forms.html',
-            {'change_project_form': project_form}
+            {'edit_project_form': project_form, "csrf_token_value": csrf_token_value, 'selected_project': selected_project}
         )
         return JsonResponse({"form_html": form_html}, status=200)
+
+    if request.method == "POST" and request.is_ajax:
+        project_form = ProjectForm(request.POST)
+        if project_form.is_valid():
+            new_project = request.POST['project_name']
+            selected_project = request.POST['selected_project']
+            project = get_object_or_404(Project, id=selected_project)
+            if Project.objects.filter(project_name__iexact=new_project).exclude(project_name=project.project_name).exists():
+                return JsonResponse({"success":False, "message":"Project with this name already exists!"}, status=200)
+            project.project_name = new_project
+            project.summary = request.POST['summary']
+            worker_list = request.POST.getlist('workers')
+            project.workers.remove(*project.workers.all())
+            for people in worker_list:
+                project.workers.add(people)
+            project.save()
+            print('end')
+            project_html = loader.render_to_string(
+                'Tracker/content.html',
+                {'new_solo_project': project}
+            )
+            return JsonResponse({"success":True, "project_html": project_html, "project": project.id}, status=200)
+        else:
+            return JsonResponse({"success":False, "message":"You did not fill all the fields!"}, status=200)
     return JsonResponse({"success":False}, status=400)
 
-def completed_project(request):
+def complet_project(request):
 
     if request.method == "POST" and request.is_ajax:
         project_key = request.POST['project']
@@ -204,7 +255,7 @@ def completed_project(request):
         project.complete()
         project_block = loader.render_to_string(
             'Tracker/content.html',
-            {'project': project, 'user': request.user}
+            {'closed_solo_project': project, 'user': request.user}
         )
         return JsonResponse({"project_block": project_block}, status=200)
     return JsonResponse({"success":False}, status=400)
@@ -218,7 +269,7 @@ def open_project(request):
         project.open()
         project_block = loader.render_to_string(
             'Tracker/content.html',
-            {'project': project, 'user': request.user}
+            {'new_solo_project': project, 'user': request.user}
         )
         return JsonResponse({"project_block": project_block}, status=200)
     return JsonResponse({"success":False}, status=400)

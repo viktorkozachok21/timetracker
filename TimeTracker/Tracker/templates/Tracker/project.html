@@ -1,98 +1,83 @@
 <!-- project detail page -->
   {% if worker in project.workers.all or user.is_superuser %}
-  <div class="row">
-    <div class="col-10">
+  <div class="jumbotron" id="{{ project.id }}">
+  <div class="p-1 m-1 block-center text-center row">
+    <div class="col-lg-11 col-xs-11 ml-auto block-center text-center">
       <h1>{{ project.project_name }}</h1>
     </div>
-    <div class="col-2">
+    <div class="col-lg-1 col-xs-1 ml-auto block-center text-center">
       {% if user.is_superuser %}
-      <i class="fas fa-plus-circle mr-3" data-toggle="modal" data-target="#newTaskForm" onclick="closeMenu()" alt="{{ project.id }}" title="add new task"></i>
-      <i class="fas fa-user-edit" data-toggle="modal" data-target="#newProjectWorkersForm" title="edit project workers" alt="{{ project.id }}"></i>
+      <i class="fas fa-plus-circle m-1 mr-2 text-center" onclick="closeMenu()" title="add new task"></i>
+      <i class="fas fa-edit m-1 text-center" title="edit the project"></i>
       {% endif %}
     </div>
   </div>
   <hr class="my-3">
-  <div class="container z-depth-5 text-justify cyan lighten-5 p-3 m-auto">{{ project.summary|safe }}</div>
-  <!-- task block -->
+  <div class="container-fluid z-depth-5 text-justify cyan lighten-5 p-3 m-auto">{{ project.summary|safe }}</div>
   <div class="p-1 mt-3 grey" id="task-content">
     {% for task in task_list %}
     {% if not task.is_completed %}
-    <!-- if task is not completed -->
-    <div class="p-1 m-3 white">
-      <div class="row align-items-center success-color-dark p-3 m-3">
-        <div class="col-7 p-3 created_on warning-color">
+    <div class="p-1 m-3 white task" id="{{ task.id }}">
+      <div class="block-center text-center row success-color-dark p-3 m-3">
+        <div class="col-lg-7 col-xs-7 block-center text-center p-3 warning-color">
           <a title="{{ task.title }}" data-toggle="collapse" data-target="#summary{{ task.id }}">
             <span>{{ task.title }}</span>
           </a>
         </div>
-        <div class="col-4 created_on">
+        <div class="col-lg-4 col-xs-4 ml-auto block-center p-1 text-center">
           {% if user.is_superuser %}
-          <i class="far fa-window-close mr-5 p-2" title="close the task" alt="{{ task.id }}"></i>
+          <i class="far fa-window-close m-1 mr-2 text-center" title="close the task"></i>
           {% endif %}
           {% if task.is_available == True %}
-          <div class="row">
-            <div class="p-2 col-xs-12 col-sm-4"><i class="fas fa-sync more" alt="{{ task.id }}" title="synchronize"></i></div>
+          <i class="fas fa-sync m-1 mr-2 text-center" title="synchronize"></i>
             {% if not task.is_active %}
-            <div class="p-2 col-xs-12 col-sm-4 task_status" id="task_status{{ task.id }}">
-              <i class="far fa-check-square" title="start" alt="{{ task.id }}"></i>
-            </div>
+          <i class="far fa-check-square  m-1 mr-2 text-center" title="start"></i>
             {% elif worker == task.worker %}
-            <div class="p-2 col-xs-12 col-sm-4 task_status" id="task_status{{ task.id }}">
-              <i class="far fa-pause-circle" title="end" alt="{{ task.id }}"></i>
-            </div>
+            <i class="far fa-pause-circle m-1 mr-2 text-center" title="end"></i>
             {% else %}
-            <div class="p-2 col-xs-12 col-sm-4 task_status">
-              <i class="fas fa-lock" title="active"></i>
-            </div>
+            <i class="fas fa-lock m-1 mr-2 text-center" title="active"></i>
             {% endif %}
-            <div class="p-2 col-xs-12 col-sm-4">
-              <i class="far fa-plus-square" id="{{ task.id }}" title="add comment"></i>
-            </div>
-          </div>
+            <i class="far fa-plus-square m-1 text-center" title="add comment"></i>
           {% else %}
-          <div class="col">
-            <h5>The task is unavailable</h5>
-          </div>
+            <h5 class="m-1 text-center">The task is unavailable</h5>
           {% endif %}
         </div>
-        <div class="col-1 created_on">
-          <i class="fas p-1 fa-user-clock" alt="{{ task.id }}" title="estimated time"><span class="time-block p-1 created_on"> {{ task.estimated_time }}</span></i>
+        <div class="col-lg-1 col-xs-1 ml-auto block-center p-1 text-center">
+          <i class="fas p-1 fa-user-clock" title="estimated time"><span class="time-block p-1 block-center text-center"> {{ task.estimated_time }}</span></i>
         </div>
-        <div class="text-center col-12 m-1">
+        <div class="col-lg-12 col-xs-12 text-center p-1">
           <div id="summary{{ task.id }}" class="collapse">
             <div class="container-fluid grey lighten-2 p-1">
-              <div class="row white m-1">
-                <div class="col-12 summary-content text-justify p-3" contenteditable="true" id="content{{ task.id }}">{{ task.description|safe }}</div>
-                <div class="col m-1 p-1"><i class="fas fa-save" title="save" alt="{{ task.id }}"></i></div>
+              <div class="block-center text-center row white m-1">
+                <div class="col-lg-12 col-xs-12 summary-content text-justify p-3" contenteditable="true" id="content{{ task.id }}">{{ task.description|safe }}</div>
+                <div class="col-lg-12 col-xs-12 m-1 p-1"><i class="fas fa-save m-1 text-center" title="save"></i></div>
               </div>
-              <div class="row orange accent-1">
-                <div class="col-3 created_on">Created: {{ task.date_of_start }}</div>
-                <div class="col-3 created_on">Priority: {{ task.get_priority_of_task_display }}</div>
-                <div class="col-3 created_on">Type: {{ task.get_type_of_task_display }}</div>
+              <div class="block-center text-center row orange accent-1">
+                <div class="col-lg-3 col-xs-3 p-1 block-center text-center">Created: {{ task.date_of_start }}</div>
+                <div class="col-lg-3 col-xs-3 p-1 block-center text-center">Priority: {{ task.get_priority_of_task_display }}</div>
+                <div class="col-lg-3 col-xs-3 p-1 block-center text-center">Type: {{ task.get_type_of_task_display }}</div>
                 {% if task.worker %}
-                <div class="col-3 task_worker created_on" id="task_worker{{ task.id }}">Worker: {{ task.worker }}</div>
+                <div class="col-lg-3 col-xs-3 p-1 block-center text-center task_worker" id="task_worker{{ task.id }}">Worker: {{ task.worker }}</div>
                 {% else %}
-                <div class="col-3 task_worker created_on" id="task_worker{{ task.id }}">Worker: the task is free</div>
+                <div class="col-lg-3 col-xs-3 p-1 block-center text-center task_worker" id="task_worker{{ task.id }}">Worker: the task is free</div>
                 {% endif %}
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="row created_on">
-        <div class="col-12 warning-color created_on m-1 p-1">
+      <div class="block-center text-center row">
+        <div class="col-lg-12 col-xs-12 block-center text-center warning-color m-1 p-1">
           Available from: {{ task.available_from }} to: {{ task.available_to }}
         </div>
       </div>
       {% if task.is_available == True %}
-      <div class="silver border border-warning p-1 m-2 text-center" id="more{{ task.id }}">
+      <div class="silver border border-warning p-1 m-2 block-center text-center" id="more{{ task.id }}">
         <h5>To load comments, just click on the sync button</h5>
       </div>
       {% endif %}
     </div>
-    <!-- end is not completed -->
     {% else %}
-    <!-- if task is completed -->
     <div class="p-1 m-3 white">
       <div class="row align-items-center teal lighten-4 p-3 m-3">
         <div class="col-12 p-3 unique-color">
@@ -124,13 +109,12 @@
         </div>
       </div>
     </div>
-    <!-- end is completed -->
     {% endif %}
     {% endfor %}
   </div>
-  <!-- end task block -->
+  </div>
   {% endif %}
-<!-- end project detail block -->
+
 
   <!-- modal form to add a new comment for task -->
   <div class="modal fade" id="modalCommentForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

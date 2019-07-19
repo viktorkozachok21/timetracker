@@ -32,7 +32,6 @@
   <button id="back-to-top-btn"><i class="fas fa-angle-double-up"></i></button>
 
   <!-- header with navbar menu -->
-  <header class="container-fluid">
     <nav class="navbar navbar-light amber fixed-top scrolling-navbar lighten-4 mb-4">
       {% if user.is_authenticated %}
       <ul class="navbar-nav mr-auto nav-flex-icons m-1">
@@ -45,7 +44,7 @@
         </li>
       </ul>
       <button class="navbar-toggler first-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent20" aria-controls="navbarSupportedContent20" aria-expanded="false" aria-label="Toggle navigation">
-        <div class="animated-icon1"><span></span><span></span><span></span></div>
+        <div class="animated-icon"><span></span><span></span><span></span></div>
       </button>
       {% endif %}
       <div class="collapse navbar-collapse" id="navbarSupportedContent20">
@@ -59,7 +58,7 @@
             <a class="nav-link p-1 teal lighten-4" id="add-new-worker" onclick="closeMenu()">New worker</a>
           </li>
           <li class="nav-item m-1 text-center">
-            <a class="nav-link p-1 teal lighten-4" data-toggle="modal" data-target="#newProjectForm" onclick="closeMenu()">New project</a>
+            <a class="nav-link p-1 teal lighten-4" id="add-new-project" onclick="closeMenu()">New project</a>
           </li>
           {% endif %}
           <li class="nav-item m-1 text-center">
@@ -75,22 +74,21 @@
         </ul>
       </div>
     </nav>
-  </header>
   <!-- end header -->
 
   <!-- the main block -->
   <hr class="my-5">
   <hr class="my-3">
-  <main class="container-fluid text-center" id="main-block">
-    {% block project_list %}
+  <div class="container-fluid text-center" id="main-block">
+    {% block main_block %}
     {% endblock %}
-  </main>
+</div>
   <hr class="my-3">
   <!-- end main -->
 
   <!-- modal section -->
-  <section class="forms-container">
-  </section>
+  <div class="forms-container">
+  </div>
   <!-- end modal section -->
 
   <!-- modal form to show information about active worker -->
@@ -153,7 +151,7 @@
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.5/js/mdb.min.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <!-- end bootstrap js -->
 
   <script type="text/javascript">
@@ -186,12 +184,12 @@
   <script type="text/javascript">
     //hamburger button animation in menu
     $(document).on("click", ".first-button", function() {
-      $('.animated-icon1').toggleClass('open');
+      $('.animated-icon').toggleClass('open');
     });
 
     //close menu
     function closeMenu() {
-      if ($('.animated-icon1').hasClass("open")) {
+      if ($('.animated-icon').hasClass("open")) {
         $('.first-button').click();
       }
     };
@@ -212,7 +210,7 @@
 
   <!-- worker ajax -->
   <script type="text/javascript">
-  //show new project form
+  //show new worker form
   $(document).on("click", "#add-new-worker", function() {
     $.ajax({
       type: 'GET',
@@ -239,13 +237,18 @@
     //add new worker
     $(document).on("submit", "#new-worker-form", function(event) {
       event.preventDefault();
+      $(".error").css('visibility', 'hidden');
       $.ajax({
         type: 'POST',
         url: "{% url 'add_worker' %}",
         data: $(this).serializeArray(),
         success: function(response) {
-          $("#new-worker-form")[0].reset();
+          if(response['success']) {
           $("#newWorkerForm").modal('hide');
+        }else {
+          $(".error").html(response.message);
+          $(".error").css('visibility', 'visible');
+        }
         }
       });
       return false;
@@ -282,17 +285,42 @@
 
   <!-- project ajax -->
   <script type="text/javascript">
+  //show new project forms
+  $(document).on("click", "#add-new-project", function() {
+    $.ajax({
+      type: 'GET',
+      url: '{% url "add_project" %}',
+      data: {},
+      success: function(response) {
+        $(".forms-container").html(response.form_html);
+        $("#newProjectForm").modal('show');
+        tinyMCE.remove();
+        tinyMCE.init({
+          mode: "specific_textareas",
+          editor_selector: "mceEditor",
+          height: 300,
+          theme: "modern"
+        });
+      }
+    });
+  });
+
     //add new project
     $(document).on("submit", "#new-project-form", function(event) {
       event.preventDefault();
+      $(".error").css('visibility', 'hidden');
       $.ajax({
         type: 'POST',
         url: "{% url 'add_project' %}",
         data: $(this).serializeArray(),
         success: function(response) {
-          $("#new-project-form")[0].reset();
+          if(response['success']) {
           $("#newProjectForm").modal('hide');
-          $(".worker-avatar").click();
+          $("#main-block").prepend(response.project_html).fadeIn();
+        }else {
+          $(".error").html(response.message);
+          $(".error").css('visibility', 'visible');
+        }
         }
       });
       return false;
@@ -306,7 +334,7 @@
         type: 'GET',
         url: '{% url "project_detail" %}',
         data: {
-          'project': self.attr("alt"),
+          'project': self.parent().parent().attr("id")
         },
         success: function(response) {
           $("#main-block").html(response.project_html);
@@ -315,17 +343,18 @@
       });
     });
 
-    //show change project form
-    $(document).on("click", ".fa-edit", function() {
+    //show edit project forms
+    $(document).on("click", ".fas.fa-edit", function() {
+      var self = $(this);
       $.ajax({
         type: 'GET',
         url: '{% url "change_project" %}',
         data: {
-          'project': $(this).attr("alt")
+          'project': self.parent().parent().parent().attr("id")
         },
         success: function(response) {
           $(".forms-container").html(response.form_html);
-          $("#changeProjectForm").modal('show');
+          $("#editProjectForm").modal('show');
           tinyMCE.remove();
           tinyMCE.init({
             mode: "specific_textareas",
@@ -337,18 +366,49 @@
       });
     });
 
+      //edit selected project
+      $(document).on("submit", "#edit-project-form", function(event) {
+        event.preventDefault();
+        $(".error").css('visibility', 'hidden');
+        var formData = $(this).serializeArray();
+        formData.push({
+          name: 'selected_project',
+          value: $('.error').attr('id')
+        });
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'change_project' %}",
+          data: formData,
+          success: function(response) {
+            if(response['success']) {
+            $("#editProjectForm").modal('hide');
+            var project = "#" + response.project;
+            if($(project)){
+            $(project).replaceWith(response.project_html);
+          }else{
+            
+          }
+          }else {
+            $(".error").html(response.message);
+            $(".error").css('visibility', 'visible');
+          }
+          }
+        });
+        return false;
+      });
+
     //close project
-    $(document).on("click", ".fa-times", function() {
-      var start = $(this);
+    $(document).on("click", ".far.fa-times-circle", function() {
+      var self = $(this);
       $.ajax({
         type: 'POST',
-        url: "{% url 'completed_project' %}",
+        url: "{% url 'complet_project' %}",
         data: {
-          'project': start.attr("alt"),
+          'project': self.parent().parent().parent().attr("id"),
           'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
         },
         success: function(response) {
-          var list = start.parent().parent().parent();
+          var list = self.parent().parent().parent();
           list.fadeOut(function() {
             $("#main-block").append(response.project_block).fadeIn();
             list.remove();
@@ -358,17 +418,17 @@
     });
 
     //open closed project
-    $(document).on("click", ".fa-external-link-alt", function() {
-      var start = $(this);
+    $(document).on("click", ".far.fa-arrow-alt-circle-up", function() {
+      var self = $(this);
       $.ajax({
         type: 'POST',
         url: "{% url 'open_project' %}",
         data: {
-          'project': start.attr("alt"),
+          'project': self.parent().parent().parent().attr("id"),
           'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
         },
         success: function(response) {
-          var list = start.parent().parent().parent();
+          var list = self.parent().parent().parent();
           list.fadeOut(function() {
             $("#main-block").prepend(response.project_block).fadeIn();
             list.remove();
@@ -378,17 +438,17 @@
     });
 
     //remove project
-    $(document).on("click", ".fa-minus-square", function() {
-      var start = $(this);
+    $(document).on("click", ".fas.fa-trash-alt", function() {
+      var self = $(this);
       $.ajax({
         type: 'POST',
         url: "{% url 'remove_project' %}",
         data: {
-          'project': start.attr("alt"),
+          'project': self.parent().parent().parent().attr("id"),
           'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
         },
         success: function(response) {
-          var list = start.parent().parent().parent();
+          var list = self.parent().parent().parent();
           list.fadeOut(function() {
             list.remove();
           });
@@ -713,7 +773,7 @@
     });
 
     //message to trash
-    $(document).on("click", ".fa-trash-alt", function() {
+    $(document).on("click", ".fa-trash", function() {
       $.ajax({
         type: 'POST',
         url: '{% url "remove_message" %}',

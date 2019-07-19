@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 
 class UserForm(forms.ModelForm):
 
-    username = forms.CharField(max_length=50,widget=forms.TextInput(attrs={'placeholder': 'Username'}))
-    password = forms.CharField(min_length=8, max_length=50, widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
+    username = forms.CharField(min_length=2, max_length=30,widget=forms.TextInput(attrs={'placeholder': 'Username'}))
+    password = forms.CharField(min_length=8, max_length=30, widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
     email = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder': 'Email'}))
 
     class Meta:
@@ -16,8 +16,8 @@ class UserForm(forms.ModelForm):
 
 class WorkerForm(forms.ModelForm):
 
-    first_name = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'placeholder': 'First name'}))
-    last_name = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'placeholder': 'Last name'}))
+    first_name = forms.CharField(min_length=2, max_length=30, widget=forms.TextInput(attrs={'placeholder': 'First name'}))
+    last_name = forms.CharField(min_length=2, max_length=30, widget=forms.TextInput(attrs={'placeholder': 'Last name'}))
     date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'class' : 'picker date', 'placeholder': 'Choice your birth date', 'readonly': ''}))
 
     class Meta:
