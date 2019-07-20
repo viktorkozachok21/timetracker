@@ -74,14 +74,14 @@
 </div>
 {% endif %}
 
-{% if change_user_form %}
-<div class="modal fade card" id="changeWorkerForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+{% if edit_worker_form %}
+<div class="modal fade card" id="editWorkerForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog form-dialog">
     <div class="modal-content form-content container-fluid text-center p-1">
-      <form action="" id="change-worker-form" method="POST" novalidate>
-        {% csrf_token %}
+      <form action="" id="edit-worker-form" method="POST">
+        <div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token_value }}" /></div>
         <div class="modal-header mb-3">
-          <h4 class="modal-title font-weight-bold">New Worker</h4>
+          <h4 class="modal-title font-weight-bold">Edit Worker</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -90,28 +90,14 @@
           <div class="row teal lighten-2 m-1">
             <div class="col-md-6">
               <div class="md-form">
-                <i class="fas fa-user-tie mr-2" title="username"></i>
-                {{ user_form.username }}
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="md-form">
                 <i class="fas fa-envelope mr-2" title="email"></i>
-                {{ user_form.email }}
-              </div>
-            </div>
-          </div>
-          <div class="row teal lighten-2 m-1">
-            <div class="col-md-6">
-              <div class="md-form">
-                <i class="fas fa-key mr-2" title="password"></i>
-                {{ user_form.password }}
+                <input type="email" name="email" id="id_email" placeholder="email" value="{{ email }}">
               </div>
             </div>
             <div class="col-md-6">
               <div class="md-form">
                 <i class="fas fa-calendar-alt mr-2" title="birth date"></i>Birth date:
-                {{ worker_form.date_of_birth }}
+                {{ edit_worker_form.date_of_birth }}
               </div>
             </div>
           </div>
@@ -119,13 +105,13 @@
             <div class="col-md-6">
               <div class="md-form">
                 <i class="fas fa-user-tag mr-2" title="first name"></i>
-                {{ worker_form.first_name }}
+                {{ edit_worker_form.first_name }}
               </div>
             </div>
             <div class="col-md-6">
               <div class="md-form">
                 <i class="fas fa-user-tag mr-2" title="last name"></i>
-                {{ worker_form.last_name }}
+                {{ edit_worker_form.last_name }}
               </div>
             </div>
           </div>
@@ -134,13 +120,22 @@
               <div class="input-group-addon">
                 <span class="input-group-text"><i class="fas fa-user-circle mr-2" title="post"></i>Post: </span>
               </div>
-              {{ worker_form.post }}
+              {{ edit_worker_form.post }}
+            </div>
+          </div>
+          <div class="row teal lighten-2 m-1">
+            <div class="col-md-12 md-form block-center input-group">
+              <div class="input-group-addon">
+                <span class="input-group-text"><i class="fas fa-user-circle mr-2" title="avatar"></i>Avatar</span>
+              </div>
+              <input class="form-control" type="file" name="avatar" id="id_avatar">
             </div>
           </div>
         </div>
+        <div class="block-center error p-1" id="{{ selected_worker }}"></div>
         <div class="modal-footer block-center">
           <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-success btn-lg">Add worker</button>
+          <button type="submit" class="btn btn-success btn-lg">Save worker</button>
         </div>
       </form>
     </div>

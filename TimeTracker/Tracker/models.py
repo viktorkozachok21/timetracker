@@ -114,7 +114,6 @@ class Comment(models.Model):
     class Meta:
         ordering = ["-created_on"]
 
-
 class Worker(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -122,6 +121,8 @@ class Worker(models.Model):
     last_name = models.CharField(max_length=100)
     date_of_birth = models.DateField(null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    is_blocked = models.BooleanField(default=False)
+    date_of_start = models.DateField(auto_now_add=True)
 
     POSTS = (
         ('A', 'Analyst'),
@@ -141,6 +142,14 @@ class Worker(models.Model):
 
     def full_name(self):
         return self.last_name + ' ' + self.first_name
+
+    def block(self):
+        self.is_blocked = True
+        self.save()
+
+    def unblock(self):
+        self.is_blocked = False
+        self.save()
 
 class TimeLog(models.Model):
 

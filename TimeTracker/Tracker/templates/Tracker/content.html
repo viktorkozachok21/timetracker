@@ -1,11 +1,10 @@
 {% if new_solo_project %}
-<div class="card m-3 border border-info" id="{{ new_solo_project.id }}">
-  <div class="p-1 m-1 light-green lighten-2 waves-effect waves-light block-center text-center row">
+<div class="card m-1 border border-info" id="{{ new_solo_project.id }}">
+  <div class="p-1 m-1 light-green jumbotron lighten-2 waves-effect waves-light block-center text-center row">
     <div class="p-1 project-detail col-lg-8 col-xs-8" title="{{ new_solo_project.project_name }}">
       {{ new_solo_project.project_name }}
     </div>
     <div class="col-lg-2 col-xs-2 ml-auto block-center p-1 text-center">
-      <i class="fas fa-edit m-1 mr-2 text-center" title="edit the project"></i>
       <i class="far fa-times-circle m-1 mr-2 text-center" title="close the project"></i>
       <i class="fas fa-lock-open m-1 text-center" title="available"></i>
     </div>
@@ -20,7 +19,7 @@
 {% endif %}
 
 {% if closed_solo_project %}
-<div class="card m-3 border border-warning" id="{{ closed_solo_project.id }}">
+<div class="card m-1 border border-warning" id="{{ closed_solo_project.id }}">
   <div class="p-1 m-1 teal lighten-4 waves-effect waves-light block-center text-center row">
     <div class="p-1 col-lg-8 col-xs-8">
       <span title="{{ closed_solo_project.project_name }}">{{ closed_solo_project.project_name }}</span>
@@ -145,6 +144,128 @@
 </div>
 {% endif %}
 
+{% if new_worker %}
+<div class="card my-1">
+  <div class="row rgba-blue-grey-light p-1" id="{{ new_worker.id }}">
+    <div class="col-lg-1 col-xs-1 p-1 jumbotron warning-color block-center text-center">
+      {% if new_worker.is_blocked == True %}
+      <i class="fas fa-user-lock m-1 text-center" title="blocked"></i>
+      {% else %}
+      <i class="fas fa-user-tie m-1 text-center" title="active"></i>
+      {% endif %}
+    </div>
+    <div class="col-lg-8 col-xs-8 rgba-lime-strong text-center">
+      <div class="row">
+        <div class="col-lg-8 col-xs-8 p-1 text-center">
+          <div class="row">
+            <div class="col-lg-2 col-xs-2 p-1 block-center">
+              <img class="rounded-circle z-depth-0 worker-list-avatar" src="{{ new_worker.avatar.url }}" alt="avatar">
+              </div>
+              <div class="col-lg-1 col-xs-1 p-1 block-center">
+                {% if new_worker.user.is_superuser %}
+                <div class="red-text data">admin</div>
+                {% endif %}
+                </div>
+              <div class="col-lg-9 col-xs-9 p-1 block-center">
+              <strong>{{ new_worker.full_name }}</strong>
+              </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-xs-4 p-1 text-center">
+          <small class="mr-1"><i class="far fa-calendar-alt"></i></small>Birth date: {{ new_worker.date_of_birth }}
+        </div>
+      </div>
+      <div class="row rgba-black-slight p-1">
+        <div class="col-lg-8 col-xs-8 p-1 text-left">
+          Email: {{ new_worker.user.email }}
+        </div>
+        <div class="col-lg-4 col-xs-4 p-1 text-center date">
+          Registered: {{ new_worker.date_of_start }}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-1 col-xs-1 p-1 block-center text-center date">
+      <div class="red-text">{{ new_worker.get_post_display }}</div>
+    </div>
+    <div class="col-lg-2 col-xs-2 p-1 block-center text-center">
+      {% if new_worker.user.is_superuser %}
+      <i class="fas fa-user-edit m-1 mr-1 text-center" title="edit worker"></i>
+      {% else %}
+      {% if new_worker.is_blocked == True %}
+      <i class="fas fa-unlock-alt m-1 mr-1 text-center" title="unblock worker"></i>
+      {% else %}
+      <i class="fas fa-ban m-1 mr-1 text-center" title="block worker"></i>
+      {% endif %}
+      <i class="fas fa-user-edit m-1 mr-1 text-center" title="edit worker"></i>
+      <i class="fas fa-user-minus m-1 text-center" title="remove worker"></i>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if workers_list %}
+{% for worker in workers_list %}
+<div class="card my-1">
+  <div class="row rgba-blue-grey-light p-1" id="{{ worker.id }}">
+    <div class="col-lg-1 col-xs-1 p-1 jumbotron warning-color block-center text-center">
+      {% if worker.is_blocked == True %}
+      <i class="fas fa-user-lock m-1 text-center" title="blocked"></i>
+      {% else %}
+      <i class="fas fa-user-tie m-1 text-center" title="active"></i>
+      {% endif %}
+    </div>
+    <div class="col-lg-8 col-xs-8 rgba-lime-strong text-center">
+      <div class="row">
+        <div class="col-lg-8 col-xs-8 p-1 text-center">
+          <div class="row">
+            <div class="col-lg-2 col-xs-2 p-1 block-center">
+              <img class="rounded-circle z-depth-0 worker-list-avatar" src="{{ worker.avatar.url }}" alt="avatar">
+              </div>
+              <div class="col-lg-1 col-xs-1 p-1 block-center">
+                {% if worker.user.is_superuser %}
+                <div class="red-text data">admin</div>
+                {% endif %}
+                </div>
+              <div class="col-lg-9 col-xs-9 p-1 block-center">
+              <strong>{{ worker.full_name }}</strong>
+              </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-xs-4 p-1 text-center">
+          <small class="mr-1"><i class="far fa-calendar-alt"></i></small>Birth date: {{ worker.date_of_birth }}
+        </div>
+      </div>
+      <div class="row rgba-black-slight p-1">
+        <div class="col-lg-8 col-xs-8 p-1 text-left">
+          Email: {{ worker.user.email }}
+        </div>
+        <div class="col-lg-4 col-xs-4 p-1 text-center date">
+          Registered: {{ worker.date_of_start }}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-1 col-xs-1 p-1 block-center text-center date">
+      <div class="red-text">{{ worker.get_post_display }}</div>
+    </div>
+    <div class="col-lg-2 col-xs-2 p-1 block-center text-center">
+      {% if worker.user.is_superuser %}
+      <i class="fas fa-user-edit m-1 mr-1 text-center" title="edit worker"></i>
+      {% else %}
+      {% if worker.is_blocked == True %}
+      <i class="fas fa-unlock-alt m-1 mr-1 text-center" title="unblock worker"></i>
+      {% else %}
+      <i class="fas fa-ban m-1 mr-1 text-center" title="block worker"></i>
+      {% endif %}
+      <i class="fas fa-user-edit m-1 mr-1 text-center" title="edit worker"></i>
+      <i class="fas fa-user-minus m-1 text-center" title="remove worker"></i>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endif %}
+
 {% if message_list %}
 {% for message in message_list %}
 <div class="row green accent-1 p-1 m-3" id="{{ message.id }}">
@@ -227,9 +348,9 @@
       {% if new_task.is_available == True %}
       <i class="fas fa-sync m-1 mr-2 text-center" title="synchronize"></i>
         {% if new_task.is_active == False %}
-        <i class="far fa-check-square  m-1 mr-2 text-center" title="start"></i>
+        <i class="far fa-check-square  m-1 mr-2 text-center" title="start working"></i>
         {% elif worker == new_task.worker %}
-        <i class="far fa-pause-circle m-1 mr-2 text-center" title="end"></i>
+        <i class="far fa-pause-circle m-1 mr-2 text-center" title="finish working"></i>
         {% else %}
         <i class="fas fa-lock m-1 mr-2 text-center" title="active"></i>
         {% endif %}

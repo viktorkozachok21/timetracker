@@ -8,6 +8,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.template import loader
 from datetime import datetime
+import time
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 
@@ -22,10 +23,6 @@ def home(request):
         context['worker'] = worker
     else:
         return HttpResponseRedirect(reverse('user_login'))
-
-
-    file_form = FileUploadForm()
-    context['file_form'] = file_form
 
     projects_list = Project.objects.all()
 
@@ -74,8 +71,14 @@ def user_login(request):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
+        if user.is_superuser:
+            login(request,user)
+            return JsonResponse({"success":True}, status=200)
         if user:
-            if user.is_active:
+            worker = get_object_or_404(Worker, user=user)
+            if worker.is_blocked:
+                return JsonResponse({"success":False, "message":"You have blocked access, please contact the administrator for details."}, status=200)
+            elif user.is_active:
                 login(request,user)
                 return JsonResponse({"success":True}, status=200)
         else:
@@ -126,34 +129,94 @@ def add_worker(request):
             return JsonResponse({"success":False, "message":"You did not fill all the fields!"}, status=200)
     return JsonResponse({"success":False}, status=400)
 
-def change_worker(self):
+def get_workers(request):
 
     if request.method == "GET" and request.is_ajax:
-        worker_key = request.GET['project']
-        project = get_object_or_404(Project, id=project_key)
-        project_form = ProjectForm(instance=project)
+        workers_list = Worker.objects.all()
+        workers_html = loader.render_to_string(
+            'Tracker/content.html',
+            {'workers_list': workers_list}
+        )
+        return JsonResponse({"workers_html": workers_html}, status=200)
+    return JsonResponse({"success":False}, status=400)
+
+def change_worker(request):
+
+    if request.method == "GET" and request.is_ajax:
+        worker_key = request.GET['worker']
+        worker = get_object_or_404(Worker, id=worker_key)
+        selected_worker = worker.id
+        worker_form = WorkerForm(instance=worker)
+        csrf_token_value = request.COOKIES['csrftoken']
         form_html = loader.render_to_string(
             'Tracker/forms.html',
-            {'change_project_form': project_form}
+            {'edit_worker_form': worker_form, "csrf_token_value": csrf_token_value, 'selected_worker': selected_worker, 'email': worker.user.email}
         )
         return JsonResponse({"form_html": form_html}, status=200)
-    return JsonResponse({"success":False}, status=400)
-
-def change_avatar(request):
 
     if request.method == "POST" and request.is_ajax:
-        file_form = FileUploadForm(request.POST, request.FILES)
-        if file_form.is_valid():
-            worker_key = request.POST['worker']
-            worker = get_object_or_404(Worker, id=worker_key)
-            avatar = request.FILES['avatar']
-            worker.avatar = avatar
+        worker_form = WorkerForm(request.POST, request.FILES)
+        if worker_form.is_valid():
+            selected_worker = request.POST['selected_worker']
+            worker = get_object_or_404(Worker, id=selected_worker)
+            print("true")
+            new_user_email = request.POST['email']
+            if User.objects.filter(email__iexact=new_user_email).exclude(email=worker.user.email).exists():
+                return JsonResponse({"success":False, "message":"User with this email already exists!"}, status=200)
+            worker.user.email = new_user_email
+            worker.user.first_name = worker.first_name = request.POST['first_name']
+            worker.user.last_name = worker.last_name = request.POST['last_name']
+            worker.date_of_birth = datetime.strptime(request.POST['date_of_birth'], '%d.%m.%Y').date()
+            if 'avatar' in request.FILES:
+                worker.avatar = request.FILES['avatar']
             worker.save()
-            return JsonResponse({"avatar": worker.avatar.url}, status=200)
+            worker.user.save()
+            worker_html = loader.render_to_string(
+                'Tracker/content.html',
+                {'new_worker': worker}
+            )
+            return JsonResponse({"success":True, "worker_html": worker_html, "worker": worker.id}, status=200)
+        else:
+            print(worker_form.errors)
+            return JsonResponse({"success":False, "message":"You did not fill all the fields!"}, status=200)
     return JsonResponse({"success":False}, status=400)
 
+def block_worker(request):
+
+    if request.method == "POST" and request.is_ajax:
+        worker_key = request.POST['worker']
+        worker = get_object_or_404(Worker, id=worker_key)
+        if worker.user.is_superuser:
+            return JsonResponse({"success":False}, status=200)
+        if request.POST['status'] == "block":
+            worker.block()
+        elif request.POST['status'] == "unblock":
+            worker.unblock()
+        return JsonResponse({"success":True}, status=200)
+    return JsonResponse({"success":False}, status=400)
+
+# def change_avatar(request):
+#
+#     if request.method == "POST" and request.is_ajax:
+#         file_form = FileUploadForm(request.POST, request.FILES)
+#         if file_form.is_valid():
+#             worker_key = request.POST['worker']
+#             worker = get_object_or_404(Worker, id=worker_key)
+#             avatar = request.FILES['avatar']
+#             worker.avatar = avatar
+#             worker.save()
+#             return JsonResponse({"avatar": worker.avatar.url}, status=200)
+#     return JsonResponse({"success":False}, status=400)
+
 def remove_worker(request):
-    pass
+
+    if request.method == "POST" and request.is_ajax:
+        worker_key = request.POST['worker']
+        worker = get_object_or_404(Worker, id=worker_key)
+        user = get_object_or_404(User, username=worker.user.username)
+        user.delete()
+        return JsonResponse({"success":False}, status=200)
+    return JsonResponse({"success":False}, status=400)
 
 #project views block
 def add_project(request):
@@ -234,11 +297,7 @@ def change_project(request):
             for people in worker_list:
                 project.workers.add(people)
             project.save()
-            project_html = loader.render_to_string(
-                'Tracker/content.html',
-                {'new_solo_project': project}
-            )
-            return JsonResponse({"success":True, "project_html": project_html, "project": project.id, 'project_name': project.project_name, 'project_summary': project.summary}, status=200)
+            return JsonResponse({"success":True, "project": project.id, 'project_name': project.project_name, 'project_summary': project.summary}, status=200)
         else:
             return JsonResponse({"success":False, "message":"You did not fill all the fields!"}, status=200)
     return JsonResponse({"success":False}, status=400)
@@ -321,16 +380,17 @@ def save_task(request):
         task_key = request.POST['task']
         worker_key = request.POST['worker']
         task = get_object_or_404(Task, id=task_key)
-        worker = get_object_or_404(Worker, id=worker_key)
-        author = get_object_or_404(Worker, user=task.author)
-        worker_name = worker.full_name()
-        message_title = "Worker: " + worker_name + " changed task: " + task.title
-        message_context = "<h5 class='success-color p-1 text-center'>Old description</h5>" + task.description + "<h5 class='success-color p-1 text-center'>New description</h5>" + request.POST['description']
-        message_to_worker = Message.objects.create(receiver=worker, title=message_title, message=message_context)
-        message_to_author = Message.objects.create(receiver=author, title=message_title, message=message_context)
-        task.description = request.POST['description']
-        task.save()
-        timelog = TimeLog.objects.create(task=task, worker=worker, action="change task description", comment=None)
+        if task.description != request.POST['description']:
+            worker = get_object_or_404(Worker, id=worker_key)
+            author = get_object_or_404(Worker, user=task.author)
+            worker_name = worker.full_name()
+            message_title = "Worker: " + worker_name + " changed task: " + task.title
+            message_context = "<h5 class='success-color p-1 text-center'>Old description</h5>" + task.description + "<h5 class='success-color p-1 text-center'>New description</h5>" + request.POST['description']
+            message_to_worker = Message.objects.create(receiver=worker, title=message_title, message=message_context)
+            message_to_author = Message.objects.create(receiver=author, title=message_title, message=message_context)
+            task.description = request.POST['description']
+            task.save()
+            timelog = TimeLog.objects.create(task=task, worker=worker, action="change task description", comment=None)
         return JsonResponse({"success":True}, status=200)
     return JsonResponse({"success":False}, status=400)
 
@@ -398,22 +458,7 @@ def end_task(request):
         task.end()
         old_timelog = TimeLog.objects.filter(task=task, worker=worker, action="start working")[0]
         timelog = TimeLog.objects.create(task=task, worker=worker, action="finish working", comment=None)
-        hour = timelog.time_of_start.hour - old_timelog.time_of_start.hour
-        minute = timelog.time_of_start.minute - old_timelog.time_of_start.minute
-        second = timelog.time_of_start.second - old_timelog.time_of_start.second
-        if hour < 10:
-            hours = "0" + str(hour)
-        else:
-            hours = str(hour)
-        if minute < 10:
-            minutes = "0" + str(minute)
-        else:
-            minutes = str(minute)
-        if second < 10:
-            seconds = "0" + str(second)
-        else:
-            seconds = str(second)
-        spend_time = str(hours) + ":" + str(minutes) + ":" + str(seconds)
+        spend_time = time.strftime("%H:%M:%S", time.gmtime((timelog.time_of_start - old_timelog.time_of_start).total_seconds()))
         timelog.spend_time = spend_time
         timelog.save()
         return JsonResponse({"success":True}, status=200)
@@ -438,6 +483,7 @@ def open_task(request):
         task_key = request.POST['task']
         task = get_object_or_404(Task, id=task_key)
         task.open()
+        task.accessibility()
         task_html = loader.render_to_string(
             'Tracker/content.html',
             {'new_task': task}

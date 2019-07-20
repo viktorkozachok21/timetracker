@@ -51,7 +51,3 @@ class TaskForm(forms.ModelForm):
             'priority_of_task': forms.Select(choices=Task.PRIORITIZE,attrs={'class': 'form-control'}),
             'type_of_task': forms.Select(choices=Task.TYPES,attrs={'class': 'form-control'})
         }
-
-class FileUploadForm(forms.Form):
-
-    avatar = forms.ImageField()

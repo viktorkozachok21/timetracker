@@ -43,32 +43,35 @@
         </a>
       </li>
     </ul>
-    <button class="navbar-toggler first-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent20" aria-controls="navbarSupportedContent20" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler first-button" type="button" data-toggle="collapse" data-target="#navbar-top" aria-controls="navbar-top" aria-expanded="false" aria-label="Toggle navigation">
       <div class="animated-icon"><span></span><span></span><span></span></div>
     </button>
     {% endif %}
-    <div class="collapse navbar-collapse" id="navbarSupportedContent20">
+    <div class="collapse navbar-collapse" id="navbar-top">
       <ul class="navbar-nav ml-auto">
         {% if user.is_authenticated %}
         <li class="nav-item m-1 text-center">
-          <a href="{% url 'home' %}" class="nav-link p-1 teal lighten-4 worker-avatar" onclick="closeMenu()">Home</a>
+          <a href="{% url 'home' %}" class="nav-link block-center p-1 worker-avatar" onclick="closeMenu()"><i class="fas fa-home mr-1"></i>Home</a>
         </li>
         {% if user.is_superuser %}
         <li class="nav-item m-1 text-center">
-          <a class="nav-link p-1 teal lighten-4" id="add-new-worker" onclick="closeMenu()">New worker</a>
+          <a class="nav-link block-center p-1" id="add-new-worker" onclick="closeMenu()"><i class="fas fa-user-plus mr-1"></i>Add new worker</a>
         </li>
         <li class="nav-item m-1 text-center">
-          <a class="nav-link p-1 teal lighten-4" id="add-new-project" onclick="closeMenu()">New project</a>
+          <a class="nav-link block-center p-1" id="add-new-project" onclick="closeMenu()"><i class="fas fa-plus-square mr-1"></i>Create new project</a>
+        </li>
+        <li class="nav-item m-1 text-center">
+          <a class="nav-link block-center p-1" id="list-of-workers" onclick="closeMenu()"><i class="fas fa-users mr-1"></i>List of workers</a>
         </li>
         {% endif %}
         <li class="nav-item m-1 text-center">
-          <a class="nav-link p-1 teal lighten-4" id="account" onclick="closeMenu()">My account</a>
+          <a class="nav-link block-center p-1" id="account" onclick="closeMenu()"><i class="fas fa-user-circle mr-1"></i>Account</a>
         </li>
         <li class="nav-item m-1 text-center">
-          <a class="nav-link p-1 teal lighten-4 show-timelogs" onclick="closeMenu()">Time logs</a>
+          <a class="nav-link block-center p-1 show-timelogs" onclick="closeMenu()"><i class="fas fa-stopwatch mr-1"></i>Time logs</a>
         </li>
         <li class="nav-item m-1 text-center">
-          <a class="nav-link p-1 teal lighten-4" href="{% url 'user_logout' %}">Log Out</a>
+          <a class="nav-link block-center p-1" href="{% url 'user_logout' %}"><i class="fas fa-sign-out-alt mr-1"></i>Log Out</a>
         </li>
         {% endif %}
       </ul>
@@ -108,10 +111,10 @@
         </div>
         <div class="modal-body jumbotron m-2">
           <div class="row text-center">
-            <div class="col-lg-3 col-xs-3 col-lg-offset-1 p-1">
+            <div class="col-lg-6 col-xs-6 col-lg-offset-1 p-1">
               <img src="{{ worker.avatar.url }}" id="avatar-full" class="rounded" alt="avatar image">
             </div>
-            <div class="col-lg-4 col-xs-4 p-1 px-3 block-center text-center">
+            <div class="col-lg-6 col-xs-6 p-1 px-3 block-center text-center">
               <div class="row block-center text-center">
                 <div class="col-lg-12 col-xs-12 m-1 p-1 text-center">
                   <span class="m-1" id="user_name" alt="{{ worker.id }}">{{ worker.last_name }} {{ worker.first_name }}</span>
@@ -127,7 +130,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-lg-3 col-xs-3 p-1 text-center">
+            <!-- <div class="col-lg-3 col-xs-3 p-1 text-center">
               <div class="row text-center p-1 m-1">
                 <div class="col-lg-12 col-xs-12 rgba-cyan-slight waves-effect waves-light p-2" title="change avatar" data-toggle="collapse" data-target="#change-avatar">
                   <strong>Change avatar</strong>
@@ -146,10 +149,11 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
           </div>
           <hr class="my-1">
           <div class="row rgba-lime-light">
+            <form action="">{% csrf_token %}</form>
             <div class="col-lg-12 col-xs-12 p-1 text-center" id="messages-box"></div>
           </div>
           <hr class="my-1">
@@ -273,27 +277,164 @@
         return false;
       });
 
-      //change avatar for worker
-      $(document).on("submit", "#change-avatar-form", function(event) {
+      //show edit worker form
+      $(document).on("click", ".fas.fa-user-edit", function() {
+        $.ajax({
+          type: 'GET',
+          url: '{% url "change_worker" %}',
+          data: {
+            'worker': $(this).parent().parent().attr("id")
+          },
+          success: function(response) {
+            $(".forms-container").html(response.form_html);
+            $("#editWorkerForm").modal('show');
+            $(function() {
+              $('.picker-worker').datepicker({
+                dateFormat: 'dd.mm.yy',
+                minDate: '01.01.1930',
+                maxDate: '0',
+                autoclose: true,
+                changeMonth: true,
+                changeYear: true
+              });
+            });
+          }
+        });
+      });
+
+      //edit selected project
+      $(document).on("submit", "#edit-worker-form", function(event) {
         event.preventDefault();
+        $(".error").css('visibility', 'hidden');
         var self = $(this);
         var formData = new FormData(self[0]);
-        formData.append('worker', $('#user_name').attr("alt"));
+        formData.append('selected_worker', $('.error').attr('id'));
+        formData.append('avatar', $('#id_avatar').val());
+        console.log(self.serialize());
         $.ajax({
           type: 'POST',
-          url: "{% url 'change_avatar' %}",
+          url: "{% url 'change_worker' %}",
           data: formData ? formData : self.serialize(),
           cache: false,
           contentType: false,
           processData: false,
           success: function(response) {
-            $("#change-avatar-form")[0].reset();
-            $("#avatar-small").attr('src', response.avatar);
-            $("#avatar-full").attr('src', response.avatar);
+            if (response['success']) {
+              $("#editWorkerForm").modal('hide');
+              var worker = $("#" + response.worker).parent();
+                worker.replaceWith(response.worker_html);
+            } else {
+              $(".error").html(response.message);
+              $(".error").css('visibility', 'visible');
+            }
           }
         });
         return false;
       });
+
+      //show list of workers
+      $(document).on("click", "#list-of-workers", function() {
+        $.ajax({
+          type: 'GET',
+          url: '{% url "get_workers" %}',
+          data: {},
+          success: function(response) {
+            closeMenu();
+            $("#main-block").html(response.workers_html);
+          }
+        });
+      });
+
+      //block worker
+      $(document).on("click", ".fas.fa-ban", function() {
+        var self = $(this);
+        var parent = self.parent().parent().attr("id");
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'block_worker' %}",
+          data: {
+            'status': "block",
+            'worker': parent,
+            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+          },
+          success: function(response) {
+            if(response['success']) {
+            var worker = self.parent().parent();
+            var status = worker.find(".fas.fa-user-tie");
+            self.replaceWith('<i class="fas fa-unlock-alt m-1 mr-1 text-center" title="unblock worker"></i>').fadeIn();
+            status.replaceWith('<i class="fas fa-user-lock m-1 text-center" title="blocked"></i>').fadeIn();
+          }else {
+            alert("No access!");
+          }
+          }
+        });
+      });
+
+      //unblock worker
+      $(document).on("click", ".fas.fa-unlock-alt", function() {
+        var self = $(this);
+        var parent = self.parent().parent().attr("id");
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'block_worker' %}",
+          data: {
+            'status': "unblock",
+            'worker': parent,
+            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+          },
+          success: function(response) {
+            if(response['success']) {
+            var worker = self.parent().parent();
+            var status = worker.find(".fas.fa-user-lock");
+            self.replaceWith('<i class="fas fa-ban m-1 mr-1 text-center" title="block worker"></i>').fadeIn();
+            status.replaceWith('<i class="fas fa-user-tie m-1 text-center" title="active"></i>').fadeIn();
+          }else {
+            alert("No access!");
+          }
+          }
+        });
+      });
+
+      //remove worker
+      $(document).on("click", ".fas.fa-user-minus", function() {
+        var self = $(this);
+        var parent = self.parent().parent().attr("id");
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'remove_worker' %}",
+          data: {
+            'worker': parent,
+            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+          },
+          success: function(response) {
+            var worker = self.parent().parent().parent();
+            worker.fadeOut(function() {
+              worker.remove();
+            });
+          }
+        });
+      });
+      // //change avatar for worker
+      // $(document).on("submit", "#change-avatar-form", function(event) {
+      //   event.preventDefault();
+      //   var self = $(this);
+      //   var formData = new FormData(self[0]);
+      //   formData.append('worker', $('#user_name').attr("alt"));
+      //   $.ajax({
+      //     type: 'POST',
+      //     url: "",
+      //     data: formData ? formData : self.serialize(),
+      //     cache: false,
+      //     contentType: false,
+      //     processData: false,
+      //     success: function(response) {
+      //       $("#change-avatar-form")[0].reset();
+      //       $("#avatar-small").attr('src', response.avatar);
+      //       $("#avatar-full").attr('src', response.avatar);
+      //     }
+      //   });
+      //   return false;
+      // });
     </script>
     <!-- end worker ajax -->
 
@@ -402,12 +543,8 @@
             if (response['success']) {
               $("#editProjectForm").modal('hide');
               var project = $("#" + response.project);
-              if (project) {
-                project.replaceWith(response.project_html);
-              } else {
                 $('.project-name').html(`<h1>${response.project_name}</h1>`);
                 $('.project-summary').html(response.project_summary);
-              }
             } else {
               $(".error").html(response.message);
               $(".error").css('visibility', 'visible');
@@ -645,7 +782,7 @@
           },
           success: function(response) {
             var worker = "#task_worker" + parent;
-            self.replaceWith('<i class="far fa-pause-circle m-1 mr-2 text-center" title="end"></i>').fadeIn();
+            self.replaceWith('<i class="far fa-pause-circle m-1 mr-2 text-center" title="finish working"></i>').fadeIn();
             $(worker).html(`Worker: ${response.worker}`).fadeIn();
           }
         });
@@ -666,7 +803,7 @@
           },
           success: function(response) {
             var worker = "#task_worker" + parent;
-            self.replaceWith('<i class="far fa-check-square  m-1 mr-2 text-center" title="start"></i>').fadeIn();
+            self.replaceWith('<i class="far fa-check-square  m-1 mr-2 text-center" title="start working"></i>').fadeIn();
             $(worker).html('Worker: the task is free').fadeIn();
           }
         });
@@ -821,7 +958,7 @@
             if (response['success']) {
               $("#main-block").html(`<div class="block-center mb-2 p-1 text-center">
             <div class="block-center text-center m-1 p-1 default-color-dark show-timelogs waves-effect waves-light">All time logs</div>
-            <div class="block-center text-center m-1 p-1 default-color-dark my_timelogs waves-effect waves-light">User time logs</div>
+            <div class="block-center text-center m-1 p-1 default-color-dark my_timelogs waves-effect waves-light">My time logs</div>
             </div>
             ${response.timelogs_html}`);
               smoothScrollBackToTop();
@@ -844,7 +981,7 @@
             if (response['success']) {
               $("#main-block").html(`<div class="block-center mb-2 p-1 text-center">
             <div class="block-center text-center m-1 p-1 default-color-dark show-timelogs waves-effect waves-light">All time logs</div>
-            <div class="block-center text-center m-1 p-1 default-color-dark my_timelogs waves-effect waves-light">User time logs</div>
+            <div class="block-center text-center m-1 p-1 default-color-dark my_timelogs waves-effect waves-light">My time logs</div>
             </div>
             ${response.timelogs_html}`);
               smoothScrollBackToTop();

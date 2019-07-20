@@ -30,9 +30,9 @@
           {% if task.is_available == True %}
           <i class="fas fa-sync m-1 mr-2 text-center" title="synchronize"></i>
           {% if task.is_active == False %}
-          <i class="far fa-check-square  m-1 mr-2 text-center" title="start"></i>
+          <i class="far fa-check-square  m-1 mr-2 text-center" title="start working"></i>
           {% elif worker == task.worker %}
-          <i class="far fa-pause-circle m-1 mr-2 text-center" title="end"></i>
+          <i class="far fa-pause-circle m-1 mr-2 text-center" title="finish working"></i>
           {% else %}
           <i class="fas fa-lock m-1 mr-2 text-center" title="active"></i>
           {% endif %}
@@ -133,8 +133,7 @@
         </div>
         <div class="modal-body mx-1">
           <div class="md-form">
-            <textarea type="text" id="comments" name="comment" class="form-control p-2 m-1 md-textarea" minlength="10" required="required"></textarea>
-            <label data-error="wrong" data-success="right" for="comments">Your comments</label>
+            <textarea type="text" id="comments" name="comment" class="form-control p-2 m-1 md-textarea" placeholder="Your comments" minlength="10" required="required"></textarea>
             <div id="hide"></div>
           </div>
         </div>

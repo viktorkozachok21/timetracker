@@ -5,15 +5,14 @@
 {% block main_block %}
 {% for project in projects_list %}
 {% if project.is_completed == False %}
-<div class="card m-3 border border-info" id="{{ project.id }}">
+<div class="card m-1 border border-info" id="{{ project.id }}">
   {% if worker in project.workers.all or user.is_superuser %}
-  <div class="p-1 m-1 light-green lighten-2 waves-effect waves-light block-center text-center row">
+  <div class="p-1 m-1 light-green jumbotron lighten-2 waves-effect waves-light block-center text-center row">
     <div class="p-1 project-detail col-lg-8 col-xs-8" title="{{ project.project_name }}">
       {{ project.project_name }}
     </div>
     <div class="col-lg-2 col-xs-2 ml-auto block-center p-1 text-center">
       {% if user.is_superuser %}
-      <i class="fas fa-edit m-1 mr-2 text-center" title="edit the project"></i>
       <i class="far fa-times-circle m-1 mr-2 text-center" title="close the project"></i>
       {% endif %}
       <i class="fas fa-lock-open m-1 text-center" title="available"></i>
@@ -34,7 +33,7 @@
   </div>
 </div>
 {% else %}
-<div class="card m-3 border border-warning" id="{{ project.id }}">
+<div class="card m-1 border border-warning" id="{{ project.id }}">
   <div class="p-1 m-1 teal lighten-4 waves-effect waves-light block-center text-center row">
     <div class="p-1 col-lg-8 col-xs-8">
       <span title="{{ project.project_name }}">{{ project.project_name }}</span>

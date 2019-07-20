@@ -10,7 +10,10 @@ urlpatterns = [
 
     path('add_worker/', views.add_worker, name="add_worker"),
     path('change_worker/', views.change_worker, name="change_worker"),
-    path('change_avatar/', views.change_avatar, name="change_avatar"),
+    path('get_workers/', views.get_workers, name="get_workers"),
+    path('block_worker/', views.block_worker, name="block_worker"),
+    path('remove_worker/', views.remove_worker, name="remove_worker"),
+    # path('change_avatar/', views.change_avatar, name="change_avatar"),
     path('remove_worker/', views.remove_worker, name="remove_worker"),
 
     path('add_project/', views.add_project, name="add_project"),
