@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.template import loader
+from datetime import datetime
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 
@@ -42,28 +43,28 @@ def home(request):
 
     return render(request, 'Tracker/home.html', context)
 
-def back_to_home(request):
-
-    if request.method == "GET" and request.is_ajax:
-        worker = get_object_or_404(Worker, user=request.user)
-        projects_list = Project.objects.all()
-
-        paginator = Paginator(projects_list, 30)
-        page = request.GET.get('page')
-        try:
-            projects_list = paginator.page(page)
-        except PageNotAnInteger:
-            projects_list = paginator.page(1)
-        except EmptyPage:
-            projects_list = paginator.page(paginator.num_pages)
-
-        home_html = loader.render_to_string(
-                'Tracker/content.html',
-                {'projects_list': projects_list, 'worker': worker, 'page': page, 'user': request.user}
-            )
-
-        return JsonResponse({"home_html": home_html}, status=200)
-    return JsonResponse({"success":False}, status=400)
+# def back_to_home(request):
+#
+#     if request.method == "GET" and request.is_ajax:
+#         worker = get_object_or_404(Worker, user=request.user)
+#         projects_list = Project.objects.all()
+#
+#         paginator = Paginator(projects_list, 5)
+#         page = request.GET.get('page')
+#         try:
+#             projects_list = paginator.page(page)
+#         except PageNotAnInteger:
+#             projects_list = paginator.page(1)
+#         except EmptyPage:
+#             projects_list = paginator.page(paginator.num_pages)
+#
+#         home_html = loader.render_to_string(
+#                 'Tracker/content.html',
+#                 {'projects_list': projects_list, 'worker': worker, 'page': page, 'user': request.user}
+#             )
+#
+#         return JsonResponse({"home_html": home_html}, status=200)
+#     return JsonResponse({"success":False}, status=400)
 
 def user_login(request):
 
@@ -76,9 +77,9 @@ def user_login(request):
         if user:
             if user.is_active:
                 login(request,user)
-                return HttpResponseRedirect(reverse('home'))
+                return JsonResponse({"success":True}, status=200)
         else:
-            return HttpResponseRedirect(reverse('user_login'))
+            return JsonResponse({"success":False, "message":"Username or password is incorrect! Please try again."}, status=200)
 
     return render(request, 'Tracker/login.html', {})
 
@@ -117,7 +118,6 @@ def add_worker(request):
             worker = worker_form.save()
             worker.user = user
             worker.save()
-            print(worker.first_name)
             return JsonResponse({"success":True}, status=200)
         username = request.POST['username']
         if User.objects.filter(username__iexact=username).exists():
@@ -174,7 +174,6 @@ def add_project(request):
             if Project.objects.filter(project_name__iexact=new_project).exists():
                 return JsonResponse({"success":False, "message":"Project with this name already exists!"}, status=200)
             project = project_form.save()
-            print(project.project_name)
             worker_list = request.POST.getlist('workers')
             project.workers.remove(*project.workers.all())
             for people in worker_list:
@@ -184,7 +183,6 @@ def add_project(request):
                 'Tracker/content.html',
                 {'new_solo_project': project}
             )
-            print("end")
             return JsonResponse({"success":True, "project_html": project_html}, status=200)
         else:
             return JsonResponse({"success":False, "message":"You did not fill all the fields!"}, status=200)
@@ -208,7 +206,6 @@ def project_detail(request):
     return JsonResponse({"success":False}, status=400)
 
 def change_project(request):
-
 
     if request.method == "GET" and request.is_ajax:
         project_key = request.GET['project']
@@ -237,12 +234,11 @@ def change_project(request):
             for people in worker_list:
                 project.workers.add(people)
             project.save()
-            print('end')
             project_html = loader.render_to_string(
                 'Tracker/content.html',
                 {'new_solo_project': project}
             )
-            return JsonResponse({"success":True, "project_html": project_html, "project": project.id}, status=200)
+            return JsonResponse({"success":True, "project_html": project_html, "project": project.id, 'project_name': project.project_name, 'project_summary': project.summary}, status=200)
         else:
             return JsonResponse({"success":False, "message":"You did not fill all the fields!"}, status=200)
     return JsonResponse({"success":False}, status=400)
@@ -286,24 +282,37 @@ def remove_project(request):
 #task views block
 def add_task(request):
 
+    if request.method == "GET" and request.is_ajax:
+        project_key = request.GET['project']
+        project = get_object_or_404(Project, id=project_key)
+        selected_task = project.id
+        task_form = TaskForm()
+        csrf_token_value = request.COOKIES['csrftoken']
+        form_html = loader.render_to_string(
+            'Tracker/forms.html',
+            {'new_task_form': task_form, "csrf_token_value": csrf_token_value, 'selected_task': selected_task}
+        )
+        return JsonResponse({"form_html": form_html}, status=200)
+
     if request.method == "POST" and request.is_ajax:
         task_form = TaskForm(request.POST)
         if task_form.is_valid():
-            task = task_form.save()
             project_key = request.POST['project']
             project = get_object_or_404(Project, id=project_key)
+            new_task = request.POST['title']
+            if Task.objects.filter(title__iexact=new_task, project=project).exists():
+                return JsonResponse({"success":False, "message":"Task with this name already exists!"}, status=200)
+            task = task_form.save()
             task.project = project
-            task.is_active = False
-            task.is_completed = False
-            task.save()
             task.accessibility()
-            task = get_object_or_404(Task, project=project)
             worker = get_object_or_404(Worker, user=request.user)
-            task_block = loader.render_to_string(
+            task_html = loader.render_to_string(
                 'Tracker/content.html',
-                {'task': task, 'user': request.user, 'worker': worker}
+                {'new_task': task}
             )
-            return JsonResponse({"task_block": task_block}, status=200)
+            return JsonResponse({"success":True, "task_html": task_html}, status=200)
+        else:
+            return JsonResponse({"success":False, "message":"You did not fill all the fields!"}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def save_task(request):
@@ -311,34 +320,59 @@ def save_task(request):
     if request.method == "POST" and request.is_ajax:
         task_key = request.POST['task']
         worker_key = request.POST['worker']
-        new_description = request.POST['description']
         task = get_object_or_404(Task, id=task_key)
-        author_key = task.author
         worker = get_object_or_404(Worker, id=worker_key)
-        author = get_object_or_404(Worker, user=author_key)
-        old_description = task.description
-        title = "Changed task description: " + task.project.project_name + " ~ " + task.title
-        message_context = "<h3>Worker: " + worker.last_name + " " + worker.first_name + " changed task: " + task.title + "</h3>" + "<h5>Old description:</h5>" + old_description + "<h5>New description:</h5>" + new_description
-        message_to_worker = Message.objects.create(receiver=worker, title=title, message=message_context)
-        message_to_author = Message.objects.create(receiver=author, title=title, message=message_context)
-        task.description = new_description
+        author = get_object_or_404(Worker, user=task.author)
+        worker_name = worker.full_name()
+        message_title = "Worker: " + worker_name + " changed task: " + task.title
+        message_context = "<h5 class='success-color p-1 text-center'>Old description</h5>" + task.description + "<h5 class='success-color p-1 text-center'>New description</h5>" + request.POST['description']
+        message_to_worker = Message.objects.create(receiver=worker, title=message_title, message=message_context)
+        message_to_author = Message.objects.create(receiver=author, title=message_title, message=message_context)
+        task.description = request.POST['description']
         task.save()
         timelog = TimeLog.objects.create(task=task, worker=worker, action="change task description", comment=None)
-        messages = Message.objects.filter(receiver=worker)
-        messages_html = loader.render_to_string(
-            'Tracker/content.html',
-            {'messages': messages}
-        )
-        changed_task = {
-            'description': task.description,
-            'messages_html': messages_html
-        }
-        return JsonResponse({"task":changed_task}, status=200)
+        return JsonResponse({"success":True}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def change_task(request):
 
-    pass
+    if request.method == "GET" and request.is_ajax:
+        task_key = request.GET['task']
+        task = get_object_or_404(Task, id=task_key)
+        selected_task = task.id
+        task_form = TaskForm(instance=task)
+        csrf_token_value = request.COOKIES['csrftoken']
+        form_html = loader.render_to_string(
+            'Tracker/forms.html',
+            {'edit_task_form': task_form, "csrf_token_value": csrf_token_value, 'selected_task': selected_task}
+        )
+        return JsonResponse({"form_html": form_html}, status=200)
+
+    if request.method == "POST" and request.is_ajax:
+        task_form = TaskForm(request.POST)
+        if task_form.is_valid():
+            new_task = request.POST['title']
+            selected_task = request.POST['selected_task']
+            task = get_object_or_404(Task, id=selected_task)
+            worker = get_object_or_404(Worker, user=request.user)
+            if Task.objects.filter(title__iexact=new_task, project=task.project).exclude(title=task.title).exists():
+                return JsonResponse({"success":False, "message":"Task with this name already exists!"}, status=200)
+            task.title = new_task
+            task.description = request.POST['description']
+            task.priority_of_task = request.POST['priority_of_task']
+            task.type_of_task = request.POST['type_of_task']
+            task.available_from = datetime.strptime(request.POST['available_from'], '%d.%m.%Y').date()
+            task.available_to = datetime.strptime(request.POST['available_to'], '%d.%m.%Y').date()
+            task.estimated_time = request.POST['estimated_time']
+            task.accessibility()
+            task_html = loader.render_to_string(
+                'Tracker/content.html',
+                {'new_task': task, 'worker': worker}
+            )
+            return JsonResponse({"success":True, "task_html": task_html, "task": task.id}, status=200)
+        else:
+            return JsonResponse({"success":False, "message":"You did not fill all the fields!"}, status=200)
+    return JsonResponse({"success":False}, status=400)
 
 def start_task(request):
 
@@ -349,14 +383,9 @@ def start_task(request):
         worker = get_object_or_404(Worker, id=worker_key)
         task.worker = worker
         task.is_active = True
-        task.is_single = False
         task.save()
         timelog = TimeLog.objects.create(task=task, worker=worker, action="start working", comment=None)
-        changed_task = {
-            'task': task.id,
-            'worker': task.worker.last_name + " " + task.worker.first_name
-        }
-        return JsonResponse({"task":changed_task}, status=200)
+        return JsonResponse({"worker": worker.full_name()}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def end_task(request):
@@ -367,9 +396,7 @@ def end_task(request):
         task = get_object_or_404(Task, id=task_key)
         worker = get_object_or_404(Worker, id=worker_key)
         task.end()
-        task = get_object_or_404(Task, id=task_key)
         old_timelog = TimeLog.objects.filter(task=task, worker=worker, action="start working")[0]
-        print(old_timelog.time_of_start)
         timelog = TimeLog.objects.create(task=task, worker=worker, action="finish working", comment=None)
         hour = timelog.time_of_start.hour - old_timelog.time_of_start.hour
         minute = timelog.time_of_start.minute - old_timelog.time_of_start.minute
@@ -389,10 +416,7 @@ def end_task(request):
         spend_time = str(hours) + ":" + str(minutes) + ":" + str(seconds)
         timelog.spend_time = spend_time
         timelog.save()
-        context = {
-            'task': task.id
-        }
-        return JsonResponse({"context":context}, status=200)
+        return JsonResponse({"success":True}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def completed_task(request):
@@ -401,11 +425,11 @@ def completed_task(request):
         task_key = request.POST['task']
         task = get_object_or_404(Task, id=task_key)
         task.complete()
-        task_block = loader.render_to_string(
+        task_html = loader.render_to_string(
             'Tracker/content.html',
-            {'task': task, 'user': request.user}
+            {'completed_task': task}
         )
-        return JsonResponse({"task_block": task_block}, status=200)
+        return JsonResponse({"task_html": task_html}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def open_task(request):
@@ -413,14 +437,12 @@ def open_task(request):
     if request.method == "POST" and request.is_ajax:
         task_key = request.POST['task']
         task = get_object_or_404(Task, id=task_key)
-        worker = get_object_or_404(Worker, user=request.user)
         task.open()
-        task = get_object_or_404(Task, id=task_key)
-        task_block = loader.render_to_string(
+        task_html = loader.render_to_string(
             'Tracker/content.html',
-            {'task': task, 'user': request.user, 'worker': worker}
+            {'new_task': task}
         )
-        return JsonResponse({"task_block": task_block}, status=200)
+        return JsonResponse({"task_html": task_html}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def remove_task(request):
@@ -437,17 +459,17 @@ def add_comment(request):
 
     if request.method == 'POST' and request.is_ajax:
         post_comment = request.POST['comment']
-        author = request.POST['author']
         worker_key = request.POST['worker']
         task_key = request.POST['task']
         task = get_object_or_404(Task, id=task_key)
         worker = get_object_or_404(Worker, id=worker_key)
+        author = worker.full_name()
         new_comment = Comment.objects.create(task=task, comments=post_comment, author=author)
         timelog = TimeLog.objects.create(task=task, worker=worker, action="add comment", comment=post_comment)
-        comments = Comment.objects.filter(task=task)
+        comments = Comment.objects.filter(task=task)[:15]
         comments_html = loader.render_to_string(
             'Tracker/content.html',
-            {'comments': comments, 'task': task_key}
+            {'comments': comments}
         )
         return JsonResponse({"comments_html": comments_html}, status=200)
     return JsonResponse({"success":False}, status=400)
@@ -457,15 +479,15 @@ def show_comments(request):
     if request.method == "GET" and request.is_ajax:
         task_key = request.GET['task']
         task = get_object_or_404(Task, id=task_key)
-        comments = Comment.objects.filter(task=task)
+        comments = Comment.objects.filter(task=task)[:15]
         if comments:
             comments_html = loader.render_to_string(
                 'Tracker/content.html',
-                {'comments': comments, 'task': task_key}
+                {'comments': comments}
             )
+            return JsonResponse({"success":True, "comments_html": comments_html}, status=200)
         else:
-            comments_html = "<h5>No comments</h5>"
-        return JsonResponse({"comments_html": comments_html}, status=200)
+            return JsonResponse({"success":False}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 #time logs views block
@@ -474,12 +496,16 @@ def get_time_logs(request):
     if request.method == "GET" and request.is_ajax:
         task_key = request.GET['task']
         task = get_object_or_404(Task, id=task_key)
-        timelogs = TimeLog.objects.filter(task=task)
-        timelogs_html = loader.render_to_string(
-            'Tracker/content.html',
-            {'timelogs': timelogs, 'user': request.user}
-        )
-        return JsonResponse({"timelogs_html": timelogs_html}, status=200)
+        timelogs = TimeLog.objects.filter(task=task)[:15]
+        small = True
+        if timelogs:
+            timelogs_html = loader.render_to_string(
+                'Tracker/content.html',
+                {'timelogs': timelogs, "small": small}
+            )
+            return JsonResponse({"success":True, "timelogs_html": timelogs_html}, status=200)
+        else:
+            return JsonResponse({"success":False}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def show_time_logs(request):
@@ -487,22 +513,24 @@ def show_time_logs(request):
     if request.method == "GET" and request.is_ajax:
         if 'worker' in request.GET:
             worker_key = request.GET['worker']
-            timelogs = TimeLog.objects.filter(worker=worker_key)
+            timelogs = TimeLog.objects.filter(worker=worker_key)[:15]
         else:
-            timelogs = TimeLog.objects.all()
-        timelogs_html = loader.render_to_string(
-            'Tracker/content.html',
-            {'timelogs': timelogs, 'user': request.user}
-        )
-        return JsonResponse({"timelogs_html": timelogs_html}, status=200)
+            timelogs = TimeLog.objects.all()[:15]
+        if timelogs:
+            small = False
+            timelogs_html = loader.render_to_string(
+                'Tracker/content.html',
+                {'timelogs': timelogs, "small": small, 'user': request.user}
+            )
+            return JsonResponse({"success":True, "timelogs_html": timelogs_html}, status=200)
+        else:
+            return JsonResponse({"success":False}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def remove_time_log(request):
 
     if request.method == "POST" and request.is_ajax:
-        worker_key = request.POST['worker']
         log_key = request.POST['timelog']
-        worker = get_object_or_404(Worker, id=worker_key)
         timelog = get_object_or_404(TimeLog, id=log_key)
         timelog.delete()
         return JsonResponse({"success":True}, status=200)
@@ -530,11 +558,14 @@ def get_messages(request):
         worker_key = request.GET['worker']
         worker = get_object_or_404(Worker, id=worker_key)
         messages = Message.objects.filter(receiver=worker)
-        messages_html = loader.render_to_string(
-            'Tracker/content.html',
-            {'message_list': messages}
-        )
-        return JsonResponse({"messages_html": messages_html}, status=200)
+        if messages:
+            messages_html = loader.render_to_string(
+                'Tracker/content.html',
+                {'message_list': messages}
+            )
+            return JsonResponse({"success":True, "messages_html": messages_html}, status=200)
+        else:
+            return JsonResponse({"success":False}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def remove_message(request):
@@ -545,10 +576,5 @@ def remove_message(request):
         worker = get_object_or_404(Worker, id=worker_key)
         message = get_object_or_404(Message, id=message_key)
         message.delete()
-        messages = Message.objects.filter(receiver=worker)
-        messages_html = loader.render_to_string(
-            'Tracker/content.html',
-            {'message_list': messages}
-        )
-        return JsonResponse({"messages_html": messages_html}, status=200)
+        return JsonResponse({"success":True}, status=200)
     return JsonResponse({"success":False}, status=400)

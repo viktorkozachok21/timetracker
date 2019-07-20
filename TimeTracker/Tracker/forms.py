@@ -18,7 +18,7 @@ class WorkerForm(forms.ModelForm):
 
     first_name = forms.CharField(min_length=2, max_length=30, widget=forms.TextInput(attrs={'placeholder': 'First name'}))
     last_name = forms.CharField(min_length=2, max_length=30, widget=forms.TextInput(attrs={'placeholder': 'Last name'}))
-    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'class' : 'picker date', 'placeholder': 'Choice your birth date', 'readonly': ''}))
+    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'class' : 'picker-worker picker-date', 'placeholder': 'Choice your birth date', 'readonly': ''}))
 
     class Meta:
         model = Worker
@@ -40,9 +40,9 @@ class TaskForm(forms.ModelForm):
 
     title = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Task title'}))
     description = forms.CharField(widget=forms.Textarea(attrs={'class': 'mceEditor'}))
-    estimated_time = forms.CharField(max_length=9, widget=forms.TextInput(attrs={'placeholder': 'Estimated time', 'value' : '24:00:00'}))
-    available_from = forms.DateField(widget=forms.DateInput(attrs={'class' : 'picker-from date', 'placeholder': 'Choice start date', 'readonly': ''}))
-    available_to = forms.DateField(widget=forms.DateInput(attrs={'class' : 'picker-to date', 'placeholder': 'Choice end date', 'readonly': ''}))
+    estimated_time = forms.CharField(min_length=8, max_length=8, widget=forms.TextInput(attrs={'placeholder': 'Estimated time', 'value': '10:00:00'}))
+    available_from = forms.DateField(widget=forms.DateInput(attrs={'class' : 'picker-task picker-date', 'placeholder': 'Choice start date', 'readonly': ''}))
+    available_to = forms.DateField(widget=forms.DateInput(attrs={'class' : 'picker-task picker-date', 'placeholder': 'Choice end date', 'readonly': ''}))
 
     class Meta:
         model = Task

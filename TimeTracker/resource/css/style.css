@@ -7,6 +7,8 @@
 }
 
 body {
+  min-width: 100%;
+  min-height: 100vh;
   background-image: linear-gradient(120deg, #487eb0, #fbc531);
   background-repeat: no-repeat;
   font-family: 'Poppins', sans-serif;
@@ -21,6 +23,10 @@ body {
 
 .date {
   font-size: 0.7em;
+}
+
+.picker-date {
+  cursor: pointer;
 }
 
 .fas, .far, .fab {
@@ -51,7 +57,7 @@ body {
   background-color: rgba(65, 163, 41, 0.5);
 }
 
-#id_post, #id_date_of_birth, #id_priority_of_task, #id_type_of_task {
+#id_post, #id_date_of_birth, #id_priority_of_task, #id_type_of_task, #change-avatar {
   cursor: pointer;
 }
 
@@ -66,10 +72,6 @@ a {
 
 nav .nav-item:hover {
   background-color: rgba(4, 70, 51, 0.78);
-}
-
-.task a:hover {
-  color: rgb(170, 45, 18);
 }
 
 .animated-icon {
@@ -161,15 +163,32 @@ nav .nav-item:hover {
   border-radius: 0;
 }
 
+.user-dialog {
+  min-width: 100%;
+  min-height: 55vh;
+  padding: 0;
+}
+
+.user-content {
+  height: 100%;
+  border-radius: 0;
+}
+
 .jumbotron {
-  background-color: rgba(156, 219, 174, 0.83);
+  background-color: rgba(158, 204, 171, 0.42);
 }
 
 input {
   min-width: 100%;
+  text-align: center;
 }
 
 .container-fluid img {
   width: 50%;
   height: 50%;
+}
+
+#avatar-full {
+  width: 100%;
+  height: 100%;
 }

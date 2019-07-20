@@ -13,7 +13,7 @@
   </div>
   <div class="row p-1">
     <div class="col-lg-12 col-xs-12 text-left">
-    Workers: {{ new_solo_project.workers.all|join:", " }}
+      Workers: {{ new_solo_project.workers.all|join:", " }}
     </div>
   </div>
 </div>
@@ -36,8 +36,7 @@
 {% endif %}
 
 {% if projects_list %}
-<!-- if project list block -->
-{% for project in projects_list %}
+<!-- {% for project in projects_list %}
 {% if project.is_completed == False %}
 <div class="card m-3 border border-info" id="{{ project.id }}">
   {% if worker in project.workers.all or user.is_superuser %}
@@ -63,7 +62,7 @@
   {% endif %}
   <div class="row p-1">
     <div class="col-lg-12 col-xs-12 text-left">
-    Workers: {{ project.workers.all|join:", " }}
+      Workers: {{ project.workers.all|join:", " }}
     </div>
   </div>
 </div>
@@ -86,8 +85,10 @@
   </div>
 </div>
 {% endif %}
-{% endfor %}
+{% endfor %} -->
+{% endif %}
 
+{% if paginator %}
 <!-- <nav class="font-weight-bold d-flex m-3 justify-content-center" aria-label="Page navigation example">
   {% if projects_list.has_other_pages %}
   <ul class="pagination pagination-circle pg-blue justify-content-center">
@@ -111,188 +112,199 @@
     {% endif %}
   </ul>
 </nav> -->
-<!-- end project list block -->
 {% endif %}
 
 {% if comments %}
-<!-- if comment block -->
 {% for comment in comments %}
-<div class="row align-items-center green accent-1 p-1 m-3">
-  <div class="col-8 p-1 text-justify">
-    <p>{{ comment.comments|safe }}</p>
+<div class="container-fluid">
+  <div class="row green accent-1 m-3">
+    <div class="col-lg-10 col-xs-10 p-1 text-justify">
+      {{ comment.comments|safe }}
+    </div>
+    <div class="col-lg-2 col-xs-2 text-center p-1 date">{{ comment.author }}<br>{{ comment.created_on }}</div>
   </div>
-  <div class="col comment_block created_on">{{ comment.author }}</div>
-  <div class="col comment_block created_on">{{ comment.created_on }}</div>
 </div>
 {% endfor %}
-<!-- end comment block -->
 {% endif %}
 
 {% if new_message %}
-<!-- if message block -->
-<div class="text-justify cyan lighten-4 p-3">
-  {{ new_message.message|safe }}
-  <hr class="my-3">
-  <div class="row created_on">
-    <h5>{{ new_message.created_on }}</h5>
+<div class="container-fluid cyan lighten-4 p-3">
+  <div class="row jumbotron mx-2">
+    <div class="col-lg-12 col-xs-12 block-center text-center p-1">
+      <h3>{{ new_message.title }}</h3>
+      <hr class="my-1">
+    </div>
+    <div class="col-lg-12 col-xs-12 text-justify p-1">
+      {{ new_message.message|safe }}
+      <hr class="my-1">
+    </div>
+    <div class="col-lg-12 col-xs-12 block-center text-center p-1">
+      <h5>{{ new_message.created_on }}</h5>
+    </div>
   </div>
 </div>
 {% endif %}
 
 {% if message_list %}
 {% for message in message_list %}
-<div class="row align-items-center green accent-1 p-1 m-3">
-  <div class="col-8 comment_block created_on"><a class="show-message" alt="{{ message.id }}">{{ message.title }}</a></div>
-  <div class="col comment_block created_on red-text">{{ message.status }}</div>
-  <div class="col comment_block created_on" title="to trash"><i class="far fa-trash-alt" alt="{{ message.id }}"></i></div>
+<div class="row green accent-1 p-1 m-3" id="{{ message.id }}">
+  <div class="col-lg-10 col-xs-10 p-1 date block-center text-center waves-effect waves-light show-message">{{ message.title }}</div>
+  <div class="col-lg-2 col-xs-2 p-1 block-center text-center date" title="to trash">
+    <div class="red-text">{{ message.status }}</div><i class="far fa-minus-square ml-2 m-1 text-center"></i>
+  </div>
 </div>
 {% endfor %}
-<!-- end message block -->
 {% endif %}
 
 {% if timelogs %}
-<!-- if log block -->
 {% for log in timelogs %}
-<div class="blue-grey lighten-3 p-1 m-2">
-  <div class="row">
-    <div class="col card p-3">
+<div class="blue-grey lighten-3 p-2 m-2" id="{{ log.id }}">
+  <div class="row p-3 date">
+    {% if small == True or not user.is_superuser %}
+    <div class="col-lg-12 col-xs-12 card text-center p-1">
       <div class="timelog_block created_on p-1">
         <span class="mr-3 created_on info-color">{{ log.worker.last_name }} {{ log.worker.first_name }}:</span>
         <span class="mr-1 created_on">[ {{ log.action }} ]</span>
       </div>
       {% if log.comment != None %}
-      <div class="m-1 timelog_block light-green lighten-3 border border-info created_on p-1">
+      <div class="m-1 light-green lighten-3 border border-info created_on p-1">
         <p>{{ log.comment }}</p>
       </div>
       {% endif %}
-      <div class="timelog_block created_on p-1">
+      <div class="block-center text-center p-1">
         <span>Task: {{ log.task.title }}. Project: {{ log.task.project.project_name }}</span>
       </div>
-      <div class="timelog_block warning-color mb-1 created_on p-1">
+      <div class="block-center text-center warning-color mb-1 p-1">
         <span class="mr-3">{{ log.time_of_start }}</span>
         {% if log.spend_time != None %}
-        <span class="created_on">Spend time: {{ log.spend_time }}<i class="far fa-clock ml-1"></i></span>
+        <span class="block-center">Spend time: {{ log.spend_time }}<i class="far fa-clock m-1 text-center ml-1"></i></span>
         {% endif %}
       </div>
     </div>
-    {% if user.is_superuser %}
-    <div class="col-1 created_on">
-      <i class="fas fa-user-times" alt="{{ log.id }}" title="to trash"></i>
+    {% else %}
+    <div class="col-lg-11 col-xs-11 card text-center p-1">
+      <div class="timelog_block created_on p-1">
+        <span class="mr-3 created_on info-color">{{ log.worker.last_name }} {{ log.worker.first_name }}:</span>
+        <span class="mr-1 created_on">[ {{ log.action }} ]</span>
+      </div>
+      {% if log.comment != None %}
+      <div class="m-1 light-green lighten-3 border border-info created_on p-1">
+        <p>{{ log.comment }}</p>
+      </div>
+      {% endif %}
+      <div class="block-center text-center p-1">
+        <span>Task: {{ log.task.title }}. Project: {{ log.task.project.project_name }}</span>
+      </div>
+      <div class="block-center text-center warning-color mb-1 p-1">
+        <span class="mr-3">{{ log.time_of_start }}</span>
+        {% if log.spend_time != None %}
+        <span class="block-center">Spend time: {{ log.spend_time }}<i class="far fa-clock m-1 text-center ml-1"></i></span>
+        {% endif %}
+      </div>
     </div>
+    {% endif %}
+    {% if user.is_superuser %}
+    {% if small != True %}
+    <div class="col-lg-1 col-xs-1 p-1 text-center">
+      <i class="fas fa-user-times m-1 text-center" title="to trash"></i>
+    </div>
+    {% endif %}
     {% endif %}
   </div>
 </div>
 {% endfor %}
-<!-- end log block -->
 {% endif %}
 
-{% if task and task.is_completed == False %}
-<!-- if task block -->
-<div class="p-1 m-3 white">
-  <div class="row align-items-center success-color-dark p-3 m-3">
-    <div class="col-7 p-3 created_on warning-color">
-      <a title="{{ task.title }}" data-toggle="collapse" data-target="#summary{{ task.id }}">
-        <span>{{ task.title }}</span>
-      </a>
+{% if new_task and new_task.is_completed == False %}
+<div class="p-1 m-3 white task" id="{{ new_task.id }}">
+  <div class="block-center text-center row success-color-dark p-3 m-3">
+    <div class="col-lg-7 col-xs-7 block-center text-center waves-effect waves-light p-3 warning-color" data-toggle="collapse" data-target="#summary{{ new_task.id }}" title="{{ new_task.title }}">
+      {{ new_task.title }}
     </div>
-    <div class="col-4 created_on">
-      {% if user.is_superuser %}
-      <i class="far fa-window-close mr-5 p-2" title="close the task" alt="{{ task.id }}"></i>
-      {% endif %}
-      {% if task.is_available == True %}
-      <div class="row">
-        <div class="p-2 col-xs-12 col-sm-4"><i class="fas fa-sync more" alt="{{ task.id }}" title="synchronize"></i></div>
-        {% if not task.is_active %}
-        <div class="p-2 col-xs-12 col-sm-4 task_status" id="task_status{{ task.id }}">
-          <i class="far fa-check-square" title="start" alt="{{ task.id }}"></i>
-        </div>
-        {% elif worker == task.worker %}
-        <div class="p-2 col-xs-12 col-sm-4 task_status" id="task_status{{ task.id }}">
-          <i class="far fa-pause-circle" title="end" alt="{{ task.id }}"></i>
-        </div>
+    <div class="col-lg-4 col-xs-4 mr-auto block-center p-1 text-center">
+      <i class="far fa-window-close m-1 mr-2 text-center" title="close the task"></i>
+      <i class="far fa-edit m-1 mr-2 text-center" title="edit the task"></i>
+      {% if new_task.is_available == True %}
+      <i class="fas fa-sync m-1 mr-2 text-center" title="synchronize"></i>
+        {% if new_task.is_active == False %}
+        <i class="far fa-check-square  m-1 mr-2 text-center" title="start"></i>
+        {% elif worker == new_task.worker %}
+        <i class="far fa-pause-circle m-1 mr-2 text-center" title="end"></i>
         {% else %}
-        <div class="p-2 col-xs-12 col-sm-4 task_status">
-          <i class="fas fa-lock" title="active"></i>
-        </div>
+        <i class="fas fa-lock m-1 mr-2 text-center" title="active"></i>
         {% endif %}
-        <div class="p-2 col-xs-12 col-sm-4">
-          <i class="far fa-plus-square" id="{{ task.id }}" title="add comment"></i>
-        </div>
-      </div>
+      <i class="far fa-plus-square m-1 text-center" title="add comment"></i>
       {% else %}
-      <div class="col">
-        <h5>The task is unavailable</h5>
-      </div>
+      <h6 class="m-1 text-center">The task is unavailable</h6>
       {% endif %}
     </div>
-    <div class="col-1 created_on">
-      <i class="fas p-1 fa-user-clock" alt="{{ task.id }}" title="estimated time"><span class="time-block p-1 created_on"> {{ task.estimated_time }}</span></i>
+    <div class="col-lg-1 col-xs-1 mr-auto block-center p-1 text-center">
+      <i class="fas p-1 fa-user-clock" title="estimated time"><small class="p-1 block-center text-center"> {{ new_task.estimated_time }}</small></i>
     </div>
-    <div class="text-center col-12 m-1">
-      <div id="summary{{ task.id }}" class="collapse">
+    <div class="col-lg-12 col-xs-12 text-center p-1">
+      <div id="summary{{ new_task.id }}" class="collapse">
         <div class="container-fluid grey lighten-2 p-1">
-          <div class="row white m-1">
-            <div class="col-12 summary-content text-justify p-3" contenteditable="true" id="content{{ task.id }}">{{ task.description|safe }}</div>
-            <div class="col m-1 p-1"><i class="fas fa-save" title="save" alt="{{ task.id }}"></i></div>
-          </div>
-          <div class="row orange accent-1">
-            <div class="col-3 created_on">Created: {{ task.date_of_start }}</div>
-            <div class="col-3 created_on">Priority: {{ task.get_priority_of_task_display }}</div>
-            <div class="col-3 created_on">Type: {{ task.get_type_of_task_display }}</div>
-            {% if task.worker %}
-            <div class="col-3 task_worker created_on" id="task_worker{{ task.id }}">Worker: {{ task.worker }}</div>
+          <div class="block-center text-center row white m-1">
+            {% if new_task.is_available == True %}
+            <div class="col-lg-12 col-xs-12 summary-content text-justify p-3" contenteditable="true" id="content{{ new_task.id }}">{{ new_task.description|safe }}</div>
+            <div class="col-lg-12 col-xs-12 m-1 p-1"><i class="fas fa-save m-1 text-center" title="save"></i></div>
             {% else %}
-            <div class="col-3 task_worker created_on" id="task_worker{{ task.id }}">Worker: the task is free</div>
+            <div class="col-lg-12 col-xs-12 summary-content text-justify p-3" id="content{{ new_task.id }}">{{ new_task.description|safe }}</div>
+            {% endif %}
+          </div>
+          <div class="block-center text-center row orange accent-1">
+            <div class="col-lg-4 col-xs-4 p-1 block-center text-center">Created: {{ new_task.date_of_start }}</div>
+            <div class="col-lg-2 col-xs-2 p-1 block-center text-center">Priority: {{ new_task.get_priority_of_task_display }}</div>
+            <div class="col-lg-2 col-xs-2 p-1 block-center text-center">Type: {{ new_task.get_type_of_task_display }}</div>
+            {% if new_task.worker %}
+            <div class="col-lg-4 col-xs-4 p-1 block-center text-center task_worker" id="task_worker{{ new_task.id }}">Worker: {{ new_task.worker }}</div>
+            {% else %}
+            <div class="col-lg-4 col-xs-4 p-1 block-center text-center task_worker" id="task_worker{{ new_task.id }}">Worker: the task is free</div>
             {% endif %}
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="row created_on">
-    <div class="col-12 warning-color created_on m-1 p-1">
-      Available from: {{ task.available_from }} to: {{ task.available_to }}
+  <div class="block-center text-center row">
+    <div class="col-lg-12 col-xs-12 block-center text-center warning-color m-1 p-1">
+      Available from: {{ new_task.available_from }} to: {{ new_task.available_to }}
     </div>
   </div>
-  {% if task.is_available == True %}
-  <div class="silver border border-warning p-1 m-2 text-center" id="more{{ task.id }}">
+  {% if new_task.is_available == True %}
+  <div class="silver border border-warning p-1 m-1" id="more{{ new_task.id }}">
     <h5>To load comments, just click on the sync button</h5>
   </div>
   {% endif %}
 </div>
 {% endif %}
 
-{% if task and task.is_completed == True %}
-<div class="p-1 m-3 white">
-  <div class="row align-items-center teal lighten-4 p-3 m-3">
-    <div class="col-12 p-3 unique-color">
-      <div class="row">
-        <div class="col-11 created_on">
-          <a title="completed" data-toggle="collapse" data-target="#summary{{ task.id }}"><span>{{ task.title }}</span></a>
+{% if completed_task and completed_task.is_completed == True %}
+<div class="p-1 m-3 white task" id="{{ completed_task.id }}">
+  <div class="block-center text-center row teal lighten-4 p-1 m-3">
+    <div class="col-lg-12 text-center col-xs-12 p-1 unique-color">
+      <div class="row p-1 mx-2">
+        <div class="col-lg-11 col-xs-11 p-1 block-center text-center waves-effect waves-light warning-color" data-toggle="collapse" data-target="#summary{{ completed_task.id }}" title="{{ completed_task.title }}">
+          {{ completed_task.title }}
         </div>
-        <div class="col-1 mr-auto created_on">
-          {% if user.is_superuser %}
-          <i class="far fa-calendar-plus mr-3" title="open the task again" alt="{{ task.id }}"></i>
-          <i class="fas fa-trash" title="to trash" alt="{{ task.id }}"></i>
-          {% else %}
-          <i class="far fa-calendar-check m-1"></i>
-          {% endif %}
+        <div class="col-lg-1 col-xs-1 p-1 block-center text-center">
+          <i class="fas fa-arrow-alt-circle-up m-1 ml-2 mr-2 text-center" title="open the task again"></i>
+          <i class="fas fa-trash m-1 text-center" title="to trash"></i>
         </div>
       </div>
     </div>
-    <div class="text-center col-12 m-1">
-      <div id="summary{{ task.id }}" class="collapse">
+    <div class="col-lg-12 col-xs-12 text-center p-1">
+      <div id="summary{{ completed_task.id }}" class="collapse">
         <div class="container-fluid grey lighten-2 p-1">
-          <div class="row white m-1">
-            <div class="col-12 text-justify">{{ task.description|safe }}</div>
+          <div class="block-center text-center row white m-1">
+            <div class="col-lg-12 col-xs-12 summary-content text-justify p-3">{{ completed_task.description|safe }}</div>
           </div>
-          <div class="row orange accent-1">
-            <div class="col-12">End date: {{ task.date_of_end }}</div>
+          <div class="block-center text-center row orange accent-1">
+            <div class="col-lg-12 col-xs-12 p-1 block-center text-center">End date: {{ completed_task.date_of_end }}</div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-<!-- end task block -->
 {% endif %}

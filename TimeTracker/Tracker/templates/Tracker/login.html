@@ -3,25 +3,22 @@
 
 
 {% block main_block %}
-<!-- form login -->
-<div class="card h-100">
+<div class="card p-1">
   <h5 class="card-header info-color white-text text-center py-4">
     <strong>Sign in</strong>
   </h5>
-  <div class="card-body login-form px-lg-5 pt-0">
-    <form class="text-center" method="POST" action="{% url 'user_login' %}">
+  <div class="jumbotron px-5 pt-0">
+    <form class="text-center" id="user-login-form" method="POST" action="">
       {% csrf_token %}
       <div class="md-form">
-        <input type="text" id="login-username" name="username" class="form-control" required>
-        <label for="login-username">Username</label>
+        <input type="text" id="login-username" name="username" class="form-control" maxlength="50" placeholder="Username" required>
       </div>
       <div class="md-form">
-        <input type="password" id="login-password" name="password" class="form-control" required>
-        <label for="login-password">Password</label>
+        <input type="password" id="login-password" name="password" class="form-control" maxlength="50" placeholder="Password" required>
       </div>
+      <div class="block-center error p-1"></div>
       <button class="btn btn-outline-info btn-rounded btn-block my-4 waves-effect z-depth-0" type="submit">Sign in</button>
     </form>
   </div>
 </div>
-<!-- form login -->
 {% endblock %}

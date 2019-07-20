@@ -8,7 +8,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf import settings
 
 urlpatterns = [
-    path('viktor-super/', admin.site.urls),
+    path('viktor-root/', admin.site.urls),
     path('',include('Tracker.urls')),
     path('tinymce/', include('tinymce.urls')),
     path('admin/filebrowser/', site.urls),

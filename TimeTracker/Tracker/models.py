@@ -74,17 +74,15 @@ class Task(models.Model):
         today = datetime.now().date()
         if self.available_from <= today and self.available_to >= today:
             self.is_available = True
-            self.save()
         else:
             self.is_available = False
-            self.save()
+        self.save()
 
     def complete(self):
         self.date_of_start = datetime.now() - timedelta(days=7)
         self.date_of_end = datetime.now()
         self.available_from = datetime.now().date()
         self.available_to = datetime.now().date() + timedelta(days=7)
-        self.accessibility()
         self.worker = None
         self.is_active = False
         self.is_completed = True
@@ -93,7 +91,7 @@ class Task(models.Model):
     def open(self):
         self.date_of_start = datetime.now()
         self.is_completed = False
-        self.estimated_time = "20:00:00"
+        self.estimated_time = "24:00:00"
         self.save()
 
     def end(self):
@@ -140,6 +138,9 @@ class Worker(models.Model):
 
     def __str__(self):
         return self.first_name + ' ' + self.last_name
+
+    def full_name(self):
+        return self.last_name + ' ' + self.first_name
 
 class TimeLog(models.Model):
 

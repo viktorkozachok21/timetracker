@@ -2,7 +2,6 @@
 
 
 
-<!-- project list block -->
 {% block main_block %}
 {% for project in projects_list %}
 {% if project.is_completed == False %}
@@ -25,12 +24,12 @@
   <div class="p-1 m-1 orange lighten-2 waves-effect waves-light block-center text-center row">
     <div class="p-1 col-lg-8 col-xs-8 text-center" title="{{ project.project_name }}">{{ project.project_name }}</div>
     <div class="p-1 col-lg-2 col-xs-2 ml-auto text-center"><i class="fas fa-lock" title="unavailable"></i></div>
-    <div class="p-1 col-lg-2 col-xs-2 block-center date ml-auto" title="created on">{{ project.created_on }}</div>
+    <div class="col-lg-2 col-xs-2 block-center date ml-auto" title="created on">{{ project.created_on }}</div>
   </div>
   {% endif %}
   <div class="row p-1">
     <div class="col-lg-12 col-xs-12 text-left">
-    Workers: {{ project.workers.all|join:", " }}
+      Workers: {{ project.workers.all|join:", " }}
     </div>
   </div>
 </div>
@@ -55,10 +54,8 @@
 {% endif %}
 {% endfor %}
 {% endblock %}
-<!-- end project list block -->
 
-<!-- paginator -->
-<!-- {% block paginator %}
+{% block paginator %}
 <nav class="font-weight-bold d-flex m-3 justify-content-center" aria-label="Page navigation example">
   {% if projects_list.has_other_pages %}
   <ul class="pagination pagination-circle pg-blue justify-content-center">
@@ -82,5 +79,4 @@
     {% endif %}
   </ul>
 </nav>
-{% endblock %} -->
-<!-- end paginator -->
+{% endblock %}
