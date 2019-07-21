@@ -12,7 +12,7 @@ body {
   background-image: linear-gradient(120deg, #487eb0, #fbc531);
   background-repeat: no-repeat;
   font-family: 'Poppins', sans-serif;
-  font-size: 1em;
+  font-size: 1.1em;
 }
 
 .error {
@@ -25,13 +25,17 @@ body {
   font-size: 0.7em;
 }
 
+.time {
+ font-size: 0.6em;
+}
+
 .picker-date {
   cursor: pointer;
 }
 
 .fas, .far, .fab {
   cursor: pointer;
-  font-size: 1.5em;
+  font-size: 1.7em;
 }
 
 #id_workers {
@@ -39,7 +43,7 @@ body {
   justify-content: center;
   text-align: center;
   width: 100%;
-  height: 30vh;
+  height: 35vh;
   padding: 10px;
   line-height: 1.3em;
   font-size: 1.2em;
@@ -48,13 +52,13 @@ body {
 }
 
 #id_workers option {
-  margin: auto;
+  padding: 5px;
+  background: rgba(33, 51, 27, 0.71);
 }
 
 #id_workers option:hover {
-  color: rgb(166, 44, 22);
-  font-weight: 1000;
-  background-color: rgba(65, 163, 41, 0.5);
+  color: rgba(107, 28, 13, 0.91);
+  background-color: rgba(31, 166, 180, 0.83);
 }
 
 #id_post, #id_date_of_birth, #id_priority_of_task, #id_type_of_task, #change-avatar {
@@ -67,11 +71,6 @@ body {
 
 a {
   text-decoration: none;
-  color: rgba(41, 54, 51, 0.73);
-}
-
-nav .nav-item:hover {
-  background-color: rgba(173, 95, 70, 0.78);
 }
 
 .animated-icon {
@@ -165,13 +164,6 @@ nav .nav-item:hover {
 
 .user-dialog {
   min-width: 50vw;
-  height: 100vh;
-  padding: 0;
-}
-
-.user-content {
-  height: 100%;
-  border-radius: 0;
 }
 
 .jumbotron {
@@ -185,6 +177,15 @@ nav .nav-item:hover {
 input {
   min-width: 100%;
   text-align: center;
+  font-weight: 500;
+}
+
+.datepickers-container {
+  font-weight: 1000;
+}
+
+.datepickers-container {
+  z-index: 1051;
 }
 
 .container-fluid img {
@@ -197,18 +198,18 @@ input {
   height: 100%;
 }
 
-.nav-link {
+.menu-link {
   font-size: 1.3em;
   font-weight: 1000;
   color: rgba(20, 37, 27, 0.8);
   background-color: rgba(228, 131, 94, 0.2);
 }
 
-.nav-link i {
+.menu-link i {
   font-size: 1em;
 }
 
-.nav-link:hover {
+.menu-link:hover {
   background-color: rgba(27, 142, 142, 0.65);
   color: rgba(254, 9, 38, 0.45) !important;
 }
@@ -216,4 +217,19 @@ input {
 .worker-list-avatar {
   height: 35px !important;
   width: 35px !important;
+}
+
+.login-dialog {
+  background-color: rgba(44, 59, 27, 0.73);
+  margin-top: -50px;
+  height: 100%;
+}
+
+.login-block {
+  top: 50px;
+  height: 90vh;
+}
+
+.welcome {
+  width: 70vw;
 }

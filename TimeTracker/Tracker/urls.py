@@ -4,9 +4,9 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name="home"),
-    path('user_login/', views.user_login, name="user_login"),
+    path('signin/', views.signin, name="signin"),
     # path('back_to_home/', views.back_to_home, name="back_to_home"),
-    path('user_logout/', views.user_logout, name="user_logout"),
+    path('signout/', views.signout, name="signout"),
 
     path('add_worker/', views.add_worker, name="add_worker"),
     path('change_worker/', views.change_worker, name="change_worker"),
@@ -30,6 +30,7 @@ urlpatterns = [
     path('end_task/', views.end_task, name="end_task"),
     path('completed_task/', views.completed_task, name="completed_task"),
     path('open_task/', views.open_task, name="open_task"),
+    path('active_tasks/', views.active_tasks, name="active_tasks"),
     path('remove_task/', views.remove_task, name="remove_task"),
 
     path('add_comment/', views.add_comment, name="add_comment"),

@@ -2,18 +2,78 @@
 
 
 
+{% block navbar %}
+<!-- header with navbar menu -->
+<nav class="navbar navbar-light amber fixed-top lighten-4 mb-4">
+  {% if user.is_authenticated %}
+  <ul class="navbar-nav mr-auto nav-flex-icons m-1">
+    <li class="nav-item avatar">
+      <a href="{% url 'home' %}" class="nav-link rounded-circle block-center p-0 worker-avatar" title="back to home">
+        <img src="{{ worker.avatar.url }}" class="img-responsive" id="avatar-small" alt="avatar small" height="35">
+      </a>
+    </li>
+  </ul>
+  <button class="navbar-toggler first-button" type="button" data-toggle="collapse" data-target="#navbar-top" aria-controls="navbar-top" aria-expanded="false" aria-label="Toggle navigation">
+    <div class="animated-icon"><span></span><span></span><span></span></div>
+  </button>
+  {% endif %}
+  <div class="collapse navbar-collapse" id="navbar-top">
+    <ul class="navbar-nav ml-auto">
+      {% if user.is_authenticated %}
+      <li class="nav-item m-1 text-center">
+        <a href="{% url 'home' %}" class="nav-link menu-link block-center p-1 worker-avatar" onclick="closeMenu()">
+          <i class="fas fa-home mr-1"></i>Home</a>
+      </li>
+      <li class="nav-item m-1 text-center">
+        <a class="nav-link menu-link block-center p-1" id="account" onclick="closeMenu()">
+          <i class="fas fa-user-circle mr-1"></i>Account</a>
+      </li>
+      {% if user.is_superuser %}
+      <li class="nav-item m-1 text-center">
+        <a class="nav-link menu-link block-center p-1" id="add-new-worker" onclick="closeMenu()">
+          <i class="fas fa-user-plus mr-1"></i>Add new worker</a>
+      </li>
+      <li class="nav-item m-1 text-center">
+        <a class="nav-link menu-link block-center p-1" id="list-of-workers" onclick="closeMenu()">
+          <i class="fas fa-users mr-1"></i>List of workers</a>
+      </li>
+      <li class="nav-item m-1 text-center">
+        <a class="nav-link menu-link block-center p-1" id="add-new-project" onclick="closeMenu()">
+          <i class="fas fa-plus-square mr-1"></i>Create new project</a>
+      </li>
+      {% endif %}
+      <li class="nav-item m-1 text-center">
+        <a class="nav-link menu-link block-center p-1" id="list-of-tasks" onclick="closeMenu()">
+          <i class="fas fa-chart-line mr-1"></i>Active tasks</a>
+      </li>
+      <li class="nav-item m-1 text-center">
+        <a class="nav-link menu-link block-center p-1 show-timelogs" onclick="closeMenu()">
+          <i class="fas fa-stopwatch mr-1"></i>Time logs</a>
+      </li>
+      <li class="nav-item m-1 text-center">
+        <a class="nav-link menu-link block-center p-1" href="{% url 'signout' %}">
+          <i class="fas fa-sign-out-alt mr-1"></i>Log Out</a>
+      </li>
+    </ul>
+  </div>
+  {% endif %}
+</nav>
+<!-- end header -->
+{% endblock %}
+
 {% block main_block %}
 {% for project in projects_list %}
 {% if project.is_completed == False %}
-<div class="card m-1 border border-info" id="{{ project.id }}">
+<div class="card m-1 border border-info project-card" id="{{ project.id }}">
   {% if worker in project.workers.all or user.is_superuser %}
   <div class="p-1 m-1 light-green jumbotron lighten-2 waves-effect waves-light block-center text-center row">
-    <div class="p-1 project-detail col-lg-8 col-xs-8" title="{{ project.project_name }}">
+    <div class="p-1 project-detail font-weight-bold col-lg-8 brief col-xs-8" title="{{ project.project_name }}">
       {{ project.project_name }}
     </div>
     <div class="col-lg-2 col-xs-2 ml-auto block-center p-1 text-center">
       {% if user.is_superuser %}
       <i class="far fa-times-circle m-1 mr-2 text-center" title="close the project"></i>
+      <i class="fas fa-edit m-1 mr-2 text-center" title="edit the project"></i>
       {% endif %}
       <i class="fas fa-lock-open m-1 text-center" title="available"></i>
     </div>
@@ -33,10 +93,10 @@
   </div>
 </div>
 {% else %}
-<div class="card m-1 border border-warning" id="{{ project.id }}">
+<div class="card m-1 border border-warning project-card" id="{{ project.id }}">
   <div class="p-1 m-1 teal lighten-4 waves-effect waves-light block-center text-center row">
-    <div class="p-1 col-lg-8 col-xs-8">
-      <span title="{{ project.project_name }}">{{ project.project_name }}</span>
+    <div class="p-1 col-lg-8 col-xs-8 font-weight-bold" title="{{ project.project_name }}">
+      {{ project.project_name }}
     </div>
     <div class="col-lg-2 col-xs-2 ml-auto block-center text-center">
       {% if user.is_superuser %}

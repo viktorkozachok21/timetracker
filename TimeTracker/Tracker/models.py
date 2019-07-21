@@ -45,27 +45,28 @@ class Task(models.Model):
     project = models.ForeignKey('Project', on_delete=models.SET_NULL, null=True)
     is_active = models.BooleanField(default=False)
     is_completed = models.BooleanField(default=False)
-
     PRIORITIZE = (
+        ('L', 'Low'),
         ('N', 'Normal'),
         ('H', 'High'),
+        ('I', 'Important'),
         ('U', 'Urgent'),
     )
-
-    priority_of_task = models.CharField(max_length=1, choices=PRIORITIZE, blank=True, default='N')
-
+    priority_of_task = models.CharField(max_length=1, choices=PRIORITIZE, default='N')
     TYPES = (
         ('B', 'Bug'),
         ('F', 'Feature'),
+        ('T', 'Task'),
+        ('I', 'Improvement'),
     )
-
-    type_of_task = models.CharField(max_length=1, choices=TYPES, blank=True, default='F')
+    type_of_task = models.CharField(max_length=1, choices=TYPES, default='T')
     date_of_start = models.DateTimeField(auto_now_add=True)
     date_of_end = models.DateTimeField(null=True, blank=True)
-    available_from = models.DateField(null=True, blank=True)
-    available_to = models.DateField(null=True, blank=True)
+    available_from = models.DateField()
+    available_to = models.DateField()
     is_available = models.BooleanField(default=False)
     estimated_time = models.CharField(max_length=10, default="24:00:00")
+    spent_time = models.CharField(max_length=9, default="00:00:00")
 
     class Meta:
         ordering = ["-date_of_start", "is_completed"]
@@ -81,8 +82,6 @@ class Task(models.Model):
     def complete(self):
         self.date_of_start = datetime.now() - timedelta(days=7)
         self.date_of_end = datetime.now()
-        self.available_from = datetime.now().date()
-        self.available_to = datetime.now().date() + timedelta(days=7)
         self.worker = None
         self.is_active = False
         self.is_completed = True
@@ -92,6 +91,7 @@ class Task(models.Model):
         self.date_of_start = datetime.now()
         self.is_completed = False
         self.estimated_time = "24:00:00"
+        self.spent_time = "00:00:00"
         self.save()
 
     def end(self):
@@ -119,23 +119,25 @@ class Worker(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    date_of_birth = models.DateField(null=True, blank=True)
+    date_of_birth = models.DateField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     is_blocked = models.BooleanField(default=False)
     date_of_start = models.DateField(auto_now_add=True)
-
     POSTS = (
-        ('A', 'Analyst'),
-        ('D', 'Designer'),
-        ('M', 'Manager'),
-        ('T', 'Tester'),
-        ('P', 'Programmer'),
-        ('E', 'Engineer'),
-        ('L', 'Lead'),
+        ('1', 'Analyst'),
+        ('2', 'Designer'),
+        ('3', 'Developer'),
+        ('4', 'Engineer'),
+        ('5', 'Lead'),
+        ('6', 'Manager'),
+        ('7', 'Programmer'),
+        ('8', 'Tester'),
     )
-
-    post = models.CharField(max_length=1, choices=POSTS, blank=True, default='E')
+    post = models.CharField(max_length=1, choices=POSTS, default='3')
     avatar = models.ImageField(default="img/default.webp", blank=True, null=True, upload_to="avatars")
+
+    class Meta:
+        ordering = ["-date_of_start", "is_blocked"]
 
     def __str__(self):
         return self.first_name + ' ' + self.last_name
@@ -158,7 +160,7 @@ class TimeLog(models.Model):
     worker = models.ForeignKey('Worker', on_delete=models.SET_NULL, null=True, blank=True)
     task = models.ForeignKey('Task', on_delete=models.SET_NULL, null=True, blank=True)
     comment = models.TextField()
-    spend_time = models.CharField(max_length=10, null=True, blank=True)
+    spent_time = models.CharField(max_length=10, null=True, blank=True)
 
     class Meta:
         ordering = ["-time_of_start"]

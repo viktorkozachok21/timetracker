@@ -1,11 +1,10 @@
 {% if new_user_form %}
-<!-- user / worker form block -->
 <div class="modal fade card" id="newWorkerForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog form-dialog">
-    <div class="modal-content form-content container-fluid text-center p-1">
+    <div class="modal-content form-content container-fluid text-center">
       <form action="" id="new-worker-form" method="POST">
         <div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token_value }}" /></div>
-        <div class="modal-header mb-3">
+        <div class="modal-header mb-1">
           <h4 class="modal-title font-weight-bold">New Worker</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -57,9 +56,17 @@
           <div class="row teal lighten-2 m-1">
             <div class="col-md-12 md-form input-group">
               <div class="input-group-addon">
-                <span class="input-group-text"><i class="fas fa-user-circle mr-2" title="post"></i>Post: </span>
+                <span class="input-group-text"><i class="fas fa-user-circle mr-2" title="post"></i>Post </span>
               </div>
               {{ new_worker_form.post }}
+            </div>
+          </div>
+          <div class="row teal lighten-2 mt-1 mx-1">
+            <div class="col-md-12 md-form block-center input-group">
+              <div class="input-group-addon">
+                <span class="input-group-text"><i class="fas fa-user-circle mr-2" title="avatar"></i>Avatar </span>
+              </div>
+              <input class="form-control" type="file" name="avatar" id="id_avatar">
             </div>
           </div>
         </div>
@@ -77,10 +84,10 @@
 {% if edit_worker_form %}
 <div class="modal fade card" id="editWorkerForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog form-dialog">
-    <div class="modal-content form-content container-fluid text-center p-1">
+    <div class="modal-content form-content container-fluid text-center">
       <form action="" id="edit-worker-form" method="POST">
         <div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token_value }}" /></div>
-        <div class="modal-header mb-3">
+        <div class="modal-header mb-1">
           <h4 class="modal-title font-weight-bold">Edit Worker</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -118,15 +125,15 @@
           <div class="row teal lighten-2 m-1">
             <div class="col-md-12 md-form input-group">
               <div class="input-group-addon">
-                <span class="input-group-text"><i class="fas fa-user-circle mr-2" title="post"></i>Post: </span>
+                <span class="input-group-text"><i class="fas fa-user-circle mr-2" title="post"></i>Post </span>
               </div>
               {{ edit_worker_form.post }}
             </div>
           </div>
-          <div class="row teal lighten-2 m-1">
+          <div class="row teal lighten-2 mt-1 mx-1">
             <div class="col-md-12 md-form block-center input-group">
               <div class="input-group-addon">
-                <span class="input-group-text"><i class="fas fa-user-circle mr-2" title="avatar"></i>Avatar</span>
+                <span class="input-group-text"><i class="fas fa-user-circle mr-2" title="avatar"></i>Avatar </span>
               </div>
               <input class="form-control" type="file" name="avatar" id="id_avatar">
             </div>
@@ -141,13 +148,12 @@
     </div>
   </div>
 </div>
-<!-- end user / worker form block -->
 {% endif %}
 
 {% if new_project_form %}
 <div class="modal fade card" id="newProjectForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog form-dialog" role="document">
-    <div class="modal-content form-content container-fluid text-center p-1">
+    <div class="modal-content form-content container-fluid text-center">
       <form action="" id="new-project-form" method="POST" novalidate>
         <div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token_value }}" /></div>
         <div class="modal-header mb-1">
@@ -191,7 +197,7 @@
 {% if edit_project_form %}
 <div class="modal fade card" id="editProjectForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog form-dialog" role="document">
-    <div class="modal-content form-content container-fluid text-center p-1">
+    <div class="modal-content form-content container-fluid text-center">
       <form action="" id="edit-project-form" method="POST" novalidate>
         <div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token_value }}" /></div>
         <div class="modal-header mb-1">
@@ -235,10 +241,10 @@
 {% if new_task_form %}
 <div class="modal fade card" id="newTaskForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog form-dialog">
-    <div class="modal-content form-content container-fluid text-center p-1">
+    <div class="modal-content form-content container-fluid text-center">
       <form action="" id="new-task-form" method="POST" novalidate>
         <div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token_value }}" /></div>
-        <div class="modal-header mb-3">
+        <div class="modal-header mb-1">
           <h4 class="modal-title font-weight-bold">New Task</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -274,7 +280,7 @@
               </div>
             </div>
           </div>
-          <div class="row teal lighten-2 m-1">
+          <div class="row teal lighten-2 mt-1">
             <div class="col-md-4">
               <div class="md-form input-group block-center">
                 <div class="input-group-addon m-1">
@@ -312,10 +318,10 @@
 {% if edit_task_form %}
 <div class="modal fade card" id="editTaskForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog form-dialog">
-    <div class="modal-content form-content container-fluid text-center p-1">
+    <div class="modal-content form-content container-fluid text-center">
       <form action="" id="edit-task-form" method="POST" novalidate>
         <div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token_value }}" /></div>
-        <div class="modal-header mb-3">
+        <div class="modal-header mb-1">
           <h4 class="modal-title font-weight-bold">Edit Task</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -351,7 +357,7 @@
               </div>
             </div>
           </div>
-          <div class="row teal lighten-2 m-1">
+          <div class="row teal lighten-2 mt-1">
             <div class="col-md-4">
               <div class="md-form input-group block-center">
                 <div class="input-group-addon m-1">

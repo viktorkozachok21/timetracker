@@ -14,8 +14,10 @@
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <!-- end bootstrap css -->
   <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'css/datepicker.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/notiflix-1.7.2.css' %}">
 
-  <script type="text/javascript" src="{% static 'tinymce/js/tinymce/tinymce.min.js' %}"></script>
+  <script src="{% static 'tinymce/js/tinymce/tinymce.min.js' %}"></script>
   <script>
     tinyMCE.init({
       mode: "specific_textareas",
@@ -31,77 +33,35 @@
   <!-- the back to top button -->
   <button id="back-to-top-btn"><i class="fas fa-angle-double-up"></i></button>
 
-  <!-- header with navbar menu -->
-  <nav class="navbar navbar-light amber fixed-top scrolling-navbar lighten-4 mb-4">
-    {% if user.is_authenticated %}
-    <ul class="navbar-nav mr-auto nav-flex-icons m-1">
-      <li class="nav-item avatar">
-        <a href="{% url 'home' %}" class="nav-link p-0" title="back to home">
-          {% if user.is_authenticated %}
-          <img src="{{ worker.avatar.url }}" id="avatar-small" class="rounded-circle z-depth-0 worker-avatar" alt="avatar image" height="35">
-          {% endif %}
-        </a>
-      </li>
-    </ul>
-    <button class="navbar-toggler first-button" type="button" data-toggle="collapse" data-target="#navbar-top" aria-controls="navbar-top" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-    {% endif %}
-    <div class="collapse navbar-collapse" id="navbar-top">
-      <ul class="navbar-nav ml-auto">
-        {% if user.is_authenticated %}
-        <li class="nav-item m-1 text-center">
-          <a href="{% url 'home' %}" class="nav-link block-center p-1 worker-avatar" onclick="closeMenu()"><i class="fas fa-home mr-1"></i>Home</a>
-        </li>
-        {% if user.is_superuser %}
-        <li class="nav-item m-1 text-center">
-          <a class="nav-link block-center p-1" id="add-new-worker" onclick="closeMenu()"><i class="fas fa-user-plus mr-1"></i>Add new worker</a>
-        </li>
-        <li class="nav-item m-1 text-center">
-          <a class="nav-link block-center p-1" id="add-new-project" onclick="closeMenu()"><i class="fas fa-plus-square mr-1"></i>Create new project</a>
-        </li>
-        <li class="nav-item m-1 text-center">
-          <a class="nav-link block-center p-1" id="list-of-workers" onclick="closeMenu()"><i class="fas fa-users mr-1"></i>List of workers</a>
-        </li>
-        {% endif %}
-        <li class="nav-item m-1 text-center">
-          <a class="nav-link block-center p-1" id="account" onclick="closeMenu()"><i class="fas fa-user-circle mr-1"></i>Account</a>
-        </li>
-        <li class="nav-item m-1 text-center">
-          <a class="nav-link block-center p-1 show-timelogs" onclick="closeMenu()"><i class="fas fa-stopwatch mr-1"></i>Time logs</a>
-        </li>
-        <li class="nav-item m-1 text-center">
-          <a class="nav-link block-center p-1" href="{% url 'user_logout' %}"><i class="fas fa-sign-out-alt mr-1"></i>Log Out</a>
-        </li>
-        {% endif %}
-      </ul>
-    </div>
-  </nav>
-  <!-- end header -->
+  {% block navbar %}
+  {% endblock %}
 
   <!-- the main block -->
+  {% if user.is_authenticated %}
   <hr class="my-5">
   <hr class="my-3">
+  {% endif %}
   <div class="container-fluid text-center" id="main-block">
     {% block main_block %}
     {% endblock %}
   </div>
+  {% if user.is_authenticated %}
   <hr class="my-1">
-  <div class="container-fluid" id="main-paginator">
-  {% block paginator %}
-  {% endblock %}
-  <hr class="my-3">
+  <div class="container-fluid mb-1" id="main-paginator">
+    {% block paginator %}
+    {% endblock %}
   </div>
   <!-- end main -->
 
   <!-- modal section -->
   <div class="forms-container">
   </div>
+  {% endif %}
   <!-- end modal section -->
 
   <!-- modal form to show information about active worker -->
   <div class="modal fade right" id="userViewForm" tabindex="-1" role="dialog" aria-labelledby="myuserViewForm" aria-hidden="true">
-    <div class="modal-dialog user-dialog modal-full-height modal-right" role="document">
+    <div class="modal-dialog user-dialog modal-full-height modal-right">
       <div class="modal-content user-content">
         <div class="modal-header">
           <h4 class="modal-title" id="myuserViewForm">Profile</h4>
@@ -111,13 +71,14 @@
         </div>
         <div class="modal-body jumbotron m-2">
           <div class="row text-center">
-            <div class="col-lg-6 col-xs-6 col-lg-offset-1 p-1">
-              <img src="{{ worker.avatar.url }}" id="avatar-full" class="rounded" alt="avatar image">
+            <div class="col-lg-4 col-xs-4 p-1">
+              <img src="{{ worker.avatar.url }}" id="avatar-full" class="img-fluid rounded z-depth-1" alt="avatar image">
             </div>
-            <div class="col-lg-6 col-xs-6 p-1 px-3 block-center text-center">
+            <div class="col-lg-8 col-xs-8 p-1 px-3 block-center brief text-center">
               <div class="row block-center text-center">
                 <div class="col-lg-12 col-xs-12 m-1 p-1 text-center">
-                  <span class="m-1" id="user_name" alt="{{ worker.id }}">{{ worker.last_name }} {{ worker.first_name }}</span>
+                  <span class="m-1" id="user_name" alt="{{ worker.id }}">{{ worker.full_name }}</span>
+                  <hr class="red-text my-1">
                 </div>
                 <div class="col-lg-12 col-xs-12 m-1 p-1 text-left">
                   <span class="m-1">{{ worker.get_post_display }}</span>
@@ -130,7 +91,8 @@
                 </div>
               </div>
             </div>
-            <!-- <div class="col-lg-3 col-xs-3 p-1 text-center">
+          </div>
+          <!-- <div class="col-lg-3 col-xs-3 p-1 text-center">
               <div class="row text-center p-1 m-1">
                 <div class="col-lg-12 col-xs-12 rgba-cyan-slight waves-effect waves-light p-2" title="change avatar" data-toggle="collapse" data-target="#change-avatar">
                   <strong>Change avatar</strong>
@@ -150,932 +112,1220 @@
                 </div>
               </div>
             </div> -->
-          </div>
           <hr class="my-1">
-          <div class="row rgba-lime-light">
-            <form action="">{% csrf_token %}</form>
-            <div class="col-lg-12 col-xs-12 p-1 text-center" id="messages-box"></div>
+          <form action="">{% csrf_token %}</form>
+          <div class="row text-center">
+            <div class="col-lg-12 col-xs-12 rgba-lime-light p-1 text-center">
+              <hr class="my-1"> Messages
+              <hr class="my-1">
+            </div>
+            <div class="col-lg-12 col-xs-12 h-100 p-1 text-center" id="messages-box"></div>
           </div>
-          <hr class="my-1">
         </div>
+        <hr class="my-1">
         <div class="modal-footer block-center text-center mt-1">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
-    <!-- end worker form -->
+  </div>
+  <!-- end worker form -->
 
-    <!-- bootstrap js -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.5/js/mdb.min.js"></script>
-    <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <!-- end bootstrap js -->
+  <!-- modal form to add a new comment for task -->
+  <div class="modal fade" id="modalCommentForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form id="comment-form" action="" method="POST">
+          {% csrf_token %}
+          <div class="modal-header text-center">
+            <h4 class="modal-title font-weight-bold">Add comment</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body mx-1">
+            <div class="md-form">
+              <textarea type="text" id="comments" name="comment" class="form-control p-2 m-1 md-textarea" placeholder="Your comments" minlength="10" required="required"></textarea>
+              <div id="hide"></div>
+            </div>
+          </div>
+          <div class="modal-footer block-center text-center">
+            <button type="submit" class="btn btn-default">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- endform -->
 
-    <!-- front js -->
-    <script type="text/javascript" src="{% static 'js/go-to-top.js' %}"></script>
+  <!-- modal form to show timelogs of task -->
+  <div class="modal fade right" id="timeLogForm" tabindex="-1" role="dialog" aria-labelledby="mytimeLogForm" aria-hidden="true">
+    <div class="modal-dialog modal-full-height modal-right" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="mytimeLogForm">Time logs</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="text-center p-1" id="time-logs">
+          </div>
+          <div class="modal-footer block-center text-center m-1 p-1">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- endform -->
 
-    <script type="text/javascript">
-      //hamburger button animation in menu
-      $(document).on("click", ".first-button", function() {
-        $('.animated-icon').toggleClass('open');
-      });
+  <!-- bootstrap js -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.5/js/mdb.min.js"></script>
+  <!-- end bootstrap js -->
 
-      //close menu
-      function closeMenu() {
-        if ($('.animated-icon').hasClass("open")) {
-          $('.first-button').click();
+  <!-- front js -->
+  <script type="text/javascript" src="{% static 'js/go-to-top.js' %}"></script>
+  <script src="{% static 'js/datepicker.js' %}"></script>
+  <script src="{% static 'js/datepicker.en.js' %}"></script>
+  <script src="{% static 'js/notiflix-1.7.2.js' %}"></script>
+
+  <script type="text/javascript">
+
+    //notification init
+    Notiflix.Notify.Init({});
+    Notiflix.Confirm.Init({});
+    Notiflix.Loading.Init({});
+
+    //hamburger button animation in menu
+    $(document).on("click", ".first-button", function() {
+      $('.animated-icon').toggleClass('open');
+    });
+
+    //close menu
+    function closeMenu() {
+      if ($('.animated-icon').hasClass("open")) {
+        $('.first-button').click();
+      }
+    };
+
+    //user login
+    $(document).on("submit", "#user-login-form", function(event) {
+      event.preventDefault();
+      Notiflix.Loading.Circle();
+      var self = $(this);
+      var formData = new FormData(self[0]);
+      $(".error").css('visibility', 'hidden');
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'signin' %}",
+        data: formData ? formData : self.serialize(),
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+          if (response['success']) {
+            window.location.replace(`{% url 'home' %}`);
+            Notiflix.Notify.Success('Success!');
+          } else {
+            $(".error").html(response.message);
+            $(".error").css('visibility', 'visible');
+            Notiflix.Notify.Warning('Something went wrong!');
+          }
         }
-      };
+      });
+      Notiflix.Loading.Remove();
+      return false;
+    });
+  </script>
 
-      //user login
-      $(document).on("submit", "#user-login-form", function(event) {
-        event.preventDefault();
-        var self = $(this);
-        var formData = new FormData(self[0]);
-        $(".error").css('visibility', 'hidden');
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'user_login' %}",
-          data: formData ? formData : self.serialize(),
-          cache: false,
-          contentType: false,
-          processData: false,
-          success: function(response) {
-            if(response['success']) {
-              window.location.replace(`{% url 'home' %}`);
-            }else {
-              $(".error").html(response.message);
-              $(".error").css('visibility', 'visible');
+  <!-- worker ajax -->
+  <script type="text/javascript">
+    //show new worker form
+    $(document).on("click", "#add-new-worker", function() {
+      Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'GET',
+        url: '{% url "add_worker" %}',
+        success: function(response) {
+          $(".forms-container").html(response.form_html);
+          $("#newWorkerForm").modal('show');
+          $('#id_date_of_birth').datepicker({
+            language: 'en',
+            dateFormat: 'dd.mm.yyyy',
+            maxDate: new Date(),
+            autoClose: true,
+            minDate: new Date('1950-1-1')
+          });
+        }
+      });
+      Notiflix.Loading.Remove();
+    });
+
+    //add new worker
+    $(document).on("submit", "#new-worker-form", function(event) {
+      event.preventDefault();
+      Notiflix.Loading.Circle();
+      $(".error").css('visibility', 'hidden');
+      var self = $(this);
+      var formData = new FormData(self[0]);
+      formData.append('avatar', $('#id_avatar').val());
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'add_worker' %}",
+        data: formData ? formData : self.serialize(),
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+          if (response['success']) {
+            $("#newWorkerForm").modal('hide');
+            var block = $("#main-block").find(".worker-card");
+            if (block.length > 0) {
+              $("#main-block").prepend(response.worker_html);
             }
+            Notiflix.Notify.Success('New worker registered!');
+          } else {
+            $(".error").html(response.message);
+            $(".error").css('visibility', 'visible');
+            Notiflix.Notify.Warning('Something went wrong!');
           }
-        });
-        return false;
+        }
       });
+      Notiflix.Loading.Remove();
+      return false;
+    });
 
-      // //back to home
-      // $(document).on("click", ".worker-avatar", function() {
-      //   $.ajax({
-      //     type: 'GET',
-      //     url: '',
-      //     data: {},
-      //     success: function(response) {
-      //       $("#main-block").html(response.home_html);
-      //       smoothScrollBackToTop();
-      //     }
-      //   });
-      // });
-    </script>
-
-    <!-- worker ajax -->
-    <script type="text/javascript">
-      //show new worker form
-      $(document).on("click", "#add-new-worker", function() {
-        $.ajax({
-          type: 'GET',
-          url: '{% url "add_worker" %}',
-          success: function(response) {
-            $(".forms-container").html(response.form_html);
-            $("#newWorkerForm").modal('show');
-            $(function() {
-              $('.picker-worker').datepicker({
-                dateFormat: 'dd.mm.yy',
-                minDate: '01.01.1930',
-                maxDate: '0',
-                autoclose: true,
-                changeMonth: true,
-                changeYear: true
-              });
-            });
-          }
-        });
+    //show edit worker form
+    $(document).on("click", ".fas.fa-user-edit", function() {
+      Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'GET',
+        url: '{% url "change_worker" %}',
+        data: {
+          'worker': $(this).parent().parent().attr("id")
+        },
+        success: function(response) {
+          $(".forms-container").html(response.form_html);
+          $("#editWorkerForm").modal('show');
+          $('#id_date_of_birth').datepicker({
+            language: 'en',
+            dateFormat: 'dd.mm.yyyy',
+            maxDate: new Date(),
+            autoClose: true,
+            minDate: new Date('1950-1-1')
+          });
+        }
       });
+      Notiflix.Loading.Remove();
+    });
 
-      //add new worker
-      $(document).on("submit", "#new-worker-form", function(event) {
-        event.preventDefault();
-        $(".error").css('visibility', 'hidden');
-        var self = $(this);
-        var formData = new FormData(self[0]);
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'add_worker' %}",
-          data: formData ? formData : self.serialize(),
-          cache: false,
-          contentType: false,
-          processData: false,
-          success: function(response) {
-            if (response['success']) {
-              $("#newWorkerForm").modal('hide');
-            } else {
-              $(".error").html(response.message);
-              $(".error").css('visibility', 'visible');
+    //edit selected worker
+    $(document).on("submit", "#edit-worker-form", function(event) {
+      event.preventDefault();
+      Notiflix.Loading.Circle();
+      $(".error").css('visibility', 'hidden');
+      var self = $(this);
+      var formData = new FormData(self[0]);
+      formData.append('selected_worker', $('.error').attr('id'));
+      formData.append('avatar', $('#id_avatar').val());
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'change_worker' %}",
+        data: formData ? formData : self.serialize(),
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+          if (response['success']) {
+            if (response['avatar']) {
+              $("#avatar-small").attr('src', response.avatar);
+              $("#avatar-full").attr('src', response.avatar);
             }
+            $("#editWorkerForm").modal('hide');
+            var worker = $("#" + response.worker).parent();
+            worker.replaceWith(response.worker_html);
+            Notiflix.Notify.Success('Information saved!');
+          } else {
+            $(".error").html(response.message);
+            $(".error").css('visibility', 'visible');
+            Notiflix.Notify.Warning('Something went wrong!');
           }
-        });
-        return false;
+        }
       });
+      Notiflix.Loading.Remove();
+      return false;
+    });
 
-      //show edit worker form
-      $(document).on("click", ".fas.fa-user-edit", function() {
-        $.ajax({
-          type: 'GET',
-          url: '{% url "change_worker" %}',
-          data: {
-            'worker': $(this).parent().parent().attr("id")
-          },
-          success: function(response) {
-            $(".forms-container").html(response.form_html);
-            $("#editWorkerForm").modal('show');
-            $(function() {
-              $('.picker-worker').datepicker({
-                dateFormat: 'dd.mm.yy',
-                minDate: '01.01.1930',
-                maxDate: '0',
-                autoclose: true,
-                changeMonth: true,
-                changeYear: true
-              });
-            });
-          }
-        });
+    //show list of workers
+    $(document).on("click", "#list-of-workers", function() {
+      Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'GET',
+        url: '{% url "get_workers" %}',
+        data: {},
+        success: function(response) {
+          closeMenu();
+          $("#main-block").html(response.workers_html);
+        }
       });
+      Notiflix.Loading.Remove();
+    });
 
-      //edit selected project
-      $(document).on("submit", "#edit-worker-form", function(event) {
-        event.preventDefault();
-        $(".error").css('visibility', 'hidden');
-        var self = $(this);
-        var formData = new FormData(self[0]);
-        formData.append('selected_worker', $('.error').attr('id'));
-        formData.append('avatar', $('#id_avatar').val());
-        console.log(self.serialize());
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'change_worker' %}",
-          data: formData ? formData : self.serialize(),
-          cache: false,
-          contentType: false,
-          processData: false,
-          success: function(response) {
-            if (response['success']) {
-              $("#editWorkerForm").modal('hide');
-              var worker = $("#" + response.worker).parent();
-                worker.replaceWith(response.worker_html);
-            } else {
-              $(".error").html(response.message);
-              $(".error").css('visibility', 'visible');
-            }
-          }
-        });
-        return false;
-      });
-
-      //show list of workers
-      $(document).on("click", "#list-of-workers", function() {
-        $.ajax({
-          type: 'GET',
-          url: '{% url "get_workers" %}',
-          data: {},
-          success: function(response) {
-            closeMenu();
-            $("#main-block").html(response.workers_html);
-          }
-        });
-      });
-
-      //block worker
-      $(document).on("click", ".fas.fa-ban", function() {
-        var self = $(this);
-        var parent = self.parent().parent().attr("id");
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'block_worker' %}",
-          data: {
-            'status': "block",
-            'worker': parent,
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            if(response['success']) {
-            var worker = self.parent().parent();
-            var status = worker.find(".fas.fa-user-tie");
-            self.replaceWith('<i class="fas fa-unlock-alt m-1 mr-1 text-center" title="unblock worker"></i>').fadeIn();
+    //block worker
+    $(document).on("click", ".fas.fa-ban", function() {
+      var self = $(this);
+      var parent = self.parent().parent();
+      Notiflix.Confirm.Show(
+        'Block the worker.',
+        'Do you agree with me?',
+        'Yes','No',
+      function(){
+        Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'block_worker' %}",
+        data: {
+          'status': "block",
+          'worker': parent.attr("id"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          if (response['success']) {
+            var status = parent.find(".fas.fa-user-tie");
+            self.replaceWith('<i class="fas fa-unlock-alt m-1 mr-3 text-center" title="unblock worker"></i>').fadeIn();
             status.replaceWith('<i class="fas fa-user-lock m-1 text-center" title="blocked"></i>').fadeIn();
-          }else {
-            alert("No access!");
+            Notiflix.Notify.Success('Worker blocked!');
+          } else {
+            Notiflix.Notify.Failure('No access!');
           }
-          }
-        });
+        }
       });
+      Notiflix.Loading.Remove();
+      return false;
+      },
+      function(){Notiflix.Loading.Remove();}
+      );
+    });
 
-      //unblock worker
-      $(document).on("click", ".fas.fa-unlock-alt", function() {
-        var self = $(this);
-        var parent = self.parent().parent().attr("id");
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'block_worker' %}",
-          data: {
-            'status': "unblock",
-            'worker': parent,
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            if(response['success']) {
-            var worker = self.parent().parent();
-            var status = worker.find(".fas.fa-user-lock");
-            self.replaceWith('<i class="fas fa-ban m-1 mr-1 text-center" title="block worker"></i>').fadeIn();
+    //unblock worker
+    $(document).on("click", ".fas.fa-unlock-alt", function() {
+      var self = $(this);
+      var parent = self.parent().parent();
+      Notiflix.Confirm.Show(
+        'Unblock the worker.',
+        'Do you agree with me?',
+        'Yes','No',
+      function(){
+        Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'block_worker' %}",
+        data: {
+          'status': "unblock",
+          'worker': parent.attr("id"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          if (response['success']) {
+            var status = parent.find(".fas.fa-user-lock");
+            self.replaceWith('<i class="fas fa-ban m-1 mr-3 text-center" title="block worker"></i>').fadeIn();
             status.replaceWith('<i class="fas fa-user-tie m-1 text-center" title="active"></i>').fadeIn();
-          }else {
-            alert("No access!");
+            Notiflix.Notify.Success('Worker unblocked!');
+          } else {
+            Notiflix.Notify.Failure('No access!');
           }
-          }
-        });
+        }
       });
+      Notiflix.Loading.Remove();
+      return false;
+      },
+      function(){Notiflix.Loading.Remove();}
+      );
+    });
 
-      //remove worker
-      $(document).on("click", ".fas.fa-user-minus", function() {
-        var self = $(this);
-        var parent = self.parent().parent().attr("id");
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'remove_worker' %}",
-          data: {
-            'worker': parent,
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            var worker = self.parent().parent().parent();
-            worker.fadeOut(function() {
-              worker.remove();
-            });
-          }
-        });
+    //remove worker
+    $(document).on("click", ".fas.fa-user-minus", function() {
+      var self = $(this);
+      var parent = self.parent().parent();
+      Notiflix.Confirm.Show(
+        'Remove the worker.',
+        'Do you agree with me?',
+        'Yes','No',
+      function(){
+        Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'remove_worker' %}",
+        data: {
+          'worker': parent.attr("id"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          parent.fadeOut(function() {
+            parent.remove();
+          });
+          Notiflix.Notify.Success('Worker removed!');
+        }
       });
-      // //change avatar for worker
-      // $(document).on("submit", "#change-avatar-form", function(event) {
-      //   event.preventDefault();
-      //   var self = $(this);
-      //   var formData = new FormData(self[0]);
-      //   formData.append('worker', $('#user_name').attr("alt"));
-      //   $.ajax({
-      //     type: 'POST',
-      //     url: "",
-      //     data: formData ? formData : self.serialize(),
-      //     cache: false,
-      //     contentType: false,
-      //     processData: false,
-      //     success: function(response) {
-      //       $("#change-avatar-form")[0].reset();
-      //       $("#avatar-small").attr('src', response.avatar);
-      //       $("#avatar-full").attr('src', response.avatar);
-      //     }
-      //   });
-      //   return false;
-      // });
-    </script>
-    <!-- end worker ajax -->
+      Notiflix.Loading.Remove();
+      return false;
+      },
+      function(){Notiflix.Loading.Remove();}
+      );
+    });
+  </script>
+  <!-- end worker ajax -->
 
-    <!-- project ajax -->
-    <script type="text/javascript">
-      //show new project form
-      $(document).on("click", "#add-new-project", function() {
-        $.ajax({
-          type: 'GET',
-          url: '{% url "add_project" %}',
-          data: {},
-          success: function(response) {
-            $(".forms-container").html(response.form_html);
-            $("#newProjectForm").modal('show');
-            tinyMCE.remove();
-            tinyMCE.init({
-              mode: "specific_textareas",
-              editor_selector: "mceEditor",
-              height: 300,
-              theme: "modern"
-            });
-          }
-        });
+  <!-- project ajax -->
+  <script type="text/javascript">
+    //show new project form
+    $(document).on("click", "#add-new-project", function() {
+      Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'GET',
+        url: '{% url "add_project" %}',
+        data: {},
+        success: function(response) {
+          $(".forms-container").html(response.form_html);
+          $("#newProjectForm").modal('show');
+          tinyMCE.remove();
+          tinyMCE.init({
+            mode: "specific_textareas",
+            editor_selector: "mceEditor",
+            height: 300,
+            theme: "modern"
+          });
+        }
       });
+      Notiflix.Loading.Remove();
+    });
 
-      //add new project
-      $(document).on("submit", "#new-project-form", function(event) {
-        event.preventDefault();
-        var self = $(this);
-        var formData = new FormData(self[0]);
-        $(".error").css('visibility', 'hidden');
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'add_project' %}",
-          data: formData ? formData : self.serialize(),
-          cache: false,
-          contentType: false,
-          processData: false,
-          success: function(response) {
-            if (response['success']) {
-              $("#newProjectForm").modal('hide');
+    //add new project
+    $(document).on("submit", "#new-project-form", function(event) {
+      event.preventDefault();
+      Notiflix.Loading.Circle();
+      var self = $(this);
+      var formData = new FormData(self[0]);
+      $(".error").css('visibility', 'hidden');
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'add_project' %}",
+        data: formData ? formData : self.serialize(),
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+          if (response['success']) {
+            $("#newProjectForm").modal('hide');
+            var block = $("#main-block").find(".project-card");
+            if (block.length > 0) {
               $("#main-block").prepend(response.project_html).fadeIn();
-            } else {
-              $(".error").html(response.message);
-              $(".error").css('visibility', 'visible');
             }
+            Notiflix.Notify.Success('New project registered!');
+          } else {
+            $(".error").html(response.message);
+            $(".error").css('visibility', 'visible');
+            Notiflix.Notify.Warning('Something went wrong!');
           }
-        });
+        }
+      });
+      Notiflix.Loading.Remove();
+      return false;
+    });
+
+    //show project detail
+    $(document).on("click", ".project-detail", function() {
+      Notiflix.Loading.Circle();
+      closeMenu();
+      $.ajax({
+        type: 'GET',
+        url: '{% url "project_detail" %}',
+        data: {
+          'project': $(this).parent().parent().attr("id")
+        },
+        success: function(response) {
+          $("#main-block").html(response.project_html);
+        }
+      });
+      Notiflix.Loading.Remove();
+    });
+
+    //show edit project form
+    $(document).on("click", ".fas.fa-edit", function() {
+      Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'GET',
+        url: '{% url "change_project" %}',
+        data: {
+          'project': $(this).parent().parent().parent().attr("id")
+        },
+        success: function(response) {
+          $(".forms-container").html(response.form_html);
+          $("#editProjectForm").modal('show');
+          tinyMCE.remove();
+          tinyMCE.init({
+            mode: "specific_textareas",
+            editor_selector: "mceEditor",
+            height: 300,
+            theme: "modern"
+          });
+        }
+      });
+      Notiflix.Loading.Remove();
+    });
+
+    //edit selected project
+    $(document).on("submit", "#edit-project-form", function(event) {
+      event.preventDefault();
+      Notiflix.Loading.Circle();
+      $(".error").css('visibility', 'hidden');
+      var self = $(this);
+      var formData = new FormData(self[0]);
+      formData.append('selected_project', $('.error').attr('id'));
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'change_project' %}",
+        data: formData ? formData : self.serialize(),
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+          if (response['success']) {
+            $("#editProjectForm").modal('hide');
+            var block = $("#main-block").find(".project-card");
+            if (block.length > 0) {
+              $("#" + response.project).replaceWith(response.project_html);
+            } else {
+              $('.project-name').html(`<h1>${response.project_name}</h1>`);
+              $('.project-summary').html(response.project_summary);
+            }
+            Notiflix.Notify.Success('Information saved!');
+          } else {
+            $(".error").html(response.message);
+            $(".error").css('visibility', 'visible');
+            Notiflix.Notify.Warning('Something went wrong!');
+          }
+        }
+      });
+      Notiflix.Loading.Remove();
+      return false;
+    });
+
+    //close project
+    $(document).on("click", ".far.fa-times-circle", function() {
+      var project = $(this).parent().parent().parent();
+      Notiflix.Confirm.Show(
+        'Close the project.',
+        'Do you agree with me?',
+        'Yes','No',
+      function(){
+        Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'complet_project' %}",
+        data: {
+          'project': project.attr("id"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          project.fadeOut(function() {
+            $("#main-block").append(response.project_block).fadeIn();
+            project.remove();
+          });
+          Notiflix.Notify.Success('Success!');
+        }
+      });
+      Notiflix.Loading.Remove();
+      return false;
+      },
+      function(){Notiflix.Loading.Remove();}
+      );
+    });
+
+    //open closed project
+    $(document).on("click", ".far.fa-arrow-alt-circle-up", function() {
+      var project = $(this).parent().parent().parent();
+      Notiflix.Confirm.Show(
+        'Open the project again.',
+        'Do you agree with me?',
+        'Yes','No',
+      function(){
+        Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'open_project' %}",
+        data: {
+          'project': project.attr("id"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          project.fadeOut(function() {
+            $("#main-block").prepend(response.project_block).fadeIn();
+            project.remove();
+          });
+          Notiflix.Notify.Success('Success!');
+        }
+      });
+      Notiflix.Loading.Remove();
+      return false;
+      },
+      function(){Notiflix.Loading.Remove();}
+      );
+    });
+
+    //remove project
+    $(document).on("click", ".fas.fa-trash-alt", function() {
+      var project = $(this).parent().parent().parent();
+      Notiflix.Confirm.Show(
+        'Remove the project.',
+        'Do you agree with me?',
+        'Yes','No',
+      function(){
+        Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'remove_project' %}",
+        data: {
+          'project': project.attr("id"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          project.fadeOut(function() {
+            project.remove();
+          });
+          Notiflix.Notify.Success('Success!');
+        }
+      });
+      Notiflix.Loading.Remove();
+      return false;
+      },
+      function(){Notiflix.Loading.Remove();}
+      );
+    });
+  </script>
+  <!-- end project ajax -->
+
+  <!-- task ajax -->
+  <script type="text/javascript">
+    //show new task form
+    $(document).on("click", ".fas.fa-plus-circle", function() {
+      Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'GET',
+        url: '{% url "add_task" %}',
+        data: {
+          'project': $(this).parent().parent().parent().attr("id")
+        },
+        success: function(response) {
+          $(".forms-container").html(response.form_html);
+          $("#newTaskForm").modal('show');
+          tinyMCE.remove();
+          tinyMCE.init({
+            mode: "specific_textareas",
+            editor_selector: "mceEditor",
+            height: 300,
+            theme: "modern"
+          });
+          $('#id_available_from').datepicker({
+            language: 'en',
+            dateFormat: 'dd.mm.yyyy',
+            minDate: new Date(),
+            autoClose: true,
+            maxDate: new Date('2050-1-1')
+          });
+          $('#id_available_to').datepicker({
+            language: 'en',
+            dateFormat: 'dd.mm.yyyy',
+            minDate: new Date(),
+            autoClose: true,
+            maxDate: new Date('2050-1-1')
+          });
+        }
+      });
+      Notiflix.Loading.Remove();
+    });
+
+    //add new task
+    $(document).on("submit", "#new-task-form", function(event) {
+      event.preventDefault();
+      Notiflix.Loading.Circle();
+      $(".error").css('visibility', 'hidden');
+      var time = $("#id_estimated_time").val();
+      if (time.length < 8) {
+        $(".error").html("Invalid estimated time! Please enter the time in format: 00:00:00!");
+        $(".error").css('visibility', 'visible');
         return false;
-      });
-
-      //show project detail
-      $(document).on("click", ".project-detail", function() {
-        var self = $(this);
-        closeMenu();
-        $.ajax({
-          type: 'GET',
-          url: '{% url "project_detail" %}',
-          data: {
-            'project': self.parent().parent().attr("id")
-          },
-          success: function(response) {
-            $("#main-block").html(response.project_html);
-          }
-        });
-      });
-
-      //show edit project form
-      $(document).on("click", ".fas.fa-edit", function() {
-        var self = $(this);
-        $.ajax({
-          type: 'GET',
-          url: '{% url "change_project" %}',
-          data: {
-            'project': self.parent().parent().parent().attr("id")
-          },
-          success: function(response) {
-            $(".forms-container").html(response.form_html);
-            $("#editProjectForm").modal('show');
-            tinyMCE.remove();
-            tinyMCE.init({
-              mode: "specific_textareas",
-              editor_selector: "mceEditor",
-              height: 300,
-              theme: "modern"
-            });
-          }
-        });
-      });
-
-      //edit selected project
-      $(document).on("submit", "#edit-project-form", function(event) {
-        event.preventDefault();
-        $(".error").css('visibility', 'hidden');
+      }
         var self = $(this);
         var formData = new FormData(self[0]);
-        formData.append('selected_project', $('.error').attr('id'));
+        formData.append('project', $('.error').attr('id'));
         $.ajax({
           type: 'POST',
-          url: "{% url 'change_project' %}",
+          url: "{% url 'add_task' %}",
           data: formData ? formData : self.serialize(),
           cache: false,
           contentType: false,
           processData: false,
           success: function(response) {
             if (response['success']) {
-              $("#editProjectForm").modal('hide');
-              var project = $("#" + response.project);
-                $('.project-name').html(`<h1>${response.project_name}</h1>`);
-                $('.project-summary').html(response.project_summary);
+              $("#newTaskForm").modal('hide');
+              Notiflix.Notify.Success('New task registered!');
+              $("#task-content").prepend(response.task_html).fadeIn();
             } else {
               $(".error").html(response.message);
               $(".error").css('visibility', 'visible');
+              Notiflix.Notify.Warning('Something went wrong!');
             }
           }
         });
+        Notiflix.Loading.Remove();
         return false;
-      });
+    });
 
-      //close project
-      $(document).on("click", ".far.fa-times-circle", function() {
-        var self = $(this);
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'complet_project' %}",
-          data: {
-            'project': self.parent().parent().parent().attr("id"),
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            var project = self.parent().parent().parent();
-            project.fadeOut(function() {
-              $("#main-block").append(response.project_block).fadeIn();
-              project.remove();
-            });
-          }
-        });
-      });
-
-      //open closed project
-      $(document).on("click", ".far.fa-arrow-alt-circle-up", function() {
-        var self = $(this);
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'open_project' %}",
-          data: {
-            'project': self.parent().parent().parent().attr("id"),
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            var project = self.parent().parent().parent();
-            project.fadeOut(function() {
-              $("#main-block").prepend(response.project_block).fadeIn();
-              project.remove();
-            });
-          }
-        });
-      });
-
-      //remove project
-      $(document).on("click", ".fas.fa-trash-alt", function() {
-        var self = $(this);
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'remove_project' %}",
-          data: {
-            'project': self.parent().parent().parent().attr("id"),
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            var project = self.parent().parent().parent();
-            project.fadeOut(function() {
-              project.remove();
-            });
-          }
-        });
-      });
-    </script>
-    <!-- end project ajax -->
-
-    <!-- task ajax -->
-    <script type="text/javascript">
-      //show new task form
-      $(document).on("click", ".fas.fa-plus-circle", function() {
-        var self = $(this);
-        $.ajax({
-          type: 'GET',
-          url: '{% url "add_task" %}',
-          data: {
-            'project': self.parent().parent().parent().attr("id")
-          },
-          success: function(response) {
-            $(".forms-container").html(response.form_html);
-            $("#newTaskForm").modal('show');
-            tinyMCE.remove();
-            tinyMCE.init({
-              mode: "specific_textareas",
-              editor_selector: "mceEditor",
-              height: 300,
-              theme: "modern"
-            });
-            $(function() {
-              $('.picker-task').datepicker({
-                dateFormat: 'dd.mm.yy',
-                minDate: '0',
-                autoclose: true,
-                changeMonth: true,
-                changeYear: true
-              });
-            });
-          }
-        });
-      });
-
-      //add new task
-      $(document).on("submit", "#new-task-form", function(event) {
-        event.preventDefault();
-        $(".error").css('visibility', 'hidden');
-        var date_from = $("#id_available_from").datepicker('getDate');
-        var date_to = $('#id_available_to').datepicker('getDate');
-        if (date_from > date_to) {
-          $(".error").html("Invalid date from ... to!");
-          $(".error").css('visibility', 'visible');
-        } else {
-          var self = $(this);
-          var formData = new FormData(self[0]);
-          formData.append('project', $('.error').attr('id'));
-          $.ajax({
-            type: 'POST',
-            url: "{% url 'add_task' %}",
-            data: formData ? formData : self.serialize(),
-            cache: false,
-            contentType: false,
-            processData: false,
-            success: function(response) {
-              if (response['success']) {
-                $("#newTaskForm").modal('hide');
-                $("#task-content").prepend(response.task_html).fadeIn();
-              } else {
-                $(".error").html(response.message);
-                $(".error").css('visibility', 'visible');
-              }
-            }
+    //show edit task form
+    $(document).on("click", ".far.fa-edit", function() {
+      Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'GET',
+        url: '{% url "change_task" %}',
+        data: {
+          'task': $(this).parent().parent().parent().attr("id")
+        },
+        success: function(response) {
+          $(".forms-container").html(response.form_html);
+          $("#editTaskForm").modal('show');
+          tinyMCE.remove();
+          tinyMCE.init({
+            mode: "specific_textareas",
+            editor_selector: "mceEditor",
+            height: 300,
+            theme: "modern"
           });
-          return false;
+          $('#id_available_from').datepicker({
+            language: 'en',
+            dateFormat: 'dd.mm.yyyy',
+            minDate: new Date(),
+            autoClose: true,
+            maxDate: new Date('2050-1-1')
+          });
+          $('#id_available_to').datepicker({
+            language: 'en',
+            dateFormat: 'dd.mm.yyyy',
+            minDate: new Date(),
+            autoClose: true,
+            maxDate: new Date('2050-1-1')
+          });
         }
       });
+      Notiflix.Loading.Remove();
+    });
 
-      //show edit task form
-      $(document).on("click", ".far.fa-edit", function() {
+    //edit selected task
+    $(document).on("submit", "#edit-task-form", function(event) {
+      event.preventDefault();
+      Notiflix.Loading.Circle();
+      var time = $("#id_estimated_time").val();
+      if (time.length < 8) {
+        $(".error").html("Invalid estimated time! Please enter the time in format: 00:00:00!");
+        $(".error").css('visibility', 'visible');
+        return false;
+      }
+      $(".error").css('visibility', 'hidden');
         var self = $(this);
+        var formData = new FormData(self[0]);
+        formData.append('selected_task', $('.error').attr('id'));
         $.ajax({
-          type: 'GET',
-          url: '{% url "change_task" %}',
-          data: {
-            'task': self.parent().parent().parent().attr("id")
-          },
+          type: 'POST',
+          url: "{% url 'change_task' %}",
+          data: formData ? formData : self.serialize(),
+          cache: false,
+          contentType: false,
+          processData: false,
           success: function(response) {
-            $(".forms-container").html(response.form_html);
-            $("#editTaskForm").modal('show');
-            tinyMCE.remove();
-            tinyMCE.init({
-              mode: "specific_textareas",
-              editor_selector: "mceEditor",
-              height: 300,
-              theme: "modern"
-            });
-            $(function() {
-              $('.picker-task').datepicker({
-                dateFormat: 'dd.mm.yy',
-                minDate: '0',
-                autoclose: true,
-                changeMonth: true,
-                changeYear: true
-              });
-            });
+            if (response['success']) {
+              $("#editTaskForm").modal('hide');
+              var task = $("#" + response.task);
+              task.replaceWith(response.task_html);
+              Notiflix.Notify.Success('Information saved!');
+            } else {
+              $(".error").html(response.message);
+              $(".error").css('visibility', 'visible');
+              Notiflix.Notify.Warning('Something went wrong!');
+            }
           }
         });
-      });
+        Notiflix.Loading.Remove();
+        return false;
+    });
 
-      //edit selected task
-      $(document).on("submit", "#edit-task-form", function(event) {
-        event.preventDefault();
-        $(".error").css('visibility', 'hidden');
-        var date_from = $("#id_available_from").datepicker('getDate');
-        var date_to = $('#id_available_to').datepicker('getDate');
-        if (date_from > date_to) {
-          $(".error").html("Invalid date from ... to!");
-          $(".error").css('visibility', 'visible');
-        } else {
-          var self = $(this);
-          var formData = new FormData(self[0]);
-          formData.append('selected_task', $('.error').attr('id'));
-          $.ajax({
-            type: 'POST',
-            url: "{% url 'change_task' %}",
-            data: formData ? formData : self.serialize(),
-            cache: false,
-            contentType: false,
-            processData: false,
-            success: function(response) {
-              if (response['success']) {
-                $("#editTaskForm").modal('hide');
-                var task = $("#" + response.task);
-                task.replaceWith(response.task_html);
-              } else {
-                $(".error").html(response.message);
-                $(".error").css('visibility', 'visible');
-              }
-            }
-          });
-          return false;
+    //save changes in the task summary
+    $(document).on("click", ".fas.fa-save", function() {
+      var parent = $(this).parent().parent().parent().parent().parent().parent().parent().attr("id");
+      Notiflix.Confirm.Show(
+        'Save the changes.',
+        'Do you agree with me?',
+        'Yes','No',
+      function(){
+        Notiflix.Loading.Circle();
+      var content = "#content" + parent;
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'save_task' %}",
+        data: {
+          'description': $(content).html(),
+          'worker': $('#user_name').attr("alt"),
+          'task': parent,
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          if(response['success']) {
+          Notiflix.Notify.Success('Information saved!');
+        }else {
+          Notiflix.Notify.Info('No changes detected!');
+        }
         }
       });
+      Notiflix.Loading.Remove();
+      return false;
+      },
+      function(){Notiflix.Loading.Remove();}
+      );
+    });
 
-      //save changes in the task summary
-      $(document).on("click", ".fas.fa-save", function() {
-        var self = $(this);
-        var parent = self.parent().parent().parent().parent().parent().parent().parent().attr("id");
-        var content = "#content" + parent;
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'save_task' %}",
-          data: {
-            'description': $(content).html(),
-            'worker': $('#user_name').attr("alt"),
-            'task': parent,
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          }
-        });
-        return false;
+    //start working on task
+    $(document).on("click", ".far.fa-check-square", function() {
+      var self = $(this);
+      var parent = self.parent().parent().parent().attr("id");
+      Notiflix.Confirm.Show(
+        'Start to work.',
+        'Do you agree with me?',
+        'Yes','No',
+      function(){
+        Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'start_task' %}",
+        data: {
+          'worker': $('#user_name').attr("alt"),
+          'task': parent,
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          self.replaceWith('<i class="far fa-pause-circle m-1 mr-2 text-center" title="finish working"></i>').fadeIn();
+          $("#task_worker" + parent).html(`Worker: ${response.worker}`).fadeIn();
+          Notiflix.Notify.Success('You started to work!');
+        }
       });
+      Notiflix.Loading.Remove();
+      return false;
+      },
+      function(){Notiflix.Loading.Remove();}
+      );
+    });
 
-      //start working on task
-      $(document).on("click", ".far.fa-check-square", function() {
-        var self = $(this);
-        var parent = self.parent().parent().parent().attr("id");
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'start_task' %}",
-          data: {
-            'worker': $('#user_name').attr("alt"),
-            'task': parent,
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            var worker = "#task_worker" + parent;
-            self.replaceWith('<i class="far fa-pause-circle m-1 mr-2 text-center" title="finish working"></i>').fadeIn();
-            $(worker).html(`Worker: ${response.worker}`).fadeIn();
+    //end working on task
+    $(document).on("click", ".far.fa-pause-circle", function() {
+      var self = $(this);
+      var parent = self.parent().parent();
+      Notiflix.Confirm.Show(
+        'Finish to work.',
+        'Do you agree with me?',
+        'Yes','No',
+      function(){
+        Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'end_task' %}",
+        data: {
+          'worker': $('#user_name').attr("alt"),
+          'task': parent.parent().attr("id"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var task = parent;
+          if (response['time']) {
+            var new_time = task.find(".fas.fa-user-clock").parent();
+            new_time.html(`<i class="fas fa-user-clock text-center mx-2" title="spent time"></i>${response.time}`).fadeIn();
           }
-        });
-        return false;
+          self.replaceWith('<i class="far fa-check-square m-1 mr-2 text-center" title="start working"></i>').fadeIn();
+          $("#task_worker" + parent.parent().attr("id")).html('Worker: the task is free').fadeIn();
+          Notiflix.Notify.Success('You finished to work!');
+        }
       });
+      Notiflix.Loading.Remove();
+      return false;
+      },
+      function(){Notiflix.Loading.Remove();}
+      );
+    });
 
-      //end working on task
-      $(document).on("click", ".far.fa-pause-circle", function() {
-        var self = $(this);
-        var parent = self.parent().parent().parent().attr("id");
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'end_task' %}",
-          data: {
-            'worker': $('#user_name').attr("alt"),
-            'task': parent,
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            var worker = "#task_worker" + parent;
-            self.replaceWith('<i class="far fa-check-square  m-1 mr-2 text-center" title="start working"></i>').fadeIn();
-            $(worker).html('Worker: the task is free').fadeIn();
-          }
-        });
-        return false;
-      });
-
-      //close task
-      $(document).on("click", ".far.fa-window-close", function() {
-        var self = $(this);
-        var parent = self.parent().parent().parent().attr("id");
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'completed_task' %}",
-          data: {
-            'task': parent,
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            var task = $("#" + parent);
+    //close task
+    $(document).on("click", ".far.fa-window-close", function() {
+      var self = $(this);
+      var parent = self.parent().parent().parent().attr("id");
+      Notiflix.Confirm.Show(
+        'Close the task.',
+        'Do you agree with me?',
+        'Yes','No',
+      function(){
+        Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'completed_task' %}",
+        data: {
+          'task': parent,
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var task = $("#" + parent);
+          var block = $("#main-block").find("#task-content");
+          if (block.length > 0) {
             task.fadeOut(function() {
               $("#task-content").append(response.task_html).fadeIn();
               task.remove();
             });
-          }
-        });
-      });
-
-      //open task
-      $(document).on("click", ".fas.fa-arrow-alt-circle-up", function() {
-        var self = $(this);
-        var parent = self.parent().parent().parent().parent().parent().attr("id");
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'open_task' %}",
-          data: {
-            'task': parent,
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            var task = $("#" + parent);
-            task.fadeOut(function() {
-              $("#task-content").prepend(response.task_html).fadeIn();
-              task.remove();
-            });
-          }
-        });
-      });
-
-      //remove task
-      $(document).on("click", ".fas.fa-trash", function() {
-        var self = $(this);
-        var parent = self.parent().parent().parent().parent().parent().attr("id");
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'remove_task' %}",
-          data: {
-            'task': parent,
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            var task = $("#" + parent);
+          } else {
             task.fadeOut(function() {
               task.remove();
             });
           }
-        });
+          Notiflix.Notify.Success('Success!');
+        }
       });
-    </script>
-    <!-- end task ajax -->
+      Notiflix.Loading.Remove();
+      return false;
+      },
+      function(){Notiflix.Loading.Remove();}
+      );
+    });
 
-    <!-- comment ajax -->
-    <script type="text/javascript">
-      //show new comment form
-      $(document).on("click", ".far.fa-plus-square", function() {
-        $('#modalCommentForm').modal('show');
-        $('#hide').attr("alt", $(this).parent().parent().parent().attr("id"));
+    //open task
+    $(document).on("click", ".fas.fa-arrow-alt-circle-up", function() {
+      var self = $(this);
+      var parent = self.parent().parent().parent().parent().parent().attr("id");
+      Notiflix.Confirm.Show(
+        'Open the task again.',
+        'Do you agree with me?',
+        'Yes','No',
+      function(){
+        Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'open_task' %}",
+        data: {
+          'task': parent,
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var task = $("#" + parent);
+          task.fadeOut(function() {
+            $("#task-content").prepend(response.task_html).fadeIn();
+            task.remove();
+          });
+          Notiflix.Notify.Success('Success!');
+        }
       });
+      Notiflix.Loading.Remove();
+      return false;
+      },
+      function(){Notiflix.Loading.Remove();}
+      );
+    });
 
-      //add new comment
-      $(document).on("submit", "#comment-form", function(event) {
-        event.preventDefault();
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'add_comment' %}",
-          data: {
-            'comment': $('#comments').val(),
-            'worker': $('#user_name').attr("alt"),
-            'task': $('#hide').attr("alt"),
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            $('#modalCommentForm').modal('hide');
-            var comments = "#more" + $('#hide').attr("alt");
-            $(comments).html(response.comments_html);
-            $("#comment-form")[0].reset();
+    //get list of active tasks
+    $(document).on("click", "#list-of-tasks", function() {
+      Notiflix.Loading.Circle();
+      closeMenu();
+      $.ajax({
+        type: 'GET',
+        url: '{% url "active_tasks" %}',
+        success: function(response) {
+          smoothScrollBackToTop();
+          if (response['success']) {
+            $("#main-block").html(response.tasks_html);
+          } else {
+            $("#main-block").html("<h5>No active tasks</h5>");
           }
-        });
-        return false;
+        }
       });
+      Notiflix.Loading.Remove();
+    });
 
-      //show all comments for task
-      $(document).on("click", ".fas.fa-sync", function() {
-        var parent = $(this).parent().parent().parent().attr("id");
-        $.ajax({
-          type: 'GET',
-          url: '{% url "show_comments" %}',
-          data: {
-            'task': parent
-          },
-          success: function(response) {
-            var comments = "#more" + parent;
-            if (response['success']) {
-              $(comments).html(response.comments_html);
-            } else {
-              $(comments).html("<h5>No comments</h5>");
-            }
+    //remove task
+    $(document).on("click", ".fas.fa-trash", function() {
+      var self = $(this);
+      var parent = self.parent().parent().parent().parent().parent().attr("id");
+      Notiflix.Confirm.Show(
+        'Remove the task.',
+        'Do you agree with me?',
+        'Yes','No',
+      function(){
+        Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'remove_task' %}",
+        data: {
+          'task': parent,
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var task = $("#" + parent);
+          task.fadeOut(function() {
+            task.remove();
+          });
+          Notiflix.Notify.Success('Success!');
+        }
+      });
+      Notiflix.Loading.Remove();
+      return false;
+      },
+      function(){Notiflix.Loading.Remove();}
+      );
+    });
+  </script>
+  <!-- end task ajax -->
+
+  <!-- comment ajax -->
+  <script type="text/javascript">
+    //show new comment form
+    $(document).on("click", ".far.fa-plus-square", function() {
+      $('#modalCommentForm').modal('show');
+      $('#hide').attr("alt", $(this).parent().parent().parent().attr("id"));
+    });
+
+    //add new comment
+    $(document).on("submit", "#comment-form", function(event) {
+      event.preventDefault();
+      Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'add_comment' %}",
+        data: {
+          'comment': $('#comments').val(),
+          'worker': $('#user_name').attr("alt"),
+          'task': $('#hide').attr("alt"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          $('#modalCommentForm').modal('hide');
+          var comments = "#more" + $('#hide').attr("alt");
+          $(comments).html(response.comments_html);
+          $("#comment-form")[0].reset();
+        }
+      });
+      Notiflix.Loading.Remove();
+      return false;
+    });
+
+    //show all comments for task
+    $(document).on("click", ".fas.fa-sync", function() {
+      Notiflix.Loading.Circle();
+      var parent = $(this).parent().parent().parent().attr("id");
+      $.ajax({
+        type: 'GET',
+        url: '{% url "show_comments" %}',
+        data: {
+          'task': parent
+        },
+        success: function(response) {
+          var comments = $("#more" + parent);
+          if (response['success']) {
+            comments.html(response.comments_html);
+          } else {
+            comments.html("<h5>No comments</h5>");
           }
-        });
+        }
       });
-    </script>
-    <!-- end comment ajax -->
+      Notiflix.Loading.Remove();
+    });
+  </script>
+  <!-- end comment ajax -->
 
-    <!-- time log ajax -->
-    <script type="text/javascript">
-      //get timelogs for task
-      $(document).on("click", ".fas.fa-user-clock", function() {
-        var parent = $(this).parent().parent().parent().attr("id");
-        $.ajax({
-          type: 'GET',
-          url: '{% url "get_time_logs" %}',
-          data: {
-            'task': parent
-          },
-          success: function(response) {
-            if (response['success']) {
-              $("#time-logs").html(response.timelogs_html);
-            } else {
-              $("#time-logs").html("<h5>No time logs</h5>");
-            }
-            $('#timeLogForm').modal('show');
+  <!-- time log ajax -->
+  <script type="text/javascript">
+    //get timelogs for task
+    $(document).on("click", ".fas.fa-user-clock", function() {
+      Notiflix.Loading.Circle();
+      var parent = $(this).parent().parent().parent().parent().parent().attr("id");
+      $.ajax({
+        type: 'GET',
+        url: '{% url "get_time_logs" %}',
+        data: {
+          'task': parent
+        },
+        success: function(response) {
+          if (response['success']) {
+            $("#time-logs").html(response.timelogs_html);
+          } else {
+            $("#time-logs").html("<h5>No time logs</h5>");
           }
-        });
+          $('#timeLogForm').modal('show');
+        }
       });
+      Notiflix.Loading.Remove();
+    });
 
-      //show all time logs
-      $(document).on("click", ".show-timelogs", function() {
-        $.ajax({
-          type: 'GET',
-          url: '{% url "show_time_logs" %}',
-          data: {},
-          success: function(response) {
-            if (response['success']) {
-              $("#main-block").html(`<div class="block-center mb-2 p-1 text-center">
+    //show all time logs
+    $(document).on("click", ".show-timelogs", function() {
+      Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'GET',
+        url: '{% url "show_time_logs" %}',
+        data: {},
+        success: function(response) {
+          if (response['success']) {
+            $("#main-block").html(`<div class="block-center mb-2 p-1 text-center">
             <div class="block-center text-center m-1 p-1 default-color-dark show-timelogs waves-effect waves-light">All time logs</div>
-            <div class="block-center text-center m-1 p-1 default-color-dark my_timelogs waves-effect waves-light">My time logs</div>
+            <div class="block-center text-center m-1 p-1 default-color-dark my-timelogs waves-effect waves-light">My time logs</div>
             </div>
             ${response.timelogs_html}`);
-              smoothScrollBackToTop();
-            } else {
-              $("#main-block").html("<h5>No time logs</h5>");
-            }
-          }
-        });
-      });
-
-      //show worker time logs
-      $(document).on("click", ".my_timelogs", function() {
-        $.ajax({
-          type: 'GET',
-          url: '{% url "show_time_logs" %}',
-          data: {
-            'worker': $('#user_name').attr("alt")
-          },
-          success: function(response) {
-            if (response['success']) {
-              $("#main-block").html(`<div class="block-center mb-2 p-1 text-center">
-            <div class="block-center text-center m-1 p-1 default-color-dark show-timelogs waves-effect waves-light">All time logs</div>
-            <div class="block-center text-center m-1 p-1 default-color-dark my_timelogs waves-effect waves-light">My time logs</div>
-            </div>
-            ${response.timelogs_html}`);
-              smoothScrollBackToTop();
-            } else {
-              $("#main-block").html("<h5>No time logs</h5>");
-            }
-          }
-        });
-      });
-
-      //log to trash
-      $(document).on("click", ".fa-user-times", function() {
-        var self = $(this);
-        var parent = self.parent().parent().parent().attr("id");
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'remove_time_log' %}",
-          data: {
-            'timelog': parent,
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            var log = self.parent().parent().parent();
-            log.fadeOut(function() {
-              log.remove();
-            });
-          }
-        });
-        return false;
-      });
-    </script>
-    <!-- end time log ajax -->
-
-    <!-- message ajax -->
-    <script type="text/javascript">
-      //get messages for worker
-      $(document).on("click", "#account", function() {
-        $.ajax({
-          type: 'GET',
-          url: '{% url "get_messages" %}',
-          data: {
-            'worker': $('#user_name').attr("alt"),
-          },
-          success: function(response) {
-            if (response['success']) {
-              $("#messages-box").html(response.messages_html);
-            } else {
-              $("#messages-box").html("<h5>No messages<h5>");
-            }
-            $("#userViewForm").modal("show");
-          }
-        });
-      });
-
-      //show selected message
-      $(document).on("click", ".show-message", function() {
-        $.ajax({
-          type: 'GET',
-          url: '{% url "show_message" %}',
-          data: {
-            'worker': $('#user_name').attr("alt"),
-            'message': $(this).parent().attr("id"),
-          },
-          success: function(response) {
-            $("#main-block").html(response.message_html);
             smoothScrollBackToTop();
-            $("#userViewForm").modal('hide');
+          } else {
+            $("#main-block").html("<h5>No time logs</h5>");
           }
-        });
+        }
       });
+      Notiflix.Loading.Remove();
+    });
 
-      //message to trash
-      $(document).on("click", ".far.fa-minus-square", function() {
-        var parent = $(this).parent().parent().attr("id");
-        $.ajax({
-          type: 'POST',
-          url: '{% url "remove_message" %}',
-          data: {
-            'worker': $('#user_name').attr("alt"),
-            'message': parent,
-            'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
-          },
-          success: function(response) {
-            var message = $("#" + parent);
-            message.fadeOut(function() {
-              message.remove();
-            });
+    //show worker time logs
+    $(document).on("click", ".my-timelogs", function() {
+      Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'GET',
+        url: '{% url "show_time_logs" %}',
+        data: {
+          'worker': $('#user_name').attr("alt")
+        },
+        success: function(response) {
+          if (response['success']) {
+            $("#main-block").html(`<div class="block-center mb-2 p-1 text-center">
+            <div class="block-center text-center m-1 p-1 default-color-dark show-timelogs waves-effect waves-light">All time logs</div>
+            <div class="block-center text-center m-1 p-1 default-color-dark my-timelogs waves-effect waves-light">My time logs</div>
+            </div>
+            ${response.timelogs_html}`);
+            smoothScrollBackToTop();
+          } else {
+            $("#main-block").html("<h5>No time logs</h5>");
           }
-        });
-        return false;
+        }
       });
-    </script>
-    <!-- end message ajax -->
-    <!-- end front -->
+      Notiflix.Loading.Remove();
+    });
+
+    //log to trash
+    $(document).on("click", ".fa-user-times", function() {
+      var parent = $(this).parent().parent().parent();
+      Notiflix.Confirm.Show(
+        'Remove the time log.',
+        'Do you agree with me?',
+        'Yes','No',
+      function(){
+        Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'remove_time_log' %}",
+        data: {
+          'timelog': parent.attr("id"),
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var log = parent;
+          log.fadeOut(function() {
+            log.remove();
+          });
+          Notiflix.Notify.Success('Success!');
+        }
+      });
+      Notiflix.Loading.Remove();
+      return false;
+      },
+      function(){Notiflix.Loading.Remove();}
+      );
+    });
+  </script>
+  <!-- end time log ajax -->
+
+  <!-- message ajax -->
+  <script type="text/javascript">
+    //get messages for worker
+    $(document).on("click", "#account", function() {
+      Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'GET',
+        url: '{% url "get_messages" %}',
+        data: {
+          'worker': $('#user_name').attr("alt"),
+        },
+        success: function(response) {
+          if (response['success']) {
+            $("#messages-box").html(response.messages_html);
+          } else {
+            $("#messages-box").html("<h5>No messages<h5>");
+          }
+          $("#userViewForm").modal("show");
+        }
+      });
+      Notiflix.Loading.Remove();
+    });
+
+    //show selected message
+    $(document).on("click", ".show-message", function() {
+      Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'GET',
+        url: '{% url "show_message" %}',
+        data: {
+          'worker': $('#user_name').attr("alt"),
+          'message': $(this).parent().attr("id"),
+        },
+        success: function(response) {
+          $("#main-block").html(response.message_html);
+          smoothScrollBackToTop();
+          $("#userViewForm").modal('hide');
+        }
+      });
+      Notiflix.Loading.Remove();
+    });
+
+    //message to trash
+    $(document).on("click", ".far.fa-minus-square", function() {
+      var parent = $(this).parent().parent().attr("id");
+      Notiflix.Confirm.Show(
+        'Remove the message.',
+        'Do you agree with me?',
+        'Yes','No',
+      function(){
+        Notiflix.Loading.Circle();
+      $.ajax({
+        type: 'POST',
+        url: '{% url "remove_message" %}',
+        data: {
+          'worker': $('#user_name').attr("alt"),
+          'message': parent,
+          'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function(response) {
+          var message = $("#" + parent);
+          message.fadeOut(function() {
+            message.remove();
+          });
+          Notiflix.Notify.Success('Success!');
+        }
+      });
+      Notiflix.Loading.Remove();
+      return false;
+      },
+      function(){Notiflix.Loading.Remove();}
+      );
+    });
+  </script>
+  <!-- end message ajax -->
+  <!-- end front -->
 
 </body>
 

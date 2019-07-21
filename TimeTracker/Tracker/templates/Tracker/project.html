@@ -3,7 +3,7 @@
 <div class="jumbotron" id="{{ project.id }}">
   <div class="p-1 m-1 block-center text-center row">
     <div class="col-lg-11 col-xs-11 block-center text-center project-name">
-      <h1>{{ project.project_name }}</h1>
+      <h1 class="h1-responsive font-weight-bold">{{ project.project_name }}</h1>
     </div>
     <div class="col-lg-1 col-xs-1 mr-auto block-center text-center">
       {% if user.is_superuser %}
@@ -19,7 +19,7 @@
     {% if not task.is_completed %}
     <div class="p-1 m-3 white task" id="{{ task.id }}">
       <div class="block-center text-center row success-color-dark p-3 m-3">
-        <div class="col-lg-7 col-xs-7 block-center text-center waves-effect waves-light p-3 warning-color" data-toggle="collapse" data-target="#summary{{ task.id }}" title="{{ task.title }}">
+        <div class="col-lg-7 col-xs-7 block-center font-weight-bold text-center waves-effect waves-light p-3 warning-color" data-toggle="collapse" data-target="#summary{{ task.id }}" title="{{ task.title }}">
           {{ task.title }}
         </div>
         <div class="col-lg-4 col-xs-4 mr-auto block-center p-1 text-center">
@@ -28,9 +28,9 @@
           <i class="far fa-edit m-1 mr-2 text-center" title="edit the task"></i>
           {% endif %}
           {% if task.is_available == True %}
-          <i class="fas fa-sync m-1 mr-2 text-center" title="synchronize"></i>
+          <i class="fas fa-sync m-1 mr-2 text-center" title="load comments"></i>
           {% if task.is_active == False %}
-          <i class="far fa-check-square  m-1 mr-2 text-center" title="start working"></i>
+          <i class="far fa-check-square m-1 mr-2 text-center" title="start working"></i>
           {% elif worker == task.worker %}
           <i class="far fa-pause-circle m-1 mr-2 text-center" title="finish working"></i>
           {% else %}
@@ -41,8 +41,15 @@
           <h6 class="m-1 text-center">The task is unavailable</h6>
           {% endif %}
         </div>
-        <div class="col-lg-1 col-xs-1 mr-auto block-center p-1 text-center">
-          <i class="fas p-1 fa-user-clock" title="estimated time"><small class="p-1 block-center text-center"> {{ task.estimated_time }}</small></i>
+        <div class="col-lg-1 col-xs-1 mr-auto block-center time text-center">
+          <div class="row block-center">
+            <div class="col-lg-12 col-xs-12 mb-3 text-center">
+              <i class="fas fa-user-clock text-center mx-2" title="spent time"></i>{{ task.spent_time }}
+            </div>
+            <div class="col-lg-12 col-xs-12 mb-1 text-center">
+              <i class="fas fa-business-time text-center mx-2" title="estimated time"></i>{{ task.estimated_time }}
+            </div>
+          </div>
         </div>
         <div class="col-lg-12 col-xs-12 text-center p-1">
           <div id="summary{{ task.id }}" class="collapse">
@@ -85,7 +92,7 @@
       <div class="block-center text-center row teal lighten-4 p-1 m-3">
         <div class="col-lg-12 text-center col-xs-12 p-1 unique-color">
           <div class="row p-1 mx-2">
-            <div class="col-lg-11 col-xs-11 p-1 block-center text-center waves-effect waves-light warning-color" data-toggle="collapse" data-target="#summary{{ task.id }}" title="{{ task.title }}">
+            <div class="col-lg-11 col-xs-11 p-1 block-center font-weight-bold text-center waves-effect waves-light warning-color" data-toggle="collapse" data-target="#summary{{ task.id }}" title="{{ task.title }}">
               {{ task.title }}
             </div>
             <div class="col-lg-1 col-xs-1 p-1 block-center text-center">
@@ -117,53 +124,3 @@
   </div>
 </div>
 {% endif %}
-
-
-<!-- modal form to add a new comment for task -->
-<div class="modal fade" id="modalCommentForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <form id="comment-form" action="" method="POST">
-        {% csrf_token %}
-        <div class="modal-header text-center">
-          <h4 class="modal-title font-weight-bold">Add comment</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body mx-1">
-          <div class="md-form">
-            <textarea type="text" id="comments" name="comment" class="form-control p-2 m-1 md-textarea" placeholder="Your comments" minlength="10" required="required"></textarea>
-            <div id="hide"></div>
-          </div>
-        </div>
-        <div class="modal-footer block-center text-center">
-          <button type="submit" class="btn btn-default">Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-<!-- endform -->
-
-<!-- modal form to show timelogs of task -->
-<div class="modal fade right" id="timeLogForm" tabindex="-1" role="dialog" aria-labelledby="mytimeLogForm" aria-hidden="true">
-  <div class="modal-dialog modal-full-height modal-right" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="mytimeLogForm">Time logs</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="text-center p-1" id="time-logs">
-        </div>
-        <div class="modal-footer block-center text-center m-1 p-1">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- endform -->

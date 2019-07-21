@@ -3,22 +3,42 @@
 
 
 {% block main_block %}
-<div class="card h-100 p-1">
-  <h5 class="card-header info-color white-text text-center py-4">
-    <strong>Sign in</strong>
-  </h5>
-  <div class="jumbotron px-5 pt-0">
-    <form class="text-center" id="user-login-form" method="POST" action="">
-      {% csrf_token %}
-      <div class="md-form">
-        <input type="text" id="login-username" name="username" class="form-control" maxlength="50" placeholder="Username" required>
+<div class="card login-block p-3 m-0">
+  <div class="login-dialog font-weight-bold p-1">
+    <h5 class="card-header info-color white-text text-center py-4">
+      Sign in
+    </h5>
+    <div class="jumbotron row px-1 mt-1 mb-1">
+      <div class="p-1 col-lg-12 col-xs-12 block-center text-center">
+        <form class="block-center welcome row" id="user-login-form" method="POST" action="">
+          {% csrf_token %}
+          <div class="md-form-group p-1 col-lg-12 col-xs-12 block-center text-center">
+            <div class="row">
+              <div class="md-form m-1 p-1 col-lg-12 col-xs-12">
+                <input type="text" id="login-username" name="username" class="form-control rounded z-depth-3 white" minlength="2" maxlength="30" placeholder="Username" required>
+              </div>
+              <div class="md-form m-1 p-1 col-lg-12 col-xs-12">
+                <input type="password" id="login-password" name="password" class="form-control rounded z-depth-3 white" minlength="8" maxlength="30" placeholder="Password" required>
+              </div>
+            </div>
+          </div>
+          <div class="p-1 m-1 col-lg-12 col-xs-12 text-center block-center error">
+          </div>
+          <div class="p-1 p-1 col-lg-12 col-xs-12 text-center block-center">
+            <button class="btn btn-success btn-rounded btn-block brown-text w-50 font-weight-bold waves-effect rounded" type="submit">Sign in</button>
+          </div>
+        </form>
       </div>
-      <div class="md-form">
-        <input type="password" id="login-password" name="password" class="form-control" maxlength="50" placeholder="Password" required>
-      </div>
-      <div class="block-center error p-1"></div>
-      <button class="btn btn-outline-info btn-rounded btn-block my-4 waves-effect z-depth-0" type="submit">Sign in</button>
-    </form>
+    </div>
+  </div>
+  <div class="p-1 block-center text-center mt-3">
+    <p>Time tracking system. Copyright &copy;
+      <script>
+        document.write(new Date().getFullYear());
+      </script>, Viktor Kozachok</p>
+  </div>
+  <div class=" text-center">
+    <hr class="red font-weight-bold">
   </div>
 </div>
 {% endblock %}

@@ -1,11 +1,12 @@
 {% if new_solo_project %}
-<div class="card m-1 border border-info" id="{{ new_solo_project.id }}">
+<div class="card m-1 border border-info project-card" id="{{ new_solo_project.id }}">
   <div class="p-1 m-1 light-green jumbotron lighten-2 waves-effect waves-light block-center text-center row">
-    <div class="p-1 project-detail col-lg-8 col-xs-8" title="{{ new_solo_project.project_name }}">
+    <div class="p-1 project-detail font-weight-bold col-lg-8 col-xs-8" title="{{ new_solo_project.project_name }}">
       {{ new_solo_project.project_name }}
     </div>
     <div class="col-lg-2 col-xs-2 ml-auto block-center p-1 text-center">
       <i class="far fa-times-circle m-1 mr-2 text-center" title="close the project"></i>
+      <i class="fas fa-edit m-1 mr-2 text-center" title="edit the project"></i>
       <i class="fas fa-lock-open m-1 text-center" title="available"></i>
     </div>
     <div class="col-lg-2 col-xs-2 block-center date ml-auto" title="created on">{{ new_solo_project.created_on }}</div>
@@ -19,10 +20,10 @@
 {% endif %}
 
 {% if closed_solo_project %}
-<div class="card m-1 border border-warning" id="{{ closed_solo_project.id }}">
+<div class="card m-1 border border-warning project-card" id="{{ closed_solo_project.id }}">
   <div class="p-1 m-1 teal lighten-4 waves-effect waves-light block-center text-center row">
-    <div class="p-1 col-lg-8 col-xs-8">
-      <span title="{{ closed_solo_project.project_name }}">{{ closed_solo_project.project_name }}</span>
+    <div class="p-1 col-lg-8 col-xs-8 font-weight-bold" title="{{ closed_solo_project.project_name }}">
+      {{ closed_solo_project.project_name }}
     </div>
     <div class="col-lg-2 col-xs-2 ml-auto block-center text-center">
       <i class="far fa-arrow-alt-circle-up m-1 mr-2 text-center" title="open the project again"></i>
@@ -130,7 +131,7 @@
 <div class="container-fluid cyan lighten-4 p-3">
   <div class="row jumbotron mx-2">
     <div class="col-lg-12 col-xs-12 block-center text-center p-1">
-      <h3>{{ new_message.title }}</h3>
+      <h3 class="h3-responsive">{{ new_message.title }}</h3>
       <hr class="my-1">
     </div>
     <div class="col-lg-12 col-xs-12 text-justify p-1">
@@ -138,14 +139,14 @@
       <hr class="my-1">
     </div>
     <div class="col-lg-12 col-xs-12 block-center text-center p-1">
-      <h5>{{ new_message.created_on }}</h5>
+      <h5 class="h5-responsive">{{ new_message.created_on }}</h5>
     </div>
   </div>
 </div>
 {% endif %}
 
 {% if new_worker %}
-<div class="card my-1">
+<div class="card my-1 worker-card">
   <div class="row rgba-blue-grey-light p-1" id="{{ new_worker.id }}">
     <div class="col-lg-1 col-xs-1 p-1 jumbotron warning-color block-center text-center">
       {% if new_worker.is_blocked == True %}
@@ -160,15 +161,15 @@
           <div class="row">
             <div class="col-lg-2 col-xs-2 p-1 block-center">
               <img class="rounded-circle z-depth-0 worker-list-avatar" src="{{ new_worker.avatar.url }}" alt="avatar">
-              </div>
-              <div class="col-lg-1 col-xs-1 p-1 block-center">
-                {% if new_worker.user.is_superuser %}
-                <div class="red-text data">admin</div>
-                {% endif %}
-                </div>
-              <div class="col-lg-9 col-xs-9 p-1 block-center">
-              <strong>{{ new_worker.full_name }}</strong>
-              </div>
+            </div>
+            <div class="col-lg-1 col-xs-1 p-1 block-center">
+              {% if new_worker.user.is_superuser %}
+              <div class="red-text data">admin</div>
+              {% endif %}
+            </div>
+            <div class="col-lg-9 col-xs-9 font-weight-bold p-1 block-center">
+              {{ new_worker.full_name }}
+            </div>
           </div>
         </div>
         <div class="col-lg-4 col-xs-4 p-1 text-center">
@@ -189,14 +190,14 @@
     </div>
     <div class="col-lg-2 col-xs-2 p-1 block-center text-center">
       {% if new_worker.user.is_superuser %}
-      <i class="fas fa-user-edit m-1 mr-1 text-center" title="edit worker"></i>
+      <i class="fas fa-user-edit m-1 mr-3 text-center" title="edit worker"></i>
       {% else %}
       {% if new_worker.is_blocked == True %}
-      <i class="fas fa-unlock-alt m-1 mr-1 text-center" title="unblock worker"></i>
+      <i class="fas fa-unlock-alt m-1 mr-3 text-center" title="unblock worker"></i>
       {% else %}
-      <i class="fas fa-ban m-1 mr-1 text-center" title="block worker"></i>
+      <i class="fas fa-ban m-1 mr-3 text-center" title="block worker"></i>
       {% endif %}
-      <i class="fas fa-user-edit m-1 mr-1 text-center" title="edit worker"></i>
+      <i class="fas fa-user-edit m-1 mr-3 text-center" title="edit worker"></i>
       <i class="fas fa-user-minus m-1 text-center" title="remove worker"></i>
       {% endif %}
     </div>
@@ -206,7 +207,7 @@
 
 {% if workers_list %}
 {% for worker in workers_list %}
-<div class="card my-1">
+<div class="card my-1 worker-card">
   <div class="row rgba-blue-grey-light p-1" id="{{ worker.id }}">
     <div class="col-lg-1 col-xs-1 p-1 jumbotron warning-color block-center text-center">
       {% if worker.is_blocked == True %}
@@ -221,15 +222,15 @@
           <div class="row">
             <div class="col-lg-2 col-xs-2 p-1 block-center">
               <img class="rounded-circle z-depth-0 worker-list-avatar" src="{{ worker.avatar.url }}" alt="avatar">
-              </div>
-              <div class="col-lg-1 col-xs-1 p-1 block-center">
-                {% if worker.user.is_superuser %}
-                <div class="red-text data">admin</div>
-                {% endif %}
-                </div>
-              <div class="col-lg-9 col-xs-9 p-1 block-center">
-              <strong>{{ worker.full_name }}</strong>
-              </div>
+            </div>
+            <div class="col-lg-1 col-xs-1 p-1 block-center">
+              {% if worker.user.is_superuser %}
+              <div class="red-text data">admin</div>
+              {% endif %}
+            </div>
+            <div class="col-lg-9 col-xs-9 font-weight-bold p-1 block-center">
+              {{ worker.full_name }}
+            </div>
           </div>
         </div>
         <div class="col-lg-4 col-xs-4 p-1 text-center">
@@ -250,14 +251,14 @@
     </div>
     <div class="col-lg-2 col-xs-2 p-1 block-center text-center">
       {% if worker.user.is_superuser %}
-      <i class="fas fa-user-edit m-1 mr-1 text-center" title="edit worker"></i>
+      <i class="fas fa-user-edit m-1 mr-3 text-center" title="edit worker"></i>
       {% else %}
       {% if worker.is_blocked == True %}
-      <i class="fas fa-unlock-alt m-1 mr-1 text-center" title="unblock worker"></i>
+      <i class="fas fa-unlock-alt m-1 mr-3 text-center" title="unblock worker"></i>
       {% else %}
-      <i class="fas fa-ban m-1 mr-1 text-center" title="block worker"></i>
+      <i class="fas fa-ban m-1 mr-3 text-center" title="block worker"></i>
       {% endif %}
-      <i class="fas fa-user-edit m-1 mr-1 text-center" title="edit worker"></i>
+      <i class="fas fa-user-edit m-1 mr-3 text-center" title="edit worker"></i>
       <i class="fas fa-user-minus m-1 text-center" title="remove worker"></i>
       {% endif %}
     </div>
@@ -271,7 +272,7 @@
 <div class="row green accent-1 p-1 m-3" id="{{ message.id }}">
   <div class="col-lg-10 col-xs-10 p-1 date block-center text-center waves-effect waves-light show-message">{{ message.title }}</div>
   <div class="col-lg-2 col-xs-2 p-1 block-center text-center date" title="to trash">
-    <div class="red-text">{{ message.status }}</div><i class="far fa-minus-square ml-2 m-1 text-center"></i>
+    <div class="red-text">{{ message.status }}</div><i class="far fa-minus-square ml-3 m-1 text-center"></i>
   </div>
 </div>
 {% endfor %}
@@ -283,43 +284,43 @@
   <div class="row p-3 date">
     {% if small == True or not user.is_superuser %}
     <div class="col-lg-12 col-xs-12 card text-center p-1">
-      <div class="timelog_block created_on p-1">
-        <span class="mr-3 created_on info-color">{{ log.worker.last_name }} {{ log.worker.first_name }}:</span>
-        <span class="mr-1 created_on">[ {{ log.action }} ]</span>
+      <div class="block-center p-1">
+        <span class="mr-3 block-center p-1 info-color">{{ log.worker.full_name }}</span>
+        <span class="mr-1 block-center font-weight-bold">[ {{ log.action }} ]</span>
       </div>
       {% if log.comment != None %}
-      <div class="m-1 light-green lighten-3 border border-info created_on p-1">
+      <div class="m-1 light-green lighten-3 border border-info block-center p-1">
         <p>{{ log.comment }}</p>
       </div>
       {% endif %}
       <div class="block-center text-center p-1">
-        <span>Task: {{ log.task.title }}. Project: {{ log.task.project.project_name }}</span>
+        <strong class="mr-1">Task:</strong> {{ log.task.title }} <strong class="ml-1 mr-1">Project:</strong> {{ log.task.project.project_name }}
       </div>
       <div class="block-center text-center warning-color mb-1 p-1">
         <span class="mr-3">{{ log.time_of_start }}</span>
-        {% if log.spend_time != None %}
-        <span class="block-center">Spend time: {{ log.spend_time }}<i class="far fa-clock m-1 text-center ml-1"></i></span>
+        {% if log.spent_time != None %}
+        <span class="block-center">Spent time: {{ log.spent_time }}<i class="far fa-clock m-1 text-center ml-1"></i></span>
         {% endif %}
       </div>
     </div>
     {% else %}
     <div class="col-lg-11 col-xs-11 card text-center p-1">
-      <div class="timelog_block created_on p-1">
-        <span class="mr-3 created_on info-color">{{ log.worker.last_name }} {{ log.worker.first_name }}:</span>
-        <span class="mr-1 created_on">[ {{ log.action }} ]</span>
+      <div class="block-center p-1">
+        <span class="mr-3 block-center p-1 info-color">{{ log.worker.full_name }}</span>
+        <span class="mr-1 block-center font-weight-bold">[ {{ log.action }} ]</span>
       </div>
       {% if log.comment != None %}
-      <div class="m-1 light-green lighten-3 border border-info created_on p-1">
+      <div class="m-1 light-green lighten-3 border border-info block-center p-1">
         <p>{{ log.comment }}</p>
       </div>
       {% endif %}
       <div class="block-center text-center p-1">
-        <span>Task: {{ log.task.title }}. Project: {{ log.task.project.project_name }}</span>
+        <strong class="mr-1">Task:</strong> {{ log.task.title }} <strong class="ml-1 mr-1">Project:</strong>
       </div>
       <div class="block-center text-center warning-color mb-1 p-1">
         <span class="mr-3">{{ log.time_of_start }}</span>
-        {% if log.spend_time != None %}
-        <span class="block-center">Spend time: {{ log.spend_time }}<i class="far fa-clock m-1 text-center ml-1"></i></span>
+        {% if log.spent_time != None %}
+        <span class="block-center">Spent time: {{ log.spent_time }}<i class="far fa-clock m-1 text-center ml-2"></i></span>
         {% endif %}
       </div>
     </div>
@@ -339,28 +340,35 @@
 {% if new_task and new_task.is_completed == False %}
 <div class="p-1 m-3 white task" id="{{ new_task.id }}">
   <div class="block-center text-center row success-color-dark p-3 m-3">
-    <div class="col-lg-7 col-xs-7 block-center text-center waves-effect waves-light p-3 warning-color" data-toggle="collapse" data-target="#summary{{ new_task.id }}" title="{{ new_task.title }}">
+    <div class="col-lg-7 col-xs-7 block-center text-center font-weight-bold waves-effect waves-light p-3 warning-color" data-toggle="collapse" data-target="#summary{{ new_task.id }}" title="{{ new_task.title }}">
       {{ new_task.title }}
     </div>
     <div class="col-lg-4 col-xs-4 mr-auto block-center p-1 text-center">
       <i class="far fa-window-close m-1 mr-2 text-center" title="close the task"></i>
       <i class="far fa-edit m-1 mr-2 text-center" title="edit the task"></i>
       {% if new_task.is_available == True %}
-      <i class="fas fa-sync m-1 mr-2 text-center" title="synchronize"></i>
-        {% if new_task.is_active == False %}
-        <i class="far fa-check-square  m-1 mr-2 text-center" title="start working"></i>
-        {% elif worker == new_task.worker %}
-        <i class="far fa-pause-circle m-1 mr-2 text-center" title="finish working"></i>
-        {% else %}
-        <i class="fas fa-lock m-1 mr-2 text-center" title="active"></i>
-        {% endif %}
+      <i class="fas fa-sync m-1 mr-2 text-center" title="load comments"></i>
+      {% if new_task.is_active == False %}
+      <i class="far fa-check-square m-1 mr-2 text-center" title="start working"></i>
+      {% elif worker == new_task.worker %}
+      <i class="far fa-pause-circle m-1 mr-2 text-center" title="finish working"></i>
+      {% else %}
+      <i class="fas fa-lock m-1 mr-2 text-center" title="active"></i>
+      {% endif %}
       <i class="far fa-plus-square m-1 text-center" title="add comment"></i>
       {% else %}
       <h6 class="m-1 text-center">The task is unavailable</h6>
       {% endif %}
     </div>
-    <div class="col-lg-1 col-xs-1 mr-auto block-center p-1 text-center">
-      <i class="fas p-1 fa-user-clock" title="estimated time"><small class="p-1 block-center text-center"> {{ new_task.estimated_time }}</small></i>
+    <div class="col-lg-1 col-xs-1 mr-auto block-center time text-center">
+      <div class="row block-center">
+        <div class="col-lg-12 col-xs-12 mb-3 text-center">
+          <i class="fas fa-user-clock text-center mx-2" title="spent time"></i>{{ new_task.spent_time }}
+        </div>
+        <div class="col-lg-12 col-xs-12 mb-1 text-center">
+          <i class="fas fa-business-time text-center mx-2" title="estimated time"></i>{{ new_task.estimated_time }}
+        </div>
+      </div>
     </div>
     <div class="col-lg-12 col-xs-12 text-center p-1">
       <div id="summary{{ new_task.id }}" class="collapse">
@@ -405,7 +413,7 @@
   <div class="block-center text-center row teal lighten-4 p-1 m-3">
     <div class="col-lg-12 text-center col-xs-12 p-1 unique-color">
       <div class="row p-1 mx-2">
-        <div class="col-lg-11 col-xs-11 p-1 block-center text-center waves-effect waves-light warning-color" data-toggle="collapse" data-target="#summary{{ completed_task.id }}" title="{{ completed_task.title }}">
+        <div class="col-lg-11 col-xs-11 p-1 block-center text-center font-weight-bold waves-effect waves-light warning-color" data-toggle="collapse" data-target="#summary{{ completed_task.id }}" title="{{ completed_task.title }}">
           {{ completed_task.title }}
         </div>
         <div class="col-lg-1 col-xs-1 p-1 block-center text-center">
@@ -428,4 +436,79 @@
     </div>
   </div>
 </div>
+{% endif %}
+
+{% if tasks_list %}
+{% for new_task in tasks_list %}
+<div class="p-1 m-3 white task" id="{{ new_task.id }}">
+  <div class="block-center text-center row success-color-dark p-3 m-3">
+    <div class="col-lg-7 col-xs-7 block-center text-center font-weight-bold waves-effect waves-light p-3 warning-color" data-toggle="collapse" data-target="#summary{{ new_task.id }}" title="{{ new_task.title }}">
+      {{ new_task.title }}
+    </div>
+    <div class="col-lg-4 col-xs-4 mr-auto block-center p-1 text-center">
+      {% if user.is_superuser %}
+      <i class="far fa-window-close m-1 mr-2 text-center" title="close the task"></i>
+      <i class="far fa-edit m-1 mr-2 text-center" title="edit the task"></i>
+      {% endif %}
+      {% if new_task.is_available == True %}
+      <i class="fas fa-sync m-1 mr-2 text-center" title="load comments"></i>
+      {% if new_task.is_active == False %}
+      <i class="far fa-check-square m-1 mr-2 text-center" title="start working"></i>
+      {% elif worker == new_task.worker %}
+      <i class="far fa-pause-circle m-1 mr-2 text-center" title="finish working"></i>
+      {% else %}
+      <i class="fas fa-lock m-1 mr-2 text-center" title="active"></i>
+      {% endif %}
+      <i class="far fa-plus-square m-1 text-center" title="add comment"></i>
+      {% else %}
+      <h6 class="m-1 text-center">The task is unavailable</h6>
+      {% endif %}
+    </div>
+    <div class="col-lg-1 col-xs-1 mr-auto block-center time text-center">
+      <div class="row block-center">
+        <div class="col-lg-12 col-xs-12 mb-3 text-center">
+          <i class="fas fa-user-clock text-center mx-2" title="spent time"></i>{{ new_task.spent_time }}
+        </div>
+        <div class="col-lg-12 col-xs-12 mb-1 text-center">
+          <i class="fas fa-business-time text-center mx-2" title="estimated time"></i>{{ new_task.estimated_time }}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-12 col-xs-12 text-center p-1">
+      <div id="summary{{ new_task.id }}" class="collapse">
+        <div class="container-fluid grey lighten-2 p-1">
+          <div class="block-center text-center row white m-1">
+            {% if new_task.is_available == True %}
+            <div class="col-lg-12 col-xs-12 summary-content text-justify p-3" contenteditable="true" id="content{{ new_task.id }}">{{ new_task.description|safe }}</div>
+            <div class="col-lg-12 col-xs-12 m-1 p-1"><i class="fas fa-save m-1 text-center" title="save"></i></div>
+            {% else %}
+            <div class="col-lg-12 col-xs-12 summary-content text-justify p-3" id="content{{ new_task.id }}">{{ new_task.description|safe }}</div>
+            {% endif %}
+          </div>
+          <div class="block-center text-center row orange accent-1">
+            <div class="col-lg-4 col-xs-4 p-1 block-center text-center">Created: {{ new_task.date_of_start }}</div>
+            <div class="col-lg-2 col-xs-2 p-1 block-center text-center">Priority: {{ new_task.get_priority_of_task_display }}</div>
+            <div class="col-lg-2 col-xs-2 p-1 block-center text-center">Type: {{ new_task.get_type_of_task_display }}</div>
+            {% if new_task.worker %}
+            <div class="col-lg-4 col-xs-4 p-1 block-center text-center task_worker" id="task_worker{{ new_task.id }}">Worker: {{ new_task.worker }}</div>
+            {% else %}
+            <div class="col-lg-4 col-xs-4 p-1 block-center text-center task_worker" id="task_worker{{ new_task.id }}">Worker: the task is free</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="block-center text-center row">
+    <div class="col-lg-12 col-xs-12 block-center text-center warning-color m-1 p-1">
+      Available from: {{ new_task.available_from }} to: {{ new_task.available_to }}
+    </div>
+  </div>
+  {% if new_task.is_available == True %}
+  <div class="silver border border-warning p-1 m-1" id="more{{ new_task.id }}">
+    <h5>To load comments, just click on the sync button</h5>
+  </div>
+  {% endif %}
+</div>
+{% endfor %}
 {% endif %}
