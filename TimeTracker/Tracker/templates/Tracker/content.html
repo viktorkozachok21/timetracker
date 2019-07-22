@@ -315,7 +315,7 @@
       </div>
       {% endif %}
       <div class="block-center text-center p-1">
-        <strong class="mr-1">Task:</strong> {{ log.task.title }} <strong class="ml-1 mr-1">Project:</strong>
+        <strong class="mr-1">Task:</strong> {{ log.task.title }} <strong class="ml-1 mr-1">Project:</strong>{{ log.task.project.project_name }}
       </div>
       <div class="block-center text-center warning-color mb-1 p-1">
         <span class="mr-3">{{ log.time_of_start }}</span>

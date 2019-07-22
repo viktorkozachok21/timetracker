@@ -314,12 +314,15 @@ def complet_project(request):
     if request.method == "POST" and request.is_ajax:
         project_key = request.POST['project']
         project = get_object_or_404(Project, id=project_key)
+        if Task.objects.filter(project=project, is_active=True).exists():
+            return JsonResponse({"success":False}, status=200)
+        print("stop")
         project.complete()
         project_block = loader.render_to_string(
             'Tracker/content.html',
             {'closed_solo_project': project, 'user': request.user}
         )
-        return JsonResponse({"project_block": project_block}, status=200)
+        return JsonResponse({"success":True, "project_block": project_block}, status=200)
     return JsonResponse({"success":False}, status=400)
 
 def open_project(request):
@@ -389,19 +392,20 @@ def save_task(request):
 
     if request.method == "POST" and request.is_ajax:
         task_key = request.POST['task']
-        worker_key = request.POST['worker']
+        editor_key = request.POST['worker']
         task = get_object_or_404(Task, id=task_key)
         if task.description != request.POST['description']:
-            worker = get_object_or_404(Worker, id=worker_key)
+            editor = get_object_or_404(Worker, id=editor_key)
             author = get_object_or_404(Worker, user=task.author)
-            worker_name = worker.full_name()
-            message_title = "Worker: " + worker_name + " changed task: " + task.title
+            editor_name = editor.full_name()
+            message_title = "Worker: " + editor_name + " changed Task: " + task.title + ". Project: " + task.project.project_name
             message_context = "<h5 class='success-color p-1 text-center'>Old description</h5>" + task.description + "<h5 class='success-color p-1 text-center'>New description</h5>" + request.POST['description']
-            message_to_worker = Message.objects.create(receiver=worker, title=message_title, message=message_context)
+            message_to_editor = Message.objects.create(receiver=editor, title=message_title, message=message_context)
+            message_to_worker = Message.objects.create(receiver=task.worker, title=message_title, message=message_context)
             message_to_author = Message.objects.create(receiver=author, title=message_title, message=message_context)
             task.description = request.POST['description']
             task.save()
-            timelog = TimeLog.objects.create(task=task, worker=worker, action="change task description", comment=None)
+            timelog = TimeLog.objects.create(task=task, worker=editor, action="change task description", comment=None)
             return JsonResponse({"success":True}, status=200)
         else:
             return JsonResponse({"success":False}, status=200)
@@ -493,6 +497,8 @@ def completed_task(request):
     if request.method == "POST" and request.is_ajax:
         task_key = request.POST['task']
         task = get_object_or_404(Task, id=task_key)
+        if task.is_active:
+            return JsonResponse({"success":False}, status=200)
         task.complete()
         task_html = loader.render_to_string(
             'Tracker/content.html',

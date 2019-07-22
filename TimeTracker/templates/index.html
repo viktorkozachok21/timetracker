@@ -215,7 +215,8 @@
     //user login
     $(document).on("submit", "#user-login-form", function(event) {
       event.preventDefault();
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       var self = $(this);
       var formData = new FormData(self[0]);
       $(".error").css('visibility', 'hidden');
@@ -235,9 +236,9 @@
             $(".error").css('visibility', 'visible');
             Notiflix.Notify.Warning('Something went wrong!');
           }
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
       return false;
     });
   </script>
@@ -246,7 +247,8 @@
   <script type="text/javascript">
     //show new worker form
     $(document).on("click", "#add-new-worker", function() {
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       $.ajax({
         type: 'GET',
         url: '{% url "add_worker" %}',
@@ -260,15 +262,16 @@
             autoClose: true,
             minDate: new Date('1950-1-1')
           });
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
     });
 
     //add new worker
     $(document).on("submit", "#new-worker-form", function(event) {
       event.preventDefault();
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       $(".error").css('visibility', 'hidden');
       var self = $(this);
       var formData = new FormData(self[0]);
@@ -293,15 +296,16 @@
             $(".error").css('visibility', 'visible');
             Notiflix.Notify.Warning('Something went wrong!');
           }
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
       return false;
     });
 
     //show edit worker form
     $(document).on("click", ".fas.fa-user-edit", function() {
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       $.ajax({
         type: 'GET',
         url: '{% url "change_worker" %}',
@@ -318,15 +322,16 @@
             autoClose: true,
             minDate: new Date('1950-1-1')
           });
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
     });
 
     //edit selected worker
     $(document).on("submit", "#edit-worker-form", function(event) {
       event.preventDefault();
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       $(".error").css('visibility', 'hidden');
       var self = $(this);
       var formData = new FormData(self[0]);
@@ -354,15 +359,16 @@
             $(".error").css('visibility', 'visible');
             Notiflix.Notify.Warning('Something went wrong!');
           }
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
       return false;
     });
 
     //show list of workers
     $(document).on("click", "#list-of-workers", function() {
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       $.ajax({
         type: 'GET',
         url: '{% url "get_workers" %}',
@@ -370,9 +376,9 @@
         success: function(response) {
           closeMenu();
           $("#main-block").html(response.workers_html);
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
     });
 
     //block worker
@@ -384,7 +390,6 @@
         'Do you agree with me?',
         'Yes','No',
       function(){
-        Notiflix.Loading.Circle();
       $.ajax({
         type: 'POST',
         url: "{% url 'block_worker' %}",
@@ -404,10 +409,9 @@
           }
         }
       });
-      Notiflix.Loading.Remove();
       return false;
       },
-      function(){Notiflix.Loading.Remove();}
+      function(){}
       );
     });
 
@@ -420,7 +424,6 @@
         'Do you agree with me?',
         'Yes','No',
       function(){
-        Notiflix.Loading.Circle();
       $.ajax({
         type: 'POST',
         url: "{% url 'block_worker' %}",
@@ -440,10 +443,9 @@
           }
         }
       });
-      Notiflix.Loading.Remove();
       return false;
       },
-      function(){Notiflix.Loading.Remove();}
+      function(){}
       );
     });
 
@@ -456,7 +458,6 @@
         'Do you agree with me?',
         'Yes','No',
       function(){
-        Notiflix.Loading.Circle();
       $.ajax({
         type: 'POST',
         url: "{% url 'remove_worker' %}",
@@ -471,10 +472,9 @@
           Notiflix.Notify.Success('Worker removed!');
         }
       });
-      Notiflix.Loading.Remove();
       return false;
       },
-      function(){Notiflix.Loading.Remove();}
+      function(){}
       );
     });
   </script>
@@ -484,7 +484,8 @@
   <script type="text/javascript">
     //show new project form
     $(document).on("click", "#add-new-project", function() {
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       $.ajax({
         type: 'GET',
         url: '{% url "add_project" %}',
@@ -499,15 +500,16 @@
             height: 300,
             theme: "modern"
           });
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
     });
 
     //add new project
     $(document).on("submit", "#new-project-form", function(event) {
       event.preventDefault();
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       var self = $(this);
       var formData = new FormData(self[0]);
       $(".error").css('visibility', 'hidden');
@@ -531,15 +533,16 @@
             $(".error").css('visibility', 'visible');
             Notiflix.Notify.Warning('Something went wrong!');
           }
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
       return false;
     });
 
     //show project detail
     $(document).on("click", ".project-detail", function() {
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       closeMenu();
       $.ajax({
         type: 'GET',
@@ -549,14 +552,15 @@
         },
         success: function(response) {
           $("#main-block").html(response.project_html);
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
     });
 
     //show edit project form
     $(document).on("click", ".fas.fa-edit", function() {
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       $.ajax({
         type: 'GET',
         url: '{% url "change_project" %}',
@@ -573,15 +577,16 @@
             height: 300,
             theme: "modern"
           });
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
     });
 
     //edit selected project
     $(document).on("submit", "#edit-project-form", function(event) {
       event.preventDefault();
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       $(".error").css('visibility', 'hidden');
       var self = $(this);
       var formData = new FormData(self[0]);
@@ -609,9 +614,9 @@
             $(".error").css('visibility', 'visible');
             Notiflix.Notify.Warning('Something went wrong!');
           }
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
       return false;
     });
 
@@ -623,7 +628,6 @@
         'Do you agree with me?',
         'Yes','No',
       function(){
-        Notiflix.Loading.Circle();
       $.ajax({
         type: 'POST',
         url: "{% url 'complet_project' %}",
@@ -632,17 +636,20 @@
           'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
         },
         success: function(response) {
+          if(response['success']) {
           project.fadeOut(function() {
             $("#main-block").append(response.project_block).fadeIn();
             project.remove();
           });
           Notiflix.Notify.Success('Success!');
+        }else {
+          Notiflix.Notify.Failure('The project have active task!');
+        }
         }
       });
-      Notiflix.Loading.Remove();
       return false;
       },
-      function(){Notiflix.Loading.Remove();}
+      function(){}
       );
     });
 
@@ -654,7 +661,6 @@
         'Do you agree with me?',
         'Yes','No',
       function(){
-        Notiflix.Loading.Circle();
       $.ajax({
         type: 'POST',
         url: "{% url 'open_project' %}",
@@ -670,10 +676,9 @@
           Notiflix.Notify.Success('Success!');
         }
       });
-      Notiflix.Loading.Remove();
       return false;
       },
-      function(){Notiflix.Loading.Remove();}
+      function(){}
       );
     });
 
@@ -685,7 +690,6 @@
         'Do you agree with me?',
         'Yes','No',
       function(){
-        Notiflix.Loading.Circle();
       $.ajax({
         type: 'POST',
         url: "{% url 'remove_project' %}",
@@ -700,10 +704,9 @@
           Notiflix.Notify.Success('Success!');
         }
       });
-      Notiflix.Loading.Remove();
       return false;
       },
-      function(){Notiflix.Loading.Remove();}
+      function(){}
       );
     });
   </script>
@@ -713,7 +716,8 @@
   <script type="text/javascript">
     //show new task form
     $(document).on("click", ".fas.fa-plus-circle", function() {
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       $.ajax({
         type: 'GET',
         url: '{% url "add_task" %}',
@@ -744,15 +748,16 @@
             autoClose: true,
             maxDate: new Date('2050-1-1')
           });
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
     });
 
     //add new task
     $(document).on("submit", "#new-task-form", function(event) {
       event.preventDefault();
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       $(".error").css('visibility', 'hidden');
       var time = $("#id_estimated_time").val();
       if (time.length < 8) {
@@ -780,15 +785,16 @@
               $(".error").css('visibility', 'visible');
               Notiflix.Notify.Warning('Something went wrong!');
             }
+            load.Remove();
           }
         });
-        Notiflix.Loading.Remove();
         return false;
     });
 
     //show edit task form
     $(document).on("click", ".far.fa-edit", function() {
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       $.ajax({
         type: 'GET',
         url: '{% url "change_task" %}',
@@ -819,15 +825,16 @@
             autoClose: true,
             maxDate: new Date('2050-1-1')
           });
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
     });
 
     //edit selected task
     $(document).on("submit", "#edit-task-form", function(event) {
       event.preventDefault();
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       var time = $("#id_estimated_time").val();
       if (time.length < 8) {
         $(".error").html("Invalid estimated time! Please enter the time in format: 00:00:00!");
@@ -856,9 +863,9 @@
               $(".error").css('visibility', 'visible');
               Notiflix.Notify.Warning('Something went wrong!');
             }
+            load.Remove();
           }
         });
-        Notiflix.Loading.Remove();
         return false;
     });
 
@@ -870,7 +877,6 @@
         'Do you agree with me?',
         'Yes','No',
       function(){
-        Notiflix.Loading.Circle();
       var content = "#content" + parent;
       $.ajax({
         type: 'POST',
@@ -889,10 +895,9 @@
         }
         }
       });
-      Notiflix.Loading.Remove();
       return false;
       },
-      function(){Notiflix.Loading.Remove();}
+      function(){}
       );
     });
 
@@ -905,7 +910,6 @@
         'Do you agree with me?',
         'Yes','No',
       function(){
-        Notiflix.Loading.Circle();
       $.ajax({
         type: 'POST',
         url: "{% url 'start_task' %}",
@@ -920,10 +924,9 @@
           Notiflix.Notify.Success('You started to work!');
         }
       });
-      Notiflix.Loading.Remove();
       return false;
       },
-      function(){Notiflix.Loading.Remove();}
+      function(){}
       );
     });
 
@@ -936,7 +939,6 @@
         'Do you agree with me?',
         'Yes','No',
       function(){
-        Notiflix.Loading.Circle();
       $.ajax({
         type: 'POST',
         url: "{% url 'end_task' %}",
@@ -956,10 +958,9 @@
           Notiflix.Notify.Success('You finished to work!');
         }
       });
-      Notiflix.Loading.Remove();
       return false;
       },
-      function(){Notiflix.Loading.Remove();}
+      function(){}
       );
     });
 
@@ -972,7 +973,6 @@
         'Do you agree with me?',
         'Yes','No',
       function(){
-        Notiflix.Loading.Circle();
       $.ajax({
         type: 'POST',
         url: "{% url 'completed_task' %}",
@@ -981,6 +981,7 @@
           'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()
         },
         success: function(response) {
+          if(response['success']) {
           var task = $("#" + parent);
           var block = $("#main-block").find("#task-content");
           if (block.length > 0) {
@@ -994,12 +995,14 @@
             });
           }
           Notiflix.Notify.Success('Success!');
+        }else {
+          Notiflix.Notify.Failure('The task is active!');
+        }
         }
       });
-      Notiflix.Loading.Remove();
       return false;
       },
-      function(){Notiflix.Loading.Remove();}
+      function(){}
       );
     });
 
@@ -1012,7 +1015,6 @@
         'Do you agree with me?',
         'Yes','No',
       function(){
-        Notiflix.Loading.Circle();
       $.ajax({
         type: 'POST',
         url: "{% url 'open_task' %}",
@@ -1029,16 +1031,16 @@
           Notiflix.Notify.Success('Success!');
         }
       });
-      Notiflix.Loading.Remove();
       return false;
       },
-      function(){Notiflix.Loading.Remove();}
+      function(){}
       );
     });
 
     //get list of active tasks
     $(document).on("click", "#list-of-tasks", function() {
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       closeMenu();
       $.ajax({
         type: 'GET',
@@ -1050,9 +1052,9 @@
           } else {
             $("#main-block").html("<h5>No active tasks</h5>");
           }
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
     });
 
     //remove task
@@ -1064,7 +1066,6 @@
         'Do you agree with me?',
         'Yes','No',
       function(){
-        Notiflix.Loading.Circle();
       $.ajax({
         type: 'POST',
         url: "{% url 'remove_task' %}",
@@ -1080,10 +1081,9 @@
           Notiflix.Notify.Success('Success!');
         }
       });
-      Notiflix.Loading.Remove();
       return false;
       },
-      function(){Notiflix.Loading.Remove();}
+      function(){}
       );
     });
   </script>
@@ -1100,7 +1100,6 @@
     //add new comment
     $(document).on("submit", "#comment-form", function(event) {
       event.preventDefault();
-      Notiflix.Loading.Circle();
       $.ajax({
         type: 'POST',
         url: "{% url 'add_comment' %}",
@@ -1115,15 +1114,14 @@
           var comments = "#more" + $('#hide').attr("alt");
           $(comments).html(response.comments_html);
           $("#comment-form")[0].reset();
+          Notiflix.Notify.Success('Success!');
         }
       });
-      Notiflix.Loading.Remove();
       return false;
     });
 
     //show all comments for task
     $(document).on("click", ".fas.fa-sync", function() {
-      Notiflix.Loading.Circle();
       var parent = $(this).parent().parent().parent().attr("id");
       $.ajax({
         type: 'GET',
@@ -1140,7 +1138,6 @@
           }
         }
       });
-      Notiflix.Loading.Remove();
     });
   </script>
   <!-- end comment ajax -->
@@ -1149,7 +1146,8 @@
   <script type="text/javascript">
     //get timelogs for task
     $(document).on("click", ".fas.fa-user-clock", function() {
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       var parent = $(this).parent().parent().parent().parent().parent().attr("id");
       $.ajax({
         type: 'GET',
@@ -1164,14 +1162,15 @@
             $("#time-logs").html("<h5>No time logs</h5>");
           }
           $('#timeLogForm').modal('show');
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
     });
 
     //show all time logs
     $(document).on("click", ".show-timelogs", function() {
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       $.ajax({
         type: 'GET',
         url: '{% url "show_time_logs" %}',
@@ -1187,14 +1186,15 @@
           } else {
             $("#main-block").html("<h5>No time logs</h5>");
           }
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
     });
 
     //show worker time logs
     $(document).on("click", ".my-timelogs", function() {
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       $.ajax({
         type: 'GET',
         url: '{% url "show_time_logs" %}',
@@ -1212,9 +1212,9 @@
           } else {
             $("#main-block").html("<h5>No time logs</h5>");
           }
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
     });
 
     //log to trash
@@ -1225,7 +1225,6 @@
         'Do you agree with me?',
         'Yes','No',
       function(){
-        Notiflix.Loading.Circle();
       $.ajax({
         type: 'POST',
         url: "{% url 'remove_time_log' %}",
@@ -1241,10 +1240,9 @@
           Notiflix.Notify.Success('Success!');
         }
       });
-      Notiflix.Loading.Remove();
       return false;
       },
-      function(){Notiflix.Loading.Remove();}
+      function(){}
       );
     });
   </script>
@@ -1254,7 +1252,8 @@
   <script type="text/javascript">
     //get messages for worker
     $(document).on("click", "#account", function() {
-      Notiflix.Loading.Circle();
+      var load = Notiflix.Loading;
+      load.Circle();
       $.ajax({
         type: 'GET',
         url: '{% url "get_messages" %}',
@@ -1268,14 +1267,13 @@
             $("#messages-box").html("<h5>No messages<h5>");
           }
           $("#userViewForm").modal("show");
+          load.Remove();
         }
       });
-      Notiflix.Loading.Remove();
     });
 
     //show selected message
     $(document).on("click", ".show-message", function() {
-      Notiflix.Loading.Circle();
       $.ajax({
         type: 'GET',
         url: '{% url "show_message" %}',
@@ -1289,7 +1287,6 @@
           $("#userViewForm").modal('hide');
         }
       });
-      Notiflix.Loading.Remove();
     });
 
     //message to trash
@@ -1300,7 +1297,6 @@
         'Do you agree with me?',
         'Yes','No',
       function(){
-        Notiflix.Loading.Circle();
       $.ajax({
         type: 'POST',
         url: '{% url "remove_message" %}',
@@ -1317,10 +1313,9 @@
           Notiflix.Notify.Success('Success!');
         }
       });
-      Notiflix.Loading.Remove();
       return false;
       },
-      function(){Notiflix.Loading.Remove();}
+      function(){}
       );
     });
   </script>
